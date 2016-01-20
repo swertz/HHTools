@@ -1,0 +1,28 @@
+import os, sys
+from trainMVA import *
+
+inFileDir = "/home/fynu/bfrancois/scratch/framework/oct2015/CMSSW_7_4_15/src/cp3_llbb/CommonTools/treeFactory/allFlavour_trigger_btagLL/condor/output/"
+outFileDir = inFileDir + "/withMVAout_test/"
+
+filesForMerging  = [file for file in os.listdir(inFileDir) if "_histos.root" in file and ("WJetsToLNu" in file or "M-650" in file or "M-400" in file or "M-900" in file or "DY" in file or "Run2015D" in file or "TTTo2L2Nu" in file or "VVTo2L2Nu" in file or "ST_tW" in file)]
+xmlFileDir = "/home/fynu/bfrancois/scratch/framework/oct2015/CMSSW_7_4_15/src/cp3_llbb/CommonTools/mvaTraining/HHAnalysis/weights/"
+
+massToMerge = ["400", "650", "900"]
+spinToMerge = ["0"]
+list_dict_xmlFile_label = []
+for massPoint in massToMerge :
+    for spin in spinToMerge :
+        tempdict = {}
+        label = "tests_BDT_X%s_%s_vsTT_9var_MTnoMjj_cleanCut_PTll_allFlavour"%(spin, massPoint)
+        tempdict["label"] = label
+        tempdict["discriList"] = discriList
+        tempdict["spectatorList"] = spectatorList
+        tempdict["xmlFile"] = xmlFileDir+label+"_"+label+".weights.xml"
+        list_dict_xmlFile_label.append(tempdict)
+    
+if not os.path.isdir(outFileDir):
+    os.system("mkdir "+outFileDir)
+print outFileDir
+
+for file in filesForMerging :
+    MVA_out_in_tree(inFileDir, file, outFileDir, list_dict_xmlFile_label)
