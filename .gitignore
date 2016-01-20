@@ -1,0 +1,6 @@
+*.root
+*.d
+*.o
+*.pcm
+*.exe
+*.pyc
