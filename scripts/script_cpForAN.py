@@ -30,6 +30,7 @@ listPlot_afterMllCut_withBtag = [
         ]
 
 listPlot_afterCleanCut_withBtag = [
+        "ll_M_lepIso_TT_lepID_TT_jetID_LL_btag_MM_csvOrdered.pdf",
         "ll_DR_l_l_lepIso_TT_lepID_TT_jetID_LL_btag_MM_csvOrdered.pdf",
         "jj_DR_j_j_lepIso_TT_lepID_TT_jetID_LL_btag_MM_csvOrdered.pdf",
         "llmetjj_DPhi_ll_jj_lepIso_TT_lepID_TT_jetID_LL_btag_MM_csvOrdered.pdf",
@@ -75,9 +76,5 @@ for plot in listPlot_rocCurve :
     os.system(command)
 
 os.system("scp -r %s %s"%(targetDirRocCurve, finalTarget))
-
-
-
-
 
 
