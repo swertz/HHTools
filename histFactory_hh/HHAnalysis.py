@@ -6,8 +6,8 @@ import ROOT as R
 pathCMS = os.getenv("CMSSW_BASE")
 if pathCMS == "":
     raise Exception("CMS environment is not valid!")
-pathTT = os.path.join(pathCMS, "src/cp3_llbb/HHAnalysis/")
-pathTTdefs = os.path.join(pathTT, "plugins/Indices.cc")
+pathHH = os.path.join(pathCMS, "src/cp3_llbb/HHAnalysis/")
+pathHHdefs = os.path.join(pathHH, "plugins/Indices.cc")
 
-R.gROOT.ProcessLine(".L " + pathTTdefs + "+")
+R.gROOT.ProcessLine(".L " + pathHHdefs + "+")
 HH =  R.HHAnalysis
