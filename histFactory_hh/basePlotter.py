@@ -504,6 +504,12 @@ class BasePlotter:
                     'binning': '(500, -10000, 10000)'
                 },
                 {
+                    'name':  'total_weight_%s_lepIso_%s_lepID_%s_jetID_%s_btag_%s%s'%(self.llFlav, self.llIsoCat, self.llIDCat, self.jjIDCat, self.jjBtagCat, self.suffix),
+                    'variable': "event_weight * event_pu_weight * {0} * {1} * ".format(get_csvv2_sf(self.btagWP1, self.jet1_fwkIdx), get_csvv2_sf(self.btagWP2, self.jet2_fwkIdx)) + get_leptons_SF(self.ll_str, self.lepid1, self.lepid2, self.lepiso1, self.lepiso2, "nominal"),
+                    'plot_cut': self.totalCut,
+                    'binning': '(5, -2, 2)'
+                },
+                {
                     'name':  'event_pu_weight_%s_lepIso_%s_lepID_%s_jetID_%s_btag_%s%s'%(self.llFlav, self.llIsoCat, self.llIDCat, self.jjIDCat, self.jjBtagCat, self.suffix),
                     'variable': "event_pu_weight",
                     'plot_cut': self.totalCut,
