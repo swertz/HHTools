@@ -1,5 +1,6 @@
 import os, sys
 from trainMVA import *
+from multiprocessing import Pool
 
 inFileDir = "/home/fynu/bfrancois/scratch/framework/oct2015/CMSSW_7_4_15/src/cp3_llbb/CommonTools/treeFactory/allFlavour_trigger_btagLL/condor/output/"
 outFileDir = inFileDir + "/withMVAout_test/"
@@ -24,5 +25,10 @@ if not os.path.isdir(outFileDir):
     os.system("mkdir "+outFileDir)
 print outFileDir
 
+pool = Pool(15)
+parametersForPool = []
 for file in filesForMerging :
-    MVA_out_in_tree(inFileDir, file, outFileDir, list_dict_xmlFile_label)
+    parametersForPool.append([inFileDir, file, outFileDir, list_dict_xmlFile_label])
+pool.map(MVA_out_in_tree, parametersForPool)
+pool.close()
+pool.join()
