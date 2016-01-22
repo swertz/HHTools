@@ -2,14 +2,15 @@ import os, sys
 from trainMVA import *
 from multiprocessing import Pool
 
-inFileDir = "/home/fynu/bfrancois/scratch/framework/oct2015/CMSSW_7_4_15/src/cp3_llbb/CommonTools/treeFactory/allFlavour_trigger_btagLL/condor/output/"
-outFileDir = inFileDir + "/withMVAout_test/"
+#inFileDir = "/home/fynu/bfrancois/scratch/framework/oct2015/CMSSW_7_4_15/src/cp3_llbb/CommonTools/treeFactory/allFlavour_trigger_btagMM/condor/output/"
+inFileDir = "/home/fynu/bfrancois/scratch/framework/oct2015/CMSSW_7_4_15/src/cp3_llbb/CommonTools/treeFactory/allFlavour_trigger_btagMM_2016_01_14/condor/output/withMVAoutCorrect/"
+outFileDir = inFileDir + "/withMVAout_DYevtSum/"
 
 filesForMerging  = [file for file in os.listdir(inFileDir) if "_histos.root" in file and ("WJetsToLNu" in file or "M-650" in file or "M-400" in file or "M-900" in file or "DY" in file or "Run2015D" in file or "TTTo2L2Nu" in file or "VVTo2L2Nu" in file or "ST_tW" in file)]
 xmlFileDir = "/home/fynu/bfrancois/scratch/framework/oct2015/CMSSW_7_4_15/src/cp3_llbb/CommonTools/mvaTraining/HHAnalysis/weights/"
 
 massToMerge = ["400", "650", "900"]
-spinToMerge = ["0"]
+spinToMerge = ["0", "2"]
 list_dict_xmlFile_label = []
 for massPoint in massToMerge :
     for spin in spinToMerge :
