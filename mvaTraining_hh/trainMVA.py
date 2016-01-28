@@ -17,8 +17,8 @@ def get_sample(name):
     return resultset.one()
 
 
-date = "2016_01_17"
-suffix = "dummy" #"VS_TT09_DY01_WoverSum_8var_bTagMM"
+date = "2016_01_28"
+suffix = "VS_TT09_DY01_WoverSum_8var_bTagMM"
 label_template = "DATE_BDT_XSPIN_MASS_SUFFIX"
 
 massPoints = ['400', '650', '900']
@@ -55,11 +55,10 @@ discriList = [
         #"llmetjj_projMET",
         "llmetjj_MTformula"
         ]
+spectatorList = []
 cut = "(91.1876 - ll_M) > 15 && ll_DR_l_l < 2.2 && jj_DR_j_j < 3.1 && llmetjj_DPhi_ll_jj > 1.5"
 MVAmethods = ["kBDT"]
 weightExpr = "event_weight*ll_scaleFactor*jj_scaleFactor"
-
-spectatorList = ['lep1_pt', 'lep1_eta', 'lep1_phi', 'lep1_Iso', 'lep2_pt', 'lep2_eta', 'lep2_phi', 'lep2_Iso', 'jet1_pt', 'jet1_eta', 'jet1_phi', 'jet1_JP', 'jet1_CSV', 'jet2_pt', 'jet2_eta', 'jet2_phi', 'jet2_JP', 'jet2_CSV', 'met_pt', 'met_phi', 'll_DPhi_l_l', 'jj_M', 'jj_DPhi_j_j', 'llmetjj_n', 'llmetjj_pt', 'llmetjj_M', 'llmetjj_DPhi_ll_met', 'llmetjj_minDPhi_l_met', 'llmetjj_maxDPhi_l_met', 'llmetjj_MT', 'llmetjj_DPhi_jj_met', 'llmetjj_minDPhi_j_met', 'llmetjj_maxDPhi_j_met', 'llmetjj_maxDR_l_j', 'llmetjj_DR_ll_jj', 'llmetjj_DR_llmet_jj', 'llmetjj_DPhi_llmet_jj', 'llmetjj_cosThetaStar_CS', 'lljj_pt', 'lljj_M', 'nLep', 'nLepAll', 'nElAll', 'nMuAll', 'nJet', 'nJetAll', 'nBJetLooseCSV', 'event_weight', 'isElEl', 'isMuMu', 'isElMu', 'isMuEl']
 
 if __name__ == '__main__':
     for mass in massPoints :
@@ -86,7 +85,4 @@ if __name__ == '__main__':
             label = "2016_01_17_BDT_X%s_%s_VS_TT09_DY01_8var_bTagMM"%(spin, mass)
             print bkgFiles, sigFiles
             trainMVA(bkgFiles, sigFiles, discriList, cut, weightExpr, MVAmethods, spectatorList, label)
-
-
-
 
