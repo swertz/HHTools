@@ -4,6 +4,7 @@
 #include <map>
 #include <TMVA/Reader.h>
 
+// Does not support spectator variables yet
 float evaluateMVA(const std::string & xmlPath, const std::vector<std::pair<std::string, float>> & variables) {
     static std::map<std::string, std::shared_ptr<TMVA::Reader>> readers;
     static std::map<std::string, std::vector<float>> local_variables;
