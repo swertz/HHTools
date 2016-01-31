@@ -5,8 +5,8 @@ from basePlotter import *
  
 basePlotter = BasePlotter() 
 flavour = "MuMu" # no importance, the cut will be redefined, this is just to generate the plots structure
-basePlotter.WP = ["T","T","T","T","L","L","M","M","csv"]
-basePlotter.generatePlots([flavour]) 
+#basePlotter.WP = ["T","T","T","T","L","L","M","M","csv"]
+basePlotter.generatePlots({flavour:"dummy"}) 
 plotFamilies = ["plots_lep", "plots_jet", "plots_met", "plots_ll", "plots_jj", "plots_llmetjj","plots_evt"]
 plots = []
 #cut = "1"
@@ -22,10 +22,10 @@ for plotFamily in plotFamilies :
         plots.append(plot)
         print plot
 # Now define the plots which are only there after the skimming (e.g. BDT output)
-date = "2016_01_17"
+date = "2016_01_28"
 spins = ["0", "2"]
 masses = ["400", "650", "900"]
-suffixs = ["VS_TT09_DY01_8var_bTagMM", "VS_TT1_DY0_8var_bTagMM"]
+suffixs = ["VS_TT_DY_WoverSum_7var_noMT_bTagMM", "VS_TT_DY_WoverSum_8var_bTagMM"]#["VS_TT09_DY01_8var_bTagMM", "VS_TT1_DY0_8var_bTagMM"]
 bdtTemplate = "MVA_DATE_BDT_XSPIN_MASS_SUFFIX"
 afterSkim_Plots = []
 for spin in spins : 
