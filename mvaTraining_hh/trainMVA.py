@@ -18,7 +18,7 @@ def get_sample(name):
 
 
 date = "2016_01_28"
-suffix = "VS_TT09_DY01_WoverSum_8var_bTagMM"
+suffix = "VS_TT_DY_WoverSum_8var_bTagMM"
 label_template = "DATE_BDT_XSPIN_MASS_SUFFIX"
 
 massPoints = ['400', '650', '900']
@@ -82,7 +82,6 @@ if __name__ == '__main__':
             else : 
                 print "Spin choice has to be '0' or '2'."
             label = label_template.replace("DATE", date).replace("SPIN", spin).replace("MASS", mass).replace("SUFFIX", suffix)
-            label = "2016_01_17_BDT_X%s_%s_VS_TT09_DY01_8var_bTagMM"%(spin, mass)
             print bkgFiles, sigFiles
             trainMVA(bkgFiles, sigFiles, discriList, cut, weightExpr, MVAmethods, spectatorList, label)
 
