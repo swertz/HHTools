@@ -57,6 +57,7 @@ class BasePlotter:
         self.jj_str = "%s.jj_p4"%self.baseObject
 
         if objects != "nominal" :
+            baseObjectName = baseObjectName.replace("hh_", "hh_"+objects+"_")
             self.lep1_str = self.lep1_str.replace("hh_", "hh_"+objects+"_")
             self.lep2_str = self.lep2_str.replace("hh_", "hh_"+objects+"_")
             self.jet1_str = self.jet1_str.replace("hh_", "hh_"+objects+"_")
@@ -72,7 +73,7 @@ class BasePlotter:
         self.jet2_fwkIdx = self.jet2_str+".idx"
 
         if mode == "custom" :
-            self.sanityCheck = "Length$(%s)>0"%self.baseObject
+            self.sanityCheck = "Length$(%s)>0"%baseObjectName
 
     def generatePlots(self, categories = ["All"], stage = "cleaning_cut", requested_plots = [], weights = ['trigeff', 'jjbtag', 'llidiso', 'pu'], extraCut = "", systematic = "nominal"):
 
@@ -176,7 +177,7 @@ class BasePlotter:
             jjBtag_strCommon="DOWN"
         # propagate jecup etc to the framework objects
         sys_fwk = ""
-        if "jec" in systematic or "jes" in systematic : 
+        if "jec" in systematic or "jer" in systematic : 
             sys_fwk = "_" + systematic
         jjBtag_sf = "(common::combineScaleFactors<2>({{{{{{ jet{0}_sf_csvv2_{1}[{2}][0] , jet{0}_sf_csvv2_{1}[{2}]{3} }}, {{ jet{0}_sf_csvv2_{1}[{4}][0] , jet{0}_sf_csvv2_{1}[{4}]{3} }}}}}}, {{{{1, 0}}, {{0, 1}}}}, common::Variation::{5}) )".format(sys_fwk, self.btagWP_str, self.jet1_fwkIdx, jjBtag_sfIdx, self.jet2_fwkIdx, jjBtag_strCommon)
 
