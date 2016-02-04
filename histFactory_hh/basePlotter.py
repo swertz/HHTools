@@ -42,7 +42,6 @@ class BasePlotter:
 
         elif mode == "custom" :
             self.baseObject = baseObjectName+"[0]"
-            self.sanityCheck = "Length$(%s)>0"%baseObjectName
             self.suffix = baseObjectName
             self.btagWP_str = btagWP_str
 
@@ -57,12 +56,6 @@ class BasePlotter:
         self.ll_str = "%s.ll_p4"%self.baseObject 
         self.jj_str = "%s.jj_p4"%self.baseObject
 
-        # needed to plot iso variables
-        self.lep1_fwkIdx = self.lep1_str+".idx"
-        self.lep2_fwkIdx = self.lep2_str+".idx"
-        self.jet1_fwkIdx = self.jet1_str+".idx"
-        self.jet2_fwkIdx = self.jet2_str+".idx"
-
         if objects != "nominal" :
             self.lep1_str = self.lep1_str.replace("hh_", "hh_"+objects+"_")
             self.lep2_str = self.lep2_str.replace("hh_", "hh_"+objects+"_")
@@ -71,6 +64,15 @@ class BasePlotter:
             self.ll_str = self.ll_str.replace("hh_", "hh_"+objects+"_")
             self.jj_str = self.jj_str.replace("hh_", "hh_"+objects+"_")
             self.baseObject = self.baseObject.replace("hh_", "hh_"+objects+"_")
+
+        # needed to get scale factors (needs to be after the object modification due to systematics)
+        self.lep1_fwkIdx = self.lep1_str+".idx"
+        self.lep2_fwkIdx = self.lep2_str+".idx"
+        self.jet1_fwkIdx = self.jet1_str+".idx"
+        self.jet2_fwkIdx = self.jet2_str+".idx"
+
+        if mode == "custom" :
+            self.sanityCheck = "Length$(%s)>0"%baseObjectName
 
     def generatePlots(self, categories = ["All"], stage = "cleaning_cut", requested_plots = [], weights = ['trigeff', 'jjbtag', 'llidiso', 'pu'], extraCut = "", systematic = "nominal"):
 
