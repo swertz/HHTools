@@ -174,7 +174,11 @@ class BasePlotter:
         if systematic == "jjbtagdown":
             jjBtag_sfIdx = "[1]"
             jjBtag_strCommon="DOWN"
-        jjBtag_sf = "(common::combineScaleFactors<2>({{{{{{ jet_sf_csvv2_{0}[{1}][0] , jet_sf_csvv2_{0}[{1}]{2} }}, {{ jet_sf_csvv2_{0}[{3}][0] , jet_sf_csvv2_{0}[{3}]{2} }}}}}}, {{{{1, 0}}, {{0, 1}}}}, common::Variation::{4}) )".format(self.btagWP_str, self.jet1_fwkIdx, jjBtag_sfIdx, self.jet2_fwkIdx, jjBtag_strCommon)
+        # propagate jecup etc to the framework objects
+        sys_fwk = ""
+        if "jec" in systematic or "jes" in systematic : 
+            sys_fwk = "_" + systematic
+        jjBtag_sf = "(common::combineScaleFactors<2>({{{{{{ jet{0}_sf_csvv2_{1}[{2}][0] , jet{0}_sf_csvv2_{1}[{2}]{3} }}, {{ jet{0}_sf_csvv2_{1}[{4}][0] , jet{0}_sf_csvv2_{1}[{4}]{3} }}}}}}, {{{{1, 0}}, {{0, 1}}}}, common::Variation::{5}) )".format(sys_fwk, self.btagWP_str, self.jet1_fwkIdx, jjBtag_sfIdx, self.jet2_fwkIdx, jjBtag_strCommon)
 
         # PU WEIGHT
         puWeight = "event_pu_weight"
