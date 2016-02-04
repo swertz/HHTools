@@ -1,0 +1,226 @@
+## QCD and W+jets
+#
+#'QCD_Pt-20toInf_MuEnrichedPt15_TuneCUETP8M1_13TeV_pythia8_MiniAODv2_v2.0.3+7415_HHAnalysis_2016-01-30.v2_histos.root':
+#  type: mc
+#  group: Other
+#  order: 0
+#
+#'QCD_Pt-15to20_EMEnriched_TuneCUETP8M1_13TeV_pythia8_MiniAODv2_v2.0.3+7415_HHAnalysis_2016-01-30.v2_histos.root':
+#  type: mc
+#  group: Other
+#  order: 0
+#
+#'QCD_Pt-20to30_EMEnriched_TuneCUETP8M1_13TeV_pythia8_MiniAODv2_v2.0.3+7415_HHAnalysis_2016-01-30.v2_histos.root':
+#  type: mc
+#  group: Other
+#  order: 0
+#
+#'QCD_Pt-30to50_EMEnriched_TuneCUETP8M1_13TeV_pythia8_MiniAODv2_v2.0.3+7415_HHAnalysis_2016-01-30.v2_histos.root':
+#  type: mc
+#  group: Other
+#  order: 0
+#
+#'QCD_Pt-50to80_EMEnriched_TuneCUETP8M1_13TeV_pythia8_MiniAODv2_v2.0.3+7415_HHAnalysis_2016-01-30.v2_histos.root':
+#  type: mc
+#  group: Other
+#  order: 0
+#
+#'QCD_Pt-80to120_EMEnriched_TuneCUETP8M1_13TeV_pythia8_MiniAODv2_v2.0.3+7415_HHAnalysis_2016-01-30.v2_histos.root':
+#  type: mc
+#  group: Other
+#  order: 0
+#
+#'QCD_Pt-120to170_EMEnriched_TuneCUETP8M1_13TeV_pythia8_MiniAODv2_v2.0.3+7415_HHAnalysis_2016-01-30.v2_histos.root':
+#  type: mc
+#  group: Other
+#  order: 0
+#
+#'QCD_Pt-170to300_EMEnriched_TuneCUETP8M1_13TeV_pythia8_MiniAODv2_v2.0.3+7415_HHAnalysis_2016-01-30.v2_histos.root':
+#  type: mc
+#  group: Other
+#  order: 0
+#
+##'QCD_Pt-300toInf_EMEnriched_TuneCUETP8M1_13TeV_pythia8_MiniAODv2_v2.0.3+7415_HHAnalysis_2016-01-30.v2_histos.root':
+##  type: mc
+##  group: Other
+##  order: 0
+#
+#'WJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_MiniAODv2_v2.0.3+7415_HHAnalysis_2016-01-30.v2_histos.root':
+#  type: mc
+#  group: Other
+#  order: 0
+#
+## HIGGS
+#
+#'VBFHToWWTo2L2Nu_M125_13TeV_powheg_JHUgen_pythia8_MiniAODv2_v2.0.3+7415_HHAnalysis_2016-01-30.v2_histos.root':
+#  type: mc
+#  group: Higgs
+#  order: 1
+#
+#'GluGluHToWWTo2L2Nu_M125_13TeV_powheg_JHUgen_pythia8_MiniAODv2_v2.0.3+7415_HHAnalysis_2016-01-30.v2_histos.root':
+#  type: mc
+#  group: Higgs
+#  order: 1
+#
+#'HWminusJ_HToWW_M125_13TeV_powheg_pythia8_MiniAODv2_v2.0.3+7415_HHAnalysis_2016-01-30.v2_histos.root':
+#  type: mc
+#  group: Higgs
+#  order: 1
+#
+#'HWplusJ_HToWW_M125_13TeV_powheg_pythia8_MiniAODv2_v2.0.3+7415_HHAnalysis_2016-01-30.v2_histos.root':
+#  type: mc
+#  group: Higgs
+#  order: 1
+#
+#'HZJ_HToWW_M125_13TeV_powheg_pythia8_MiniAODv2_v2.0.3+7415_HHAnalysis_2016-01-30.v2_histos.root':
+#  type: mc
+#  group: Higgs
+#  order: 1
+#
+## TTV 
+#
+#'TTWJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-madspin-pythia8_MiniAODv2_v2.0.3+7415_HHAnalysis_2016-01-30.v2_histos.root':
+#  type: mc
+#  group: ttV
+#  order: 2
+#
+#'TTWJetsToQQ_TuneCUETP8M1_13TeV-amcatnloFXFX-madspin-pythia8_MiniAODv2_v2.0.3+7415_HHAnalysis_2016-01-30.v2_histos.root':
+#  type: mc
+#  group: ttV
+#  order: 2
+#
+#'TTZToLLNuNu_M-10_TuneCUETP8M1_13TeV-amcatnlo-pythia8_25ns_v2.0.3+7415_HHAnalysis_2016-01-30.v2_histos.root':
+#  type: mc
+#  group: ttV
+#  order: 2
+#
+#'TTZToQQ_TuneCUETP8M1_13TeV-amcatnlo-pythia8_MiniAODv2_v2.0.3+7415_HHAnalysis_2016-01-30.v2_histos.root':
+#  type: mc
+#  group: ttV
+#  order: 2
+#
+## VV
+#
+#'VVTo2L2Nu_13TeV_amcatnloFXFX_madspin_pythia8_MiniAODv2_v2.0.3+7415_HHAnalysis_2016-01-30.v2_histos.root':
+#  type: mc
+#  fill-color: '#ECD078'
+#  legend: 'VV'
+#  legend-order: 3
+#  order: 3
+#
+## Single top
+#
+#'ST_s-channel_4f_leptonDecays_13TeV-amcatnlo_MiniAODv2_v2.0.3+7415_HHAnalysis_2016-01-30.v2_histos.root':
+#  type: mc
+#  group: t
+#  order: 5
+#
+#'ST_t-channel_4f_leptonDecays_13TeV-amcatnlo_MiniAODv2_v2.0.3+7415_HHAnalysis_2016-01-30.v2_histos.root':
+#  type: mc
+#  group: t
+#  order: 5
+#
+#'ST_tW_antitop_5f_inclusiveDecays_13TeV-powheg_MiniAODv2_v2.0.3+7415_HHAnalysis_2016-01-30.v2_histos.root':
+#  type: mc
+#  group: t
+#  order: 5
+#
+#'ST_tW_top_5f_inclusiveDecays_13TeV-powheg_MiniAODv2_v2.0.3+7415_HHAnalysis_2016-01-30.v2_histos.root':
+#  type: mc
+#  group: t
+#  order: 6
+#
+## TT
+#
+#'TT_TuneCUETP8M1_13TeV-powheg-pythia8_MiniAODv2_v2.0.3+7415_HHAnalysis_2016-01-30.v2_histos.root':
+#  type: mc
+#  group: tt
+#  order: 7
+#
+'TTTo2L2Nu_13TeV-powheg_MiniAODv2_v2.0.3+7415_HHAnalysis_2016-01-30.v2_histos.root':
+  type: mc
+  group: tt
+  order: 7
+#
+## DY
+#
+#'DYJetsToLL_M-10to50_TuneCUETP8M1_13TeV-amcatnloFXFX_MiniAODv2_v2.0.3+7415_HHAnalysis_2016-01-30.v2_histos.root':
+#  type: mc
+#  group: DY
+#  order: 8
+#
+#'DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX_MiniAODv2_v2.0.3+7415_HHAnalysis_2016-01-30.v2_histos.root':
+#  type: mc
+#  group: DY
+#  order: 9
+#
+## Signal
+#
+#'GluGluToRadionToHHTo2B2VTo2L2Nu_M-400_narrow_MiniAODv2_v2.0.3+7415_HHAnalysis_2016-01-30.v2_histos.root':
+#  type: signal
+#  cross-section: 03
+#  #generated-events: 300000
+#  line-color: '#008000'
+#  legend: 'X0 (400)'
+#  legend-order: 5
+#  line-width: 2
+#  line-type: 1
+#
+#'GluGluToRadionToHHTo2B2VTo2L2Nu_M-650_narrow_MiniAODv2_v2.0.3+7415_HHAnalysis_2016-01-30.v2_histos.root':
+#  type: signal
+#  cross-section: 03
+#  #generated-events: 300000
+#  line-color: '#ff0000'
+#  legend: 'X0 (650)'
+#  legend-order: 3
+#  line-width: 2
+#  line-type: 1
+#
+#'GluGluToRadionToHHTo2B2VTo2L2Nu_M-900_narrow_MiniAODv2_v2.0.3+7415_HHAnalysis_2016-01-30.v2_histos.root':
+#  type: signal
+#  cross-section: 03
+#  #generated-events: 289200.0
+#  line-color: '#000000'
+#  legend: 'X0 (900)'
+#  legend-order: 1
+#  line-width: 2
+#  line-type: 1
+#
+#'GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-400_narrow_MiniAODv2_v2.0.3+7415_HHAnalysis_2016-01-30.v2_histos.root':
+#  type: signal
+#  cross-section: 03
+#  #generated-events: 298800
+#  line-color: '#008000'
+#  legend: 'X2 (400)'
+#  legend-order: 4
+#  line-width: 2
+#  line-type: 2
+#
+#'GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-650_narrow_MiniAODv2_v2.0.3+7415_HHAnalysis_2016-01-30.v2_histos.root':
+#  type: signal
+#  cross-section: 03
+#  #generated-events: 299800.0
+#  line-color: '#ff0000'
+#  legend: 'X2 (650)'
+#  legend-order: 2
+#  line-width: 2
+#  line-type: 2
+#
+#'GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-900_narrow_MiniAODv2_v2.0.3+7415_HHAnalysis_2016-01-30.v2_histos.root':
+#  type: signal
+#  cross-section: 03
+#  #generated-events: 289200.0
+#  line-color: '#000000'
+#  legend: 'X2 (900)'
+#  legend-order: 0
+#  line-width: 2
+#  line-type: 2
+'GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-500_narrow_MiniAODv2_v2.0.1+7415_HHAnalysis_2016-01-30.v1_histos.root':
+  type: signal
+  cross-section: 03
+  #generated-events: 289200.0
+  line-color: '#000000'
+  legend: 'X2 (500)'
+  legend-order: 0
+  line-width: 2
+  line-type: 2
