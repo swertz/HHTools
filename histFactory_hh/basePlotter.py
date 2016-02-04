@@ -72,7 +72,7 @@ class BasePlotter:
         self.jet2_fwkIdx = self.jet2_str+".idx"
 
         if mode == "custom" :
-            self.sanityCheck = "Length$(%s)>0"%baseObjectName
+            self.sanityCheck = "Length$(%s)>0"%self.baseObject
 
     def generatePlots(self, categories = ["All"], stage = "cleaning_cut", requested_plots = [], weights = ['trigeff', 'jjbtag', 'llidiso', 'pu'], extraCut = "", systematic = "nominal"):
 
