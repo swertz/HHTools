@@ -1,0 +1,30 @@
+width: 800
+height: 800
+luminosity-label: '%lumi% fb^{-1} (13 TeV)'
+experiment: "CMS"
+extra-label: "Preliminary"
+# NTUPLE
+#root: '/home/fynu/bfrancois/scratch/framework/oct2015/CMSSW_7_4_15/src/cp3_llbb/CommonTools/histFactory/hists_MllLower80/'
+#root: '/home/fynu/bfrancois/scratch/framework/oct2015/CMSSW_7_4_15/src/cp3_llbb/CommonTools/histFactory/hists_LLLL_jetidL_csvANDhtOrdered/condor/output/'
+#root: '/home/fynu/bfrancois/scratch/framework/oct2015/CMSSW_7_4_15/src/cp3_llbb/CommonTools/histFactory/histMllmetAbove650/condor/output/'
+#root: '/home/fynu/bfrancois/scratch/framework/oct2015/CMSSW_7_4_15/src/cp3_llbb/CommonTools/histFactory/hists_TTTT_jetidL_csvOrdered/condor/output/'
+#root: '/home/fynu/bfrancois/scratch/framework/oct2015/CMSSW_7_4_15/src/cp3_llbb/CommonTools/histFactory/hists_TTTT_jetidL_combStud/condor/output/'
+#root: '/home/fynu/bfrancois/scratch/framework/oct2015/CMSSW_7_4_15/src/cp3_llbb/CommonTools/histFactory/MllZ_MjjZ/condor/output/'
+#root: '/home/fynu/bfrancois/scratch/framework/oct2015/CMSSW_7_4_15/src/cp3_llbb/CommonTools/histFactory/hists_withMVA650/'
+#root: '/home/fynu/bfrancois/scratch/framework/oct2015/CMSSW_7_4_15/src/cp3_llbb/CommonTools/histFactory/hists_withAllMVA/'
+#root: '/home/fynu/bfrancois/scratch/framework/oct2015/CMSSW_7_4_15/src/cp3_llbb/CommonTools/histFactory/hists_TTTT_jetidL_csvOrdered_2016_01_15/condor/output/'
+#root: '/home/fynu/bfrancois/scratch/framework/oct2015/CMSSW_7_4_15/src/cp3_llbb/CommonTools/histFactory/hists_TTTT_jetidL_csvOrdered_2016_01_15_puweight/condor/output/'
+root: '/home/fynu/bfrancois/scratch/framework/oct2015/CMSSW_7_4_15/src/cp3_llbb/CommonTools/histFactory/hists_TTsystematics/condor/output/'
+#root: '/home/fynu/bfrancois/scratch/framework/oct2015/CMSSW_7_4_15/src/cp3_llbb/CommonTools/histFactory/hists_TTTT_jetidL_csvOrdered_2016_01_14_noOverlapRemoval/condor/output/'
+
+# SKIM
+#root: '/home/fynu/bfrancois/scratch/framework/oct2015/CMSSW_7_4_15/src/cp3_llbb/CommonTools/histFactory/hists_skimmed_btagLL_plentyMVA_2016_01_14/'
+#root: '/home/fynu/bfrancois/scratch/framework/oct2015/CMSSW_7_4_15/src/cp3_llbb/CommonTools/histFactory/hists_skimmed_btagLL_nocut_2016_01_14/'
+#root: '/home/fynu/bfrancois/scratch/framework/oct2015/CMSSW_7_4_15/src/cp3_llbb/CommonTools/histFactory/hists_skimmed_btagMM_bdtCutMjjSideBands_2016_01_15_withMVA/'
+#root: '/home/fynu/bfrancois/scratch/framework/oct2015/CMSSW_7_4_15/src/cp3_llbb/CommonTools/histFactory/hists_skimmed_btagMM_mllCut_2016_01_15_withMVA/'
+#root: '/home/fynu/bfrancois/scratch/framework/oct2015/CMSSW_7_4_15/src/cp3_llbb/CommonTools/histFactory/hists_skimmed_btagMM_bdtCut_2016_01_17/'
+
+luminosity: 2245.792  # according to brilcalc 
+luminosity-error: 0.046
+blinded-range-fill-color: "16" #"#29556270"
+blinded-range-fill-style: 3004

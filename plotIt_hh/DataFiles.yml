@@ -1,0 +1,31 @@
+'DoubleEG_Run2015D-05Oct2015-v1_2015-12-18_v2.0.1+7415_HHAnalysis_2016-01-30.v1_histos.root':
+  type: data
+  #legend: "Data"
+  group: "Data"
+
+'DoubleEG_Run2015D-PromptReco-v4_2015-12-18_v2.0.1+7415_HHAnalysis_2016-01-30.v1_histos.root':
+  type: data
+  #legend: "Data"
+  group: "Data"
+
+'DoubleMuon_Run2015D-05Oct2015-v1_2015-12-18_v2.0.1+7415_HHAnalysis_2016-01-30.v1_histos.root':
+  type: data
+  legend: "Data"
+  group: "Data"
+
+'DoubleMuon_Run2015D-PromptReco-v4_2015-12-18_v2.0.1+7415_HHAnalysis_2016-01-30.v1_histos.root':
+  type: data
+  #legend: "Data"
+  group: "Data"
+
+'MuonEG_Run2015D-05Oct2015-v2_2015-12-18_v2.0.1+7415_HHAnalysis_2016-01-30.v1_histos.root':
+  type: data
+  #legend: "Data"
+  group: "Data"
+
+'MuonEG_Run2015D-PromptReco-v4_2015-12-18_v2.0.1+7415_HHAnalysis_2016-01-30.v1_histos.root':
+  type: data
+  #legend: "Data"
+  group: "Data"
+
+
