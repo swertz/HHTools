@@ -1,3 +1,7 @@
+#! /usr/bin/env python
+
+import yaml
+
 #usage : python listHisto.py (optional) suffix for yml file
 from ROOT import * 
 import sys  
@@ -23,226 +27,223 @@ skim = False
 
 file = TFile(fileName) 
 keys = file.GetListOfKeys() 
-f = open("allPlots.yml", 'w')
-#if skim :
-#    f = open("allPlots.yml", 'w')
-#elif len(sys.argv) == 2 :
-#    fmumu = open("mumuPlots"+"_"+sys.argv[1]+".yml",'w') 
-#    felel = open("elelPlots"+"_"+sys.argv[1]+".yml",'w') 
-#    fmuel = open("muelPlots"+"_"+sys.argv[1]+".yml",'w') 
-#else: 
-#    fmumu = open("mumuPlots.yml",'w') 
-#    felel = open("elelPlots.yml",'w') 
-#    fmuel = open("muelPlots.yml",'w') 
-
 alreadyIn = []
 
-commonString_yEvtPerGeV = '  y-axis: "Events"\n  y-axis-format: "%1% / %2$.0f GeV"\n  normalized: false\n  log-y: both\n  save-extensions: ["png","pdf"]\n  legend-columns: 2\n  show-ratio: true\n  show-overflow: true\n  show-errors: true\n  for-yields: true\n'
-commonString_yEvt = commonString_yEvtPerGeV.replace(" / %2$.0f GeV"," / %2$.0f")
-#commonString_yEvt = '  y-axis: "#Event"\n  y-axis-format: "%1%" \n  normalized: false\n  log-y: both\n  save-extensions: ["png","pdf"]\n  show-ratio: true\n  show-overflow: true\n\n'
+# Dictionary containing all the plots
+plots = {}
+
+defaultStyle = {
+        'log-y': 'both',
+        'save-extensions': ['pdf', 'png'],
+        'legend-columns': 2,
+        'show-ratio': True,
+        'show-overflow': True,
+        'show-errors': True
+        }
+
+defaultStyle_events_per_gev = defaultStyle.copy()
+defaultStyle_events_per_gev.update({
+        'y-axis': 'Events',
+        'y-axis-format': '%1% / %2$.2f GeV',
+        })
+
+defaultStyle_events = defaultStyle.copy()
+defaultStyle_events.update({
+        'y-axis': 'Events',
+        'y-axis-format': '%1% / %2$.2f',
+        })
+
 for key in keys :
-    if key.GetName() not in alreadyIn  and not "__" in key.GetName() :
+    if key.GetName() not in alreadyIn  and not "__" in key.GetName():
         alreadyIn.append(key.GetName())
-        x_axis = '  x-axis: "'+key.GetName()+'"\n'
-        finalString = x_axis + commonString_yEvt
+        plot = {
+                'x-axis': key.GetName()
+                }
 
         if "lep1_pt" in key.GetName() :
-            x_axis = x_axis.replace(key.GetName(), "p_{T}^{l1} (GeV)")
-            finalString = x_axis + commonString_yEvtPerGeV
+            plot['x-axis'] = "Leading lepton p_{T} (GeV)"
+            plot.update(defaultStyle_events_per_gev)
         elif "lep2_pt" in key.GetName() :  
-            x_axis = x_axis.replace(key.GetName(), "p_{T}^{l2} (GeV)")
-            finalString = x_axis + commonString_yEvtPerGeV
+            plot['x-axis'] = "Sub-leading lepton p_{T} (GeV)"
+            plot.update(defaultStyle_events_per_gev)
         elif "jet1_pt" in key.GetName() :  
-            x_axis = x_axis.replace(key.GetName(), "p_{T}^{j1} (GeV)")
-            finalString = x_axis + commonString_yEvtPerGeV
+            plot['x-axis'] = "Leading jet p_{T} (GeV)"
+            plot.update(defaultStyle_events_per_gev)
         elif "jet2_pt" in key.GetName() :  
-            x_axis = x_axis.replace(key.GetName(), "p_{T}^{j2} (GeV)")
-            finalString = x_axis + commonString_yEvtPerGeV
+            plot['x-axis'] = "Sub-leading jet p_{T} (GeV)"
+            plot.update(defaultStyle_events_per_gev)
         elif "lep1_eta" in key.GetName() :  
-            x_axis = x_axis.replace(key.GetName(), "#eta_{l1}")
-            finalString = x_axis + commonString_yEvt
+            plot['x-axis'] = "Leading jet #eta"
+            plot.update(defaultStyle_events)
         elif "lep2_eta" in key.GetName() :  
-            x_axis = x_axis.replace(key.GetName(), "#eta_{l2}")
-            finalString = x_axis + commonString_yEvt
+            plot['x-axis'] = "Sub-leading jet #eta"
+            plot.update(defaultStyle_events)
         elif "jet1_eta" in key.GetName() :  
-            x_axis = x_axis.replace(key.GetName(), "#eta_{j1}")
-            finalString = x_axis + commonString_yEvt
+            plot['x-axis'] = "Leading jet #eta"
+            plot.update(defaultStyle_events)
         elif "jet2_eta" in key.GetName() :  
-            x_axis = x_axis.replace(key.GetName(), "#eta_{j2}")
-            finalString = x_axis + commonString_yEvt
+            plot['x-axis'] = "Sub-leading jet #eta"
+            plot.update(defaultStyle_events)
         elif "lep1_phi" in key.GetName() :  
-            x_axis = x_axis.replace(key.GetName(), "#phi_{l1}")
-            finalString = x_axis + commonString_yEvt
+            plot['x-axis'] = "Leading lepton #phi"
+            plot.update(defaultStyle_events)
         elif "lep2_phi" in key.GetName() :  
-            x_axis = x_axis.replace(key.GetName(), "#phi_{l2}")
-            finalString = x_axis + commonString_yEvt
+            plot['x-axis'] = "Sub-leading lepton #phi"
+            plot.update(defaultStyle_events)
         elif "jet1_phi" in key.GetName() :  
-            x_axis = x_axis.replace(key.GetName(), "#phi_{j1}")
-            finalString = x_axis + commonString_yEvt
+            plot['x-axis'] = "Leading jet #phi"
+            plot.update(defaultStyle_events)
         elif "jet2_phi" in key.GetName() :  
-            x_axis = x_axis.replace(key.GetName(), "#phi_{j2}")
-            finalString = x_axis + commonString_yEvt
+            plot['x-axis'] = "Sub-leading jet #phi"
+            plot.update(defaultStyle_events)
         elif "jet1_CSV" in key.GetName() :  
-            x_axis = x_axis.replace(key.GetName(), "CSV_{j1}")
-            finalString = x_axis + commonString_yEvt
+            plot['x-axis'] = "Leading jet CSVv2 discriminant"
+            plot.update(defaultStyle_events)
         elif "jet2_CSV" in key.GetName() :  
-            x_axis = x_axis.replace(key.GetName(), "CSV_{j2}")
-            finalString = x_axis + commonString_yEvt
+            plot['x-axis'] = "Sub-leading jet CSVv2 discriminant"
+            plot.update(defaultStyle_events)
         elif "jet1_JP" in key.GetName() :  
-            x_axis = x_axis.replace(key.GetName(), "JP_{j1}")
-            finalString = x_axis + commonString_yEvt
+            plot['x-axis'] = "Leading jet JP discriminant"
+            plot.update(defaultStyle_events)
         elif "jet2_JP" in key.GetName() :  
-            x_axis = x_axis.replace(key.GetName(), "JP_{j2}")
-            finalString = x_axis + commonString_yEvt
+            plot['x-axis'] = "Sub-leading jet JP discriminant"
+            plot.update(defaultStyle_events)
         elif "ll_M_" in key.GetName() :  
-            x_axis = x_axis.replace(key.GetName(), "m_{ll} (GeV)")
-            finalString = x_axis + commonString_yEvtPerGeV
+            plot['x-axis'] = "m_{ll} (GeV)"
+            plot.update(defaultStyle_events_per_gev)
         elif "jj_M_" in key.GetName() :  
-            x_axis = x_axis.replace(key.GetName(), "m_{jj} (GeV)")
-            finalString = x_axis + commonString_yEvtPerGeV
+            plot['x-axis'] = "m_{jj} (GeV)"
+            plot.update(defaultStyle_events_per_gev)
         elif "ll_pt_" in key.GetName() :  
-            x_axis = x_axis.replace(key.GetName(), "p_{T}^{ll} (GeV)")
-            finalString = x_axis + commonString_yEvtPerGeV
+            plot['x-axis'] = "Dileptons system p_{T} (GeV)"
+            plot.update(defaultStyle_events_per_gev)
         elif "jj_pt_" in key.GetName() :  
-            x_axis = x_axis.replace(key.GetName(), "p_{T}^{jj} (GeV)")
-            finalString = x_axis + commonString_yEvtPerGeV
+            plot['x-axis'] = "Dijets system p_{T} (GeV)"
+            plot.update(defaultStyle_events_per_gev)
         elif "met_pt" in key.GetName() :  
-            x_axis = x_axis.replace(key.GetName(), "#slash{E}_{T} (GeV)")
-            finalString = x_axis + commonString_yEvtPerGeV
+            plot['x-axis'] = "#slash{E}_{T} (GeV)"
+            plot.update(defaultStyle_events_per_gev)
         elif "met_phi" in key.GetName() :  
-            x_axis = x_axis.replace(key.GetName(), "#phi_{#slash{E}_{T}}")
-            finalString = x_axis + commonString_yEvt
+            plot['x-axis'] = "#phi_{#slash{E}_{T}}"
+            plot.update(defaultStyle_events)
         elif "ll_DR_l_l" in key.GetName() :  
-            x_axis = x_axis.replace(key.GetName(), "#DeltaR(l1, l2)")
-            finalString = x_axis + commonString_yEvt
+            plot['x-axis'] = "#DeltaR(leading lepton, sub-leading lepton)"
+            plot.update(defaultStyle_events)
         elif "jj_DR_j_j" in key.GetName() :  
-            x_axis = x_axis.replace(key.GetName(), "#DeltaR(j1, j2)")
-            finalString = x_axis + commonString_yEvt
+            plot['x-axis'] = "#DeltaR(leading jet, sub-leading jet)"
+            plot.update(defaultStyle_events)
         elif "ll_DPhi_l_l" in key.GetName() :  
-            x_axis = x_axis.replace(key.GetName(), "#Delta#phi(l1, l2)")
-            finalString = x_axis + commonString_yEvt
+            plot['x-axis'] = "#Delta#phi(leading lepton, sub-leading lepton)"
+            plot.update(defaultStyle_events)
         elif "jj_DPhi_j_j" in key.GetName() :  
-            x_axis = x_axis.replace(key.GetName(), "#Delta#phi(j1, j2)")
-            finalString = x_axis + commonString_yEvt
+            plot['x-axis'] = "#Delta#phi(leading jet, sub-leading jet)"
+            plot.update(defaultStyle_events)
         elif "llmetjj_pt_" in key.GetName() :  
-            x_axis = x_axis.replace(key.GetName(), "p_{T}^{lljj#slash{E}_{T}}")
-            finalString = x_axis + commonString_yEvtPerGeV
+            plot['x-axis'] = "p_{T}^{lljj#slash{E}_{T}}"
+            plot.update(defaultStyle_events_per_gev)
         elif "llmetjj_M_" in key.GetName() :  
-            x_axis = x_axis.replace(key.GetName(), "m_{lljj#slash{E}_{T}}")
-            finalString = x_axis + commonString_yEvtPerGeV
+            plot['x-axis'] = "m_{lljj#slash{E}_{T}}"
+            plot.update(defaultStyle_events_per_gev)
         elif "DPhi_ll_met_" in key.GetName() :  
-            x_axis = x_axis.replace(key.GetName(), "#Delta#phi(ll, #slash{E}_{T})")
-            finalString = x_axis + commonString_yEvt
+            plot['x-axis'] = "#Delta#phi(ll, #slash{E}_{T})"
+            plot.update(defaultStyle_events)
         elif "DPhi_ll_jj" in key.GetName() :  
-            x_axis = x_axis.replace(key.GetName(), "#Delta#phi(ll, jj)")
-            finalString = x_axis + commonString_yEvt
+            plot['x-axis'] = "#Delta#phi(ll, jj)"
+            plot.update(defaultStyle_events)
         elif "minDPhi_l_met_" in key.GetName() :  
-            x_axis = x_axis.replace(key.GetName(), "min(#Delta#phi(l, #slash{E}_{T}))")
-            finalString = x_axis + commonString_yEvt
+            plot['x-axis'] = "min(#Delta#phi(lepton, #slash{E}_{T}))"
+            plot.update(defaultStyle_events)
         elif "maxDPhi_l_met_" in key.GetName() :  
-            x_axis = x_axis.replace(key.GetName(), "max(#Delta#phi(l, #slash{E}_{T}))")
-            finalString = x_axis + commonString_yEvt
+            plot['x-axis'] = "max(#Delta#phi(lepton, #slash{E}_{T}))"
+            plot.update(defaultStyle_events)
         elif "MT_" in key.GetName() :  
-            x_axis = x_axis.replace(key.GetName(), "m_{ll#slash{E}_{T}}")
-            finalString = x_axis + commonString_yEvtPerGeV
+            plot['x-axis'] = "m_{ll#slash{E}_{T}}"
+            plot.update(defaultStyle_events_per_gev)
         elif "MTformula_" in key.GetName() :  
-            x_axis = x_axis.replace(key.GetName(), "MT")
-            finalString = x_axis + commonString_yEvtPerGeV
+            plot['x-axis'] = "MT"
+            plot.update(defaultStyle_events_per_gev)
         elif "projMET_" in key.GetName() :  
-            x_axis = x_axis.replace(key.GetName(), "Projected #slash{E}_{T}")
-            finalString = x_axis + commonString_yEvtPerGeV
+            plot['x-axis'] = "Projected #slash{E}_{T}"
+            plot.update(defaultStyle_events_per_gev)
         elif "DPhi_jj_met" in key.GetName() :  
-            x_axis = x_axis.replace(key.GetName(), "#Delta#phi(jj, #slash{E}_{T})")
-            finalString = x_axis + commonString_yEvt
+            plot['x-axis'] = "#Delta#phi(jj, #slash{E}_{T})"
+            plot.update(defaultStyle_events)
         elif "minDPhi_j_met" in key.GetName() :  
-            x_axis = x_axis.replace(key.GetName(), "min#Delta#phi(j, #slash{E}_{T})")
-            finalString = x_axis + commonString_yEvt
+            plot['x-axis'] = "min#Delta#phi(j, #slash{E}_{T})"
+            plot.update(defaultStyle_events)
         elif "maxDPhi_j_met" in key.GetName() :  
-            x_axis = x_axis.replace(key.GetName(), "max#Delta#phi(j, #slash{E}_{T})")
-            finalString = x_axis + commonString_yEvt
+            plot['x-axis'] = "max#Delta#phi(j, #slash{E}_{T})"
+            plot.update(defaultStyle_events)
         elif "minDR_l_j" in key.GetName() :  
-            x_axis = x_axis.replace(key.GetName(), "min#DeltaR(l, j)")
-            finalString = x_axis + commonString_yEvt
+            plot['x-axis'] = "min#DeltaR(l, j)"
+            plot.update(defaultStyle_events)
         elif "maxDR_l_j" in key.GetName() :  
-            x_axis = x_axis.replace(key.GetName(), "max#DeltaR(l, j)")
-            finalString = x_axis + commonString_yEvt
+            plot['x-axis'] = "max#DeltaR(l, j)"
+            plot.update(defaultStyle_events)
         elif "DR_ll_jj_" in key.GetName() :  
-            x_axis = x_axis.replace(key.GetName(), "#DeltaR(ll, jj)")
-            finalString = x_axis + commonString_yEvt
+            plot['x-axis'] = "#DeltaR(ll, jj)"
+            plot.update(defaultStyle_events)
         elif "DR_llmet_jj" in key.GetName() :  
-            x_axis = x_axis.replace(key.GetName(), "#DeltaR(ll#slash{E}_{T}, jj)")
-            finalString = x_axis + commonString_yEvt
+            plot['x-axis'] = "#DeltaR(ll#slash{E}_{T}, jj)"
+            plot.update(defaultStyle_events)
         elif "DPhi_ll_jj_" in key.GetName() :  
-            x_axis = x_axis.replace(key.GetName(), "#DeltaPhi(ll, jj)")
-            finalString = x_axis + commonString_yEvt
+            plot['x-axis'] = "#DeltaPhi(ll, jj)"
+            plot.update(defaultStyle_events)
         elif "nllmetjj_" in key.GetName() :  
-            x_axis = x_axis.replace(key.GetName(), "#llmetjj")
-            finalString = x_axis + commonString_yEvt
+            plot['x-axis'] = "#llmetjj"
+            plot.update(defaultStyle_events)
         elif "nLep_" in key.GetName() :  
-            x_axis = x_axis.replace(key.GetName(), "#leptons")
-            finalString = x_axis + commonString_yEvt
+            plot['x-axis'] = "Number of leptons"
+            plot.update(defaultStyle_events)
         elif "nJet_" in key.GetName() :  
-            x_axis = x_axis.replace(key.GetName(), "#jets")
-            finalString = x_axis + commonString_yEvt
+            plot['x-axis'] = "Number of jets"
+            plot.update(defaultStyle_events)
         elif "nBJetMediumCSV_" in key.GetName() :  
-            x_axis = x_axis.replace(key.GetName(), "# B jets (CSV M)")
-            finalString = x_axis + commonString_yEvt
+            plot['x-axis'] = "Number of b-tagged jets (CSVv2 medium)"
+            plot.update(defaultStyle_events)
         elif "cosThetaStar_CS" in key.GetName() :  
-            x_axis = x_axis.replace(key.GetName(), "cos(#theta^{*}_{CS})")
-            finalString = x_axis + commonString_yEvt
+            plot['x-axis'] = "cos(#theta^{*}_{CS})"
+            plot.update(defaultStyle_events)
         elif "BDT" in key.GetName() :
-            x_axis = x_axis.replace(key.GetName(), "BDT output")
-            finalString = x_axis + commonString_yEvt + '  blinded-range: [-0.19, 0.6]\n' #  blinded-range-fill-color: "#29556270"\n  blinded-range-fill-style: 1001\n'
+            plot['x-axis'] = "BDT output"
+            plot.update(defaultStyle_events)
+            plot['blinded-range'] = [-0.19, 0.6]
         elif "scaleFactor" in key.GetName() :
-            x_axis = x_axis.replace(key.GetName(), "Scale Factor")
-            finalString = x_axis + commonString_yEvt + '  no-data: true\n'
+            plot['x-axis'] = "Scale factor"
+            plot.update(defaultStyle_events)
+            plot['no-data'] = True
+        else:
+            plot.update(defaultStyle_events)
 
+
+        label_x = 0.22
+        label_y = 0.895
         if "MuMu" in key.GetName() : 
-            f.write("'"+key.GetName()+"'"+":\n") 
-            f.write(finalString)
-            f.write('  extra-label: "Preliminary - DiMuon Channel"\n\n')
-            #break
+            plot['labels'] = [{
+                'text': '#mu#mu channel',
+                'position': [label_x, label_y],
+                'size': 24
+                }]
         elif "ElEl" in key.GetName() : 
-            f.write("'"+key.GetName()+"'"+":\n") 
-            f.write(finalString)
-            f.write('  extra-label: "Preliminary - DiElectron Channel"\n\n')
+            plot['labels'] = [{
+                'text': 'ee channel',
+                'position': [label_x, label_y],
+                'size': 24
+                }]
         elif "MuEl" in key.GetName() : 
-            f.write("'"+key.GetName()+"'"+":\n") 
-            f.write(finalString)
-            f.write('  extra-label: "Preliminary - MuEl Channel"\n\n')
+            plot['labels'] = [{
+                'text': '#mue + e#mu channels',
+                'position': [label_x, label_y],
+                'size': 24
+                }]
         elif "All" in key.GetName() : 
-            f.write("'"+key.GetName()+"'"+":\n") 
-            f.write(finalString)
-            f.write('  extra-label: "Preliminary - All Channels"\n\n')
-        
-#        if skim :
-#            f.write("'"+key.GetName()+"'"+":\n") 
-#            f.write(finalString)
-#            print key.GetName()
-#            f.write('  extra-label: "Preliminary - All Channels"\n\n')
-#            continue
-#
-        #if "MuMu" in key.GetName() : 
-        #    fmumu.write("'"+key.GetName()+"'"+":\n") 
-        #    fmumu.write(finalString)
-        #    fmumu.write('  extra-label: "Preliminary - DiMuon Channel"\n\n')
-        #    #break
-        #elif "ElEl" in key.GetName() : 
-        #    felel.write("'"+key.GetName()+"'"+":\n") 
-        #    felel.write(finalString)
-        #    felel.write('  extra-label: "Preliminary - DiElectron Channel"\n\n')
-        #elif "MuEl" in key.GetName() : 
-        #    fmuel.write("'"+key.GetName()+"'"+":\n") 
-        #    fmuel.write(finalString)
-        #    fmuel.write('  extra-label: "Preliminary - MuEl Channel"\n\n')
-        #elif "All" in key.GetName() : 
-        #    fmuel.write("'"+key.GetName()+"'"+":\n") 
-        #    fmuel.write(finalString)
-        #    fmuel.write('  extra-label: "Preliminary - All Channels"\n\n')
+            plot['labels'] = [{
+                'text': '#mu#mu + ee + #mue + e#mu channels',
+                'position': [label_x, label_y],
+                'size': 24
+                }]
 
+        plots[key.GetName()] = plot
 
-        #f.write("'"+key.GetName()+"'"+":\n") 
-        #f.write('  x-axis: "'+key.GetName()+'"\n  y-axis: "Evt"\n  y-axis-format: "%1% / %2$.0f GeV"\n  normalized: false\n  x-axis-range: [0, 250]\n  log-y: true\n  save-extensions: ["png"]\n  show-ratio: true\n')
-
-
-
+with open("allPlots.yml", "w") as f:
+    yaml.dump(plots, f)
