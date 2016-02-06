@@ -21,7 +21,8 @@ baseDir = "/home/fynu/bfrancois/scratch/framework/oct2015/CMSSW_7_4_15/src/cp3_l
 #fileName = baseDir+"CommonTools/histFactory/hists_TTTT_jetidL_csvOrdered_2016_01_14_noOverlapRemoval/condor/output/GluGluToRadionToHHTo2B2VTo2L2Nu_M-900_narrow_MiniAODv2_v1.2.0+7415_HHAnalysis_2016-01-11.v0_histos.root"
 
 #fileName = baseDir+"CommonTools/histFactory/hists_TTTT_jetidL_csvOrdered_2016_01_15_puweight/condor/output/TTTo2L2Nu_13TeV-powheg_MiniAODv2_v1.2.0+7415_HHAnalysis_2016-01-11.v0_histos.root"
-fileName = baseDir+"CommonTools/histFactory/hists_TTsystematics/condor/output/TTTo2L2Nu_13TeV-powheg_MiniAODv2_v2.0.3+7415_HHAnalysis_2016-01-30.v2_histos.root"
+#fileName = baseDir+"CommonTools/histFactory/2016-02-04-fullPlots/condor/output/TTTo2L2Nu_13TeV-powheg_MiniAODv2_v2.0.3+7415_HHAnalysis_2016-01-30.v2_histos.root"
+fileName = baseDir+"CommonTools/histFactory/raisePtCut/condor/output/GluGluToRadionToHHTo2B2VTo2L2Nu_M-900_narrow_MiniAODv2_v2.0.3+7415_HHAnalysis_2016-01-30.v2_histos.root"
 
 skim = False
 
@@ -207,7 +208,7 @@ for key in keys :
         elif "BDT" in key.GetName() :
             plot['x-axis'] = "BDT output"
             plot.update(defaultStyle_events)
-            plot['blinded-range'] = [-0.19, 0.6]
+            plot['blinded-range'] = [0.1, 0.6]
         elif "scaleFactor" in key.GetName() :
             plot['x-axis'] = "Scale factor"
             plot.update(defaultStyle_events)

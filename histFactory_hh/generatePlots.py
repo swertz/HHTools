@@ -10,13 +10,13 @@ includes = ["/home/fynu/bfrancois/scratch/framework/oct2015/CMSSW_7_4_15/src/cp3
 
 plots = []
 
-# lljj 
-basePlotter = BasePlotter(mode = "custom", baseObjectName = "hh_llmetjj_HWWleptons_nobtag_csv", btagWP_str = 'nobtag', objects = "nominal")
-weights_lljj = ['trigeff', 'llidiso', 'pu']
-categories_lljj = ["ElEl", "MuMu", "MuEl"]
-stage_lljj = "no_cut"
-plots_lljj = ["mll", "basic", "csv"]
-plots.extend(basePlotter.generatePlots(categories_lljj, stage_lljj, systematic = "nominal", weights = weights_lljj, requested_plots = plots_lljj))
+## lljj 
+#basePlotter = BasePlotter(mode = "custom", baseObjectName = "hh_llmetjj_HWWleptons_nobtag_csv", btagWP_str = 'nobtag', objects = "nominal")
+#weights_lljj = ['trigeff', 'llidiso', 'pu']
+#categories_lljj = ["ElEl", "MuMu", "MuEl"]
+#stage_lljj = "no_cut"
+#plots_lljj = ["mll", "basic", "csv"]
+#plots.extend(basePlotter.generatePlots(categories_lljj, stage_lljj, systematic = "nominal", weights = weights_lljj, requested_plots = plots_lljj))
 
 # llbb 
 basePlotter = BasePlotter(mode = "custom", baseObjectName = "hh_llmetjj_HWWleptons_btagM_csv", btagWP_str = 'medium', objects = "nominal")
@@ -50,6 +50,13 @@ for systematicType in systematics.keys() :
         plots.extend(basePlotter.generatePlots(categories_llbb_clean, "region_1_650", systematic = systematic, weights = weights_llbb, requested_plots = ["isElEl"]))
         plots.extend(basePlotter.generatePlots(categories_llbb_clean, "region_4_400", systematic = systematic, weights = weights_llbb, requested_plots = ["isElEl"]))
         plots.extend(basePlotter.generatePlots(categories_llbb_clean, "region_4_650", systematic = systematic, weights = weights_llbb, requested_plots = ["isElEl"]))
+        # lljj 
+        basePlotter = BasePlotter(mode = "custom", baseObjectName = "hh_llmetjj_HWWleptons_nobtag_csv", btagWP_str = 'nobtag', objects = "nominal")
+        weights_lljj = ['trigeff', 'llidiso', 'pu']
+        categories_lljj = ["ElEl", "MuMu", "MuEl"]
+        stage_lljj = "no_cut"
+        plots_lljj = ["mll", "basic", "csv"]
+        plots.extend(basePlotter.generatePlots(categories_lljj, stage_lljj, systematic = "nominal", weights = weights_lljj, requested_plots = plots_lljj))
 
 # Plots to control bdt output 
 basePlotter = BasePlotter(mode = "custom", baseObjectName = baseObjectName_llbb, btagWP_str = 'medium', objects = "nominal")

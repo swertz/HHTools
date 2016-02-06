@@ -110,8 +110,10 @@ class BasePlotter:
         bdt_cut_x0_400_br = "(({0}) < 0.2)".format(BDToutputsVariable[bdtNameTemplate.replace("DATE", date).replace("SPIN", "0").replace("MASS", "400").replace("SUFFIX", suffixs[0])])
         bdt_cut_x0_650_sr = "(({0}) > 0.2)".format(BDToutputsVariable[bdtNameTemplate.replace("DATE", date).replace("SPIN", "0").replace("MASS", "650").replace("SUFFIX", suffixs[0])])
         bdt_cut_x0_650_br = "(({0}) < 0.2)".format(BDToutputsVariable[bdtNameTemplate.replace("DATE", date).replace("SPIN", "0").replace("MASS", "650").replace("SUFFIX", suffixs[0])])
+        safe_cut = "(%s.p4.Pt() > 30 && %s.p4.Pt() > 30 && %s.p4.Pt() > 20 && %s.p4.Pt() > 20)"%(self.jet1_str, self.jet2_str, self.lep1_str, self.lep2_str)
         dict_stage_cut = {
                "no_cut" : "", 
+               "safe_cut" : safe_cut,
                "mll_cut" : mll_cut,
                "nminusonedrll_cut" : self.joinCuts(mll_cut, nminusonedrll_cut),
                "nminusonedrjj_cut" : self.joinCuts(mll_cut, nminusonedrjj_cut),

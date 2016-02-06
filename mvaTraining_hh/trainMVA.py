@@ -56,7 +56,7 @@ discriList = [
         "llmetjj_MTformula"
         ]
 spectatorList = []
-cut = "(91.1876 - ll_M) > 15 && ll_DR_l_l < 2.2 && jj_DR_j_j < 3.1 && llmetjj_DPhi_ll_jj > 1.5"
+cut = "(91 - ll_M) > 15 && ll_DR_l_l < 2.2 && jj_DR_j_j < 3.1 && llmetjj_DPhi_ll_jj > 1.5"
 MVAmethods = ["kBDT"]
 weightExpr = "event_weight*ll_scaleFactor*jj_scaleFactor"
 
