@@ -85,10 +85,10 @@ class BasePlotter:
         stringForMVA = baseStringForMVA_part1 + baseStringForMVA_part2
         # The following will need to be modified each time the name of the BDT output changes
         bdtNameTemplate = "DATE_BDT_XSPIN_MASS_SUFFIX"
-        date = "2016_01_17"
+        date = "2016_02_06"
         spins = ["0"] #, "2"]
         masses = ["400", "650"] #, "900"]
-        suffixs = ["VS_TT09_DY01_8var_bTagMM"] #, "VS_TT1_DY0_8var_bTagMM"]
+        suffixs = ["VS_TT_8var_bTagMM"]   #["VS_TT_DY_WoverSum_8var_bTagMM_noEvtW", "VS_TT_DY_WoverSum_8var_bTagMM"]# "VS_TT09_DY01_8var_bTagMM"] #, "VS_TT1_DY0_8var_bTagMM"]
         BDToutputs = {}
         bdtNames = []
         BDToutputsVariable = {}
