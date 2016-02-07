@@ -13,7 +13,7 @@ plots = []
 # Plots to feed combine
 baseObjectName = "hh_llmetjj_HWWleptons_btagM_csv"
 weights = ['trigeff', 'llidiso', 'pu', 'jjbtag']
-categories = ["All"] #, "ElEl", "MuMu", "MuEl"]
+categories = ["All", "ElEl", "MuMu", "MuEl"]
 systematics = {"modifObjects" : ["nominal", "jecup", "jecdown", "jerup", "jerdown"], "SF" : ["elidisoup", "elidisodown", "muidisoup", "muidisodown", "jjbtagup", "jjbtagdown", "puup", "pudown", "trigeffup", "trigeffdown"]}
 for systematicType in systematics.keys() :
     for systematic in systematics[systematicType]:
@@ -22,11 +22,11 @@ for systematicType in systematics.keys() :
         else : 
             objects = "nominal" # ensures that we use normal hh_objects for systematics not modifying obect such as scale factors 
         basePlotter = BasePlotter(mode = "custom", baseObjectName = baseObjectName, btagWP_str = 'medium', objects = objects)
-        plots.extend(basePlotter.generatePlots(categories, "region_1_400", systematic = systematic, weights = weights, requested_plots = ["mjj", "bdtoutput"]))
-        plots.extend(basePlotter.generatePlots(categories, "region_1_650", systematic = systematic, weights = weights, requested_plots = ["mjj", "bdtoutput"]))
-        plots.extend(basePlotter.generatePlots(categories, "region_2_400", systematic = systematic, weights = weights, requested_plots = ["mjj", "bdtoutput"]))
-        plots.extend(basePlotter.generatePlots(categories, "region_2_650", systematic = systematic, weights = weights, requested_plots = ["mjj", "bdtoutput"]))
-        plots.extend(basePlotter.generatePlots(categories, "region_3_400", systematic = systematic, weights = weights, requested_plots = ["mjj", "bdtoutput"]))
-        plots.extend(basePlotter.generatePlots(categories, "region_3_650", systematic = systematic, weights = weights, requested_plots = ["mjj", "bdtoutput"]))
-        plots.extend(basePlotter.generatePlots(categories, "region_4_400", systematic = systematic, weights = weights, requested_plots = ["mjj", "bdtoutput"]))
-        plots.extend(basePlotter.generatePlots(categories, "region_4_650", systematic = systematic, weights = weights, requested_plots = ["mjj", "bdtoutput"]))
+        plots.extend(basePlotter.generatePlots(categories, "highBDT_mjjP_400", systematic = systematic, weights = weights, requested_plots = ["mjj", "bdtoutput", "isElEl"]))
+        plots.extend(basePlotter.generatePlots(categories, "highBDT_mjjP_650", systematic = systematic, weights = weights, requested_plots = ["mjj", "bdtoutput", "isElEl"]))
+        plots.extend(basePlotter.generatePlots(categories, "highBDT_mjjSB_400", systematic = systematic, weights = weights, requested_plots = ["mjj", "bdtoutput", "isElEl"]))
+        plots.extend(basePlotter.generatePlots(categories, "highBDT_mjjSB_650", systematic = systematic, weights = weights, requested_plots = ["mjj", "bdtoutput", "isElEl"]))
+        plots.extend(basePlotter.generatePlots(categories, "lowBDT_mjjP_400", systematic = systematic, weights = weights, requested_plots = ["mjj", "bdtoutput", "isElEl"]))
+        plots.extend(basePlotter.generatePlots(categories, "lowBDT_mjjP_650", systematic = systematic, weights = weights, requested_plots = ["mjj", "bdtoutput", "isElEl"]))
+        plots.extend(basePlotter.generatePlots(categories, "lowBDT_mjjSB_400", systematic = systematic, weights = weights, requested_plots = ["mjj", "bdtoutput", "isElEl"]))
+        plots.extend(basePlotter.generatePlots(categories, "lowBDT_mjjSB_650", systematic = systematic, weights = weights, requested_plots = ["mjj", "bdtoutput", "isElEl"]))
