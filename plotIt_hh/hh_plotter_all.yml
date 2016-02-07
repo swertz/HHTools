@@ -2,7 +2,7 @@ configuration:
     include: ['centralConfig.yml']
 
 files:
-    include: ['MCFiles.yml'] #, 'DataFiles.yml']
+    include: ['MCFiles.yml', 'DataFiles.yml']
 
 plots:
     include: ['allPlots.yml']
