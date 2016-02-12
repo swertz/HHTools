@@ -87,7 +87,7 @@ class BasePlotter:
         bdtNameTemplate = "DATE_BDT_XSPIN_MASS_SUFFIX"
         date = "2016_02_06"
         spins = ["0"] #, "2"]
-        masses = ["400", "650"] #, "900"]
+        masses = ["350", "400", "500", "650"] #, "900"]
         suffixs = ["VS_TT_8var_bTagMM"]   #["VS_TT_DY_WoverSum_8var_bTagMM_noEvtW", "VS_TT_DY_WoverSum_8var_bTagMM"]# "VS_TT09_DY01_8var_bTagMM"] #, "VS_TT1_DY0_8var_bTagMM"]
         BDToutputs = {}
         bdtNames = []
@@ -215,6 +215,9 @@ class BasePlotter:
         self.mll_plot = []
         self.mjj_plot = []
         self.bdtoutput_plot = []
+        self.mjjvsbdt_plot = []
+
+        self.flavour_plot = []
 
         self.llidisoWeight_plot = []
         self.jjbtagWeight_plot = []
@@ -252,18 +255,26 @@ class BasePlotter:
                         'plot_cut': self.totalCut,
                         'binning': '(50, 0, 250)'
                 })
+            # Plot to compute yields (ensure we have not over/under flow)
             self.isElEl_plot.append({
                         'name':  'isElEl_%s_%s_%s%s'%(self.llFlav, self.suffix, self.extraString, self.systematicString),
                         'variable': "%s.isElEl"%self.baseObject,
                         'plot_cut': self.totalCut,
                         'binning': '(2, 0, 2)'
                 })
+            # BDT output plots
             for bdtName in bdtNames :
                 self.bdtoutput_plot.append({
                         'name' : 'MVA_%s_%s_%s_%s%s'%(bdtName, self.llFlav, self.suffix, self.extraString, self.systematicString),
                         'variable' : BDToutputsVariable[bdtName],
                         'plot_cut' : self.totalCut,
-                        'binning' : '(50, -0.6, 0.6)'
+                        'binning' : '(60, -0.6, 0.6)'
+                })
+                self.mjjvsbdt_plot.append({
+                        'name' : 'MjjvsMVA_%s_%s_%s_%s%s'%(bdtName, self.llFlav, self.suffix, self.extraString, self.systematicString),
+                        'variable' : BDToutputsVariable[bdtName]+":::"+self.jj_str+".M()",
+                        'plot_cut' : self.totalCut,
+                        'binning' : '(60, -0.6, 0.6, 50, 0, 250)'
                 })
 
             # Weight Plots
@@ -703,6 +714,57 @@ class BasePlotter:
 #                    'binning': '(6, 0, 6)'
 #                }
 #            ])
+            self.flavour_plot.extend([
+                {
+                    'name':  'gen_bb_%s_%s_%s%s'%(self.llFlav, self.suffix, self.extraString, self.systematicString),
+                    'variable': "%s.gen_bb"%self.baseObject,
+                    'plot_cut': self.totalCut,
+                    'binning': '(2, 0, 2)'
+                },
+                {
+                    'name':  'gen_bl_%s_%s_%s%s'%(self.llFlav, self.suffix, self.extraString, self.systematicString),
+                    'variable': "%s.gen_bl"%self.baseObject,
+                    'plot_cut': self.totalCut,
+                    'binning': '(2, 0, 2)'
+                },
+                {
+                    'name':  'gen_bc_%s_%s_%s%s'%(self.llFlav, self.suffix, self.extraString, self.systematicString),
+                    'variable': "%s.gen_bc"%self.baseObject,
+                    'plot_cut': self.totalCut,
+                    'binning': '(2, 0, 2)'
+                },
+                {
+                    'name':  'gen_cc_%s_%s_%s%s'%(self.llFlav, self.suffix, self.extraString, self.systematicString),
+                    'variable': "%s.gen_cc"%self.baseObject,
+                    'plot_cut': self.totalCut,
+                    'binning': '(2, 0, 2)'
+                },
+                {
+                    'name':  'gen_cl_%s_%s_%s%s'%(self.llFlav, self.suffix, self.extraString, self.systematicString),
+                    'variable': "%s.gen_cl"%self.baseObject,
+                    'plot_cut': self.totalCut,
+                    'binning': '(2, 0, 2)'
+                },
+                {
+                    'name':  'gen_ll_%s_%s_%s%s'%(self.llFlav, self.suffix, self.extraString, self.systematicString),
+                    'variable': "%s.gen_ll"%self.baseObject,
+                    'plot_cut': self.totalCut,
+                    'binning': '(2, 0, 2)'
+                },
+                {
+                    'name':  'gen_bx_%s_%s_%s%s'%(self.llFlav, self.suffix, self.extraString, self.systematicString),
+                    'variable': "({0}.gen_bl || {0}.gen_bc)".format(self.baseObject),
+                    'plot_cut': self.totalCut,
+                    'binning': '(2, 0, 2)'
+                },
+                {
+                    'name':  'gen_xx_%s_%s_%s%s'%(self.llFlav, self.suffix, self.extraString, self.systematicString),
+                    'variable': "({0}.gen_ll || {0}.gen_cc || {0}.gen_cl)".format(self.baseObject),
+                    'plot_cut': self.totalCut,
+                    'binning': '(2, 0, 2)'
+                },
+            ])
+
             self.forSkimmer_plot.extend([
                 {
                     'name':  'event_weight_%s_%s_%s%s'%(self.llFlav, self.suffix, self.extraString, self.systematicString),
