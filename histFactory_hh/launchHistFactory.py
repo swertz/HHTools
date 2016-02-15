@@ -34,10 +34,11 @@ IDsToSplitMore =  []
 
 parser = argparse.ArgumentParser(description='Facility to submit histFactory jobs on condor.')
 parser.add_argument('-o', '--output', dest='output', default=str(datetime.date.today()), help='Name of the output directory.')
-parser.add_argument('--submit', help='Choice to actually submit the jobs or not.', action="store_true")
+parser.add_argument('-s', '--submit', help='Choice to actually submit the jobs or not.', action="store_true")
 parser.add_argument('-f', '--filter', dest='filter', default=False, help='Apply filter on DY ht and TT lepton flavour.', action="store_true")
-parser.add_argument('--test', help='Run on the output of HHAnalyzer not yet in the DB.', action="store_true")
+parser.add_argument('-t', '--test', help='Run on the output of HHAnalyzer not yet in the DB.', action="store_true")
 parser.add_argument('-p', '--plotter', dest='plotter', default="generatePlots.py", help='Code generating the plots.')
+parser.add_argument('-r', '--remove', help='Overwrite output directory if it already exists.', action="store_true")
 
 args = parser.parse_args()
 
@@ -64,6 +65,15 @@ for ID in IDs:
         }
     )
 
+if args.remove :
+    if os.path.isdir(args.output) :
+        print "Are you sure you want to execute the following command ?"
+        print "rm -r " + args.output
+        print "Type enter if yes, ctrl-c if not."
+        raw_input()
+        os.system("rm -r " + args.output)
+        print "Deleted ", args.output, " folder."
+
 #print rootFileName
 if args.test : 
     os.system("../../CommonTools/histFactory/build/createPlotter.sh %s %s %s"%(rootFileName, args.plotter, args.output))
@@ -89,17 +99,17 @@ if args.filter :
 
                     ttflname = sampleName.replace("TT_Tune", "TT_FL_Tune")
                     jsonSample[ttflname] = copy.deepcopy(jsonSample[sampleName])
-                    jsonSample[ttflname]["sample_cut"] = "hh_llmetjj_HWWleptons_btagM_csv[0].cosThetaStar_CS > 0.5"
+                    jsonSample[ttflname]["sample_cut"] = "(hh_gen_ttbar_decay_type >= 4 && hh_gen_ttbar_decay_type <= 10 && hh_gen_ttbar_decay_type != 7)"
                     jsonSample[ttflname]["output_name"] = jsonSample[sampleName]["output_name"].replace("TT_Tune", "TT_FL_Tune")
 
                     ttslname = sampleName.replace("TT_Tune", "TT_SL_Tune")
                     jsonSample[ttslname] = copy.deepcopy(jsonSample[sampleName])
-                    jsonSample[ttslname]["sample_cut"] = "hh_llmetjj_HWWleptons_btagM_csv[0].isMuMu"
+                    jsonSample[ttslname]["sample_cut"] = "(hh_gen_ttbar_decay_type == 2 || hh_gen_ttbar_decay_type == 3 || hh_gen_ttbar_decay_type == 7)"
                     jsonSample[ttslname]["output_name"] = jsonSample[sampleName]["output_name"].replace("TT_Tune", "TT_SL_Tune")
 
                     ttfhname = sampleName.replace("TT_Tune", "TT_FH_Tune")
                     jsonSample[ttfhname] = copy.deepcopy(jsonSample[sampleName])
-                    jsonSample[ttfhname]["sample_cut"] = "hh_llmetjj_HWWleptons_btagM_csv[0].isMuEl"
+                    jsonSample[ttfhname]["sample_cut"] = "(hh_gen_ttbar_decay_type == 1)"
                     jsonSample[ttfhname]["output_name"] = jsonSample[sampleName]["output_name"].replace("TT_Tune", "TT_FH_Tune")
                     jsonSample.pop(sampleName)
                 if 'DYJetsToLL_M-5to50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8' in sampleName or 'DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8' in sampleName : 
