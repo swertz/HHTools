@@ -27,16 +27,12 @@ This step is done in ```plotIt_hh```. To launch the plots :
 
 will create a folder named `plots_all_DATE_SUFFIX` with all the stacked plots inside, SUFFIX being optional.
 
-Here are the key files you want to modify regularly : 
+Here are the key files you have to modify : 
 
 `centralConfig.yml` : to specify the directory where the rootfiles are.
 
 `listHistos.py` : you can modify the rootFile at the top and run `python listHistos.py` to generate the .yml file with axis labels, blinded range, etc.
 
-Here are the files you will need to modify less often :
-
-`MCFiles.yml` and `DataFiles.yml` to specify the samples you want to run on.
+`MCFiles.yml` and `DataFiles.yml` to specify the samples you want to run on. Usually you just need to replace the old tag by the new one (e.g. in  vim `:%s/v2.0.3+7415_HHAnalysis_2016-01-30.v3/v2.0.4+7415_HHAnalysis_2016-02-14.v0/`).
 
 `groups.yml` to specify the colors, the names and which samples should appear merged in the legend.
-
-Let me know if I forgot something.
