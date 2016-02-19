@@ -77,7 +77,7 @@ class BasePlotter:
         if mode == "custom" :
             self.sanityCheck = "Length$(%s)>0"%baseObjectName
 
-    def generatePlots(self, categories = ["All"], stage = "cleaning_cut", requested_plots = [], weights = ['trigeff', 'jjbtag', 'llidiso', 'pu'], extraCut = "", systematic = "nominal"):
+    def generatePlots(self, categories = ["All"], stage = "cleaning_cut", requested_plots = [], weights = ['trigeff', 'jjbtag', 'llidiso', 'pu'], extraCut = "", systematic = "nominal", extraString = ""):
 
         # MVA evaluation : ugly but necessary part
         baseStringForMVA_part1 = 'evaluateMVA("/home/fynu/bfrancois/scratch/framework/oct2015/CMSSW_7_4_15/src/cp3_llbb/HHTools/mvaTraining_hh/weights/BDTNAME_kBDT.weights.xml", '
@@ -85,10 +85,10 @@ class BasePlotter:
         stringForMVA = baseStringForMVA_part1 + baseStringForMVA_part2
         # The following will need to be modified each time the name of the BDT output changes
         bdtNameTemplate = "DATE_BDT_XSPIN_MASS_SUFFIX"
-        date = "2016_02_06"
+        date = "2016_02_19"  #"2016_02_06"
         spins = ["0"] #, "2"]
         masses = ["350", "400", "500", "650"] #, "900"]
-        suffixs = ["VS_TT_8var_bTagMM"]   #["VS_TT_DY_WoverSum_8var_bTagMM_noEvtW", "VS_TT_DY_WoverSum_8var_bTagMM"]# "VS_TT09_DY01_8var_bTagMM"] #, "VS_TT1_DY0_8var_bTagMM"]
+        suffixs = ["VS_TT_DYHTonly_tW_8var"] #["VS_TT_8var_bTagMM"]   #["VS_TT_DY_WoverSum_8var_bTagMM_noEvtW", "VS_TT_DY_WoverSum_8var_bTagMM"]# "VS_TT09_DY01_8var_bTagMM"] #, "VS_TT1_DY0_8var_bTagMM"]
         BDToutputs = {}
         bdtNames = []
         BDToutputsVariable = {}
@@ -107,10 +107,17 @@ class BasePlotter:
         nminusonedphilljj_cut = "({0}.DR_l_l < 2.2 && {1}.DR_j_j < 3.1)".format(self.baseObject, self.baseObject)
         mjj_cut_sr = "({0}.M() > 95 && {0}.M() < 135)".format(self.jj_str)
         mjj_cut_br = "({0}.M() < 95 || {0}.M() > 135)".format(self.jj_str)
+        mjj_cut_cr = "({0}.M() < 70 || {0}.M() > 150)".format(self.jj_str)
         bdt_cut_x0_400_sr = "(({0}) > 0.2)".format(BDToutputsVariable[bdtNameTemplate.replace("DATE", date).replace("SPIN", "0").replace("MASS", "400").replace("SUFFIX", suffixs[0])])
         bdt_cut_x0_400_br = "(({0}) < 0.2)".format(BDToutputsVariable[bdtNameTemplate.replace("DATE", date).replace("SPIN", "0").replace("MASS", "400").replace("SUFFIX", suffixs[0])])
         bdt_cut_x0_650_sr = "(({0}) > 0.2)".format(BDToutputsVariable[bdtNameTemplate.replace("DATE", date).replace("SPIN", "0").replace("MASS", "650").replace("SUFFIX", suffixs[0])])
         bdt_cut_x0_650_br = "(({0}) < 0.2)".format(BDToutputsVariable[bdtNameTemplate.replace("DATE", date).replace("SPIN", "0").replace("MASS", "650").replace("SUFFIX", suffixs[0])])
+        bdt_cut_x0_400_cr = "(({0}) < 0)".format(BDToutputsVariable[bdtNameTemplate.replace("DATE", date).replace("SPIN", "0").replace("MASS", "400").replace("SUFFIX", suffixs[0])])
+        bdt_cut_x0_650_cr = "(({0}) < 0)".format(BDToutputsVariable[bdtNameTemplate.replace("DATE", date).replace("SPIN", "0").replace("MASS", "650").replace("SUFFIX", suffixs[0])])
+        bdt_cut_x0_400_sr_ext = "(({0}) > 0.1)".format(BDToutputsVariable[bdtNameTemplate.replace("DATE", date).replace("SPIN", "0").replace("MASS", "400").replace("SUFFIX", suffixs[0])])
+        bdt_cut_x0_650_sr_ext = "(({0}) > 0.1)".format(BDToutputsVariable[bdtNameTemplate.replace("DATE", date).replace("SPIN", "0").replace("MASS", "650").replace("SUFFIX", suffixs[0])])
+        bdt_cut_x0_400_cr_ext = "(({0}) < 0.1)".format(BDToutputsVariable[bdtNameTemplate.replace("DATE", date).replace("SPIN", "0").replace("MASS", "400").replace("SUFFIX", suffixs[0])])
+        bdt_cut_x0_650_cr_ext = "(({0}) < 0.1)".format(BDToutputsVariable[bdtNameTemplate.replace("DATE", date).replace("SPIN", "0").replace("MASS", "650").replace("SUFFIX", suffixs[0])])
         safe_cut = "(%s.p4.Pt() > 30 && %s.p4.Pt() > 30 && %s.p4.Pt() > 20 && %s.p4.Pt() > 20)"%(self.jet1_str, self.jet2_str, self.lep1_str, self.lep2_str)
         dict_stage_cut = {
                "no_cut" : "", 
@@ -132,6 +139,13 @@ class BasePlotter:
                "lowBDT_mjjSB_650" : self.joinCuts(mll_cut, cleaning_cut, mjj_cut_br, bdt_cut_x0_650_br),
                "allBDT_mjjSB_650" : "(" + self.joinCuts(mll_cut, cleaning_cut, mjj_cut_br, bdt_cut_x0_650_sr) + ") || (" + self.joinCuts(mll_cut, cleaning_cut, mjj_cut_br, bdt_cut_x0_650_br) + ")",
                "lowBDT_mjjall_650" : "(" + self.joinCuts(mll_cut, cleaning_cut, mjj_cut_sr, bdt_cut_x0_650_br) + ") || (" + self.joinCuts(mll_cut, cleaning_cut, mjj_cut_br, bdt_cut_x0_650_br) + ")",
+               "mjj_cr" : self.joinCuts(mll_cut, cleaning_cut, mjj_cut_cr),
+               "bdt_400_cr" : self.joinCuts(mll_cut, cleaning_cut, bdt_cut_x0_400_cr), 
+               "bdt_650_cr" : self.joinCuts(mll_cut, cleaning_cut, bdt_cut_x0_650_cr),
+               "sr_400_ext" : self.joinCuts(mll_cut, cleaning_cut, bdt_cut_x0_400_sr_ext),
+               "sr_650_ext" : self.joinCuts(mll_cut, cleaning_cut, bdt_cut_x0_650_sr_ext),
+               "cr_400_ext" : self.joinCuts(mll_cut, cleaning_cut, bdt_cut_x0_400_cr_ext),
+               "cr_650_ext" : self.joinCuts(mll_cut, cleaning_cut, bdt_cut_x0_650_cr_ext),
                }
         # Categories
         self.dict_cat_cut =  {
@@ -191,6 +205,16 @@ class BasePlotter:
         if systematic == "pudown" :
             puWeight = "event_pu_weight_down"
 
+        # PDF weight
+        pdfWeight = ""
+        normalization = "nominal"
+        if systematic == "pdfup" : # do not change the name of "pdfup", use latter for the proper normalization
+            pdfWeight = "event_pdf_weight_up"
+            normalization = "pdf_up"
+        if systematic == "pdfdown" :
+            pdfWeight = "event_pdf_weight_down"
+            normalization = "pdf_down"
+
         # TRIGGER EFFICIENCY
         trigEff = "{0}.trigger_efficiency".format(self.baseObject)
         if systematic == "trigeffup" : 
@@ -225,9 +249,10 @@ class BasePlotter:
         self.puWeight_plot = []
         self.plots_gen = []
         self.plots_evt = []
-        self.plots_weights = []
 
         self.other_plot = []
+        self.vertex_plot = []
+        self.ht_plot = []
 
 
         self.forSkimmer_plot = []
@@ -241,7 +266,7 @@ class BasePlotter:
             catCut = self.dict_cat_cut[cat]
             self.totalCut = self.joinCuts(sanityCheck, catCut, extraCut, dict_stage_cut[stage])
             self.llFlav = cat
-            self.extraString = stage
+            self.extraString = stage + extraString
 
             self.mll_plot.append({
                         'name':  'll_M_%s_%s_%s%s'%(self.llFlav, self.suffix, self.extraString, self.systematicString),
@@ -520,7 +545,7 @@ class BasePlotter:
                 },
                 {
                         'name':  'll_DPhi_l_l_%s_%s_%s%s'%(self.llFlav, self.suffix, self.extraString, self.systematicString),
-                        'variable': "abs("+self.ll_str+".DPhi_l_l)",
+                        'variable': "abs("+self.baseObject+".DPhi_l_l)",
                         'plot_cut': self.totalCut,
                         'binning': '(50, 0, 3.1416)'
                 },
@@ -532,7 +557,7 @@ class BasePlotter:
                 #}
                 {
                         'name':  'jj_DPhi_j_j_%s_%s_%s%s'%(self.llFlav, self.suffix, self.extraString, self.systematicString),
-                        'variable': "abs("+self.jj_str+".DPhi_j_j)",
+                        'variable': "abs("+self.baseObject+".DPhi_j_j)",
                         'plot_cut': self.totalCut,
                         'binning': '(50, 0, 3.1416)'
                 },
@@ -764,6 +789,19 @@ class BasePlotter:
                     'binning': '(2, 0, 2)'
                 },
             ])
+            self.vertex_plot.append({
+                        'name':  'nPV_%s_%s_%s%s'%(self.llFlav, self.suffix, self.extraString, self.systematicString),
+                        'variable': "vertex_n",
+                        'plot_cut': self.totalCut,
+                        'binning': '(40, 0, 40)'
+                })
+            self.ht_plot.append({
+                        'name':  'ht_%s_%s_%s%s'%(self.llFlav, self.suffix, self.extraString, self.systematicString),
+                        'variable': "event_ht",
+                        'plot_cut': self.totalCut,
+                        'binning': '(100, 0, 800)'
+                })
+
 
             self.forSkimmer_plot.extend([
                 {
@@ -824,14 +862,39 @@ class BasePlotter:
 
         plotsToReturn = []
         for plotFamily in requested_plots :
-            for plot in getattr(self, plotFamily+"_plot"):
-                if not "Weight" in plotFamily :
-                    plot["weight"] = "event_weight"
-                    for weight in weights :  
-                        plot["weight"] += " * " + available_weights[weight]
-                else :
-                    print "No other weight then event_weight for ", plotFamily 
-                plotsToReturn.append(plot)
+            if systematic == "scale" :
+                scaleIndices = ["0", "1", "2", "3", "4", "5"]
+                for scaleIndice in scaleIndices :
+                    scaleWeight = "event_scale_weights[%s]"%scaleIndice
+                    for plot in getattr(self, plotFamily+"_plot"):
+                        if not "Weight" in plotFamily :
+                            plot["weight"] = "event_weight" + " * " + scaleWeight
+                            plot["normalize-to"] = "scale_%s"%scaleIndice
+                            for weight in weights :  
+                                plot["weight"] += " * " + available_weights[weight]
+                        else :
+                            print "No other weight then event_weight for ", plotFamily 
+                        plotsToReturn.append(plot)
+            elif "pdf" in systematic :
+                for plot in getattr(self, plotFamily+"_plot"):
+                    if not "Weight" in plotFamily :
+                        plot["weight"] = "event_weight" + " * " + pdfWeight
+                        plot["normalize-to"] = normalization
+                        for weight in weights :  
+                            plot["weight"] += " * " + available_weights[weight]
+                    else :
+                        print "No other weight then event_weight for ", plotFamily 
+                    plotsToReturn.append(plot)
+            else :
+                for plot in getattr(self, plotFamily+"_plot"):
+                    if not "Weight" in plotFamily :
+                        plot["weight"] = "event_weight"
+                        plot["normalize-to"] = normalization
+                        for weight in weights :  
+                            plot["weight"] += " * " + available_weights[weight]
+                    else :
+                        print "No other weight then event_weight for ", plotFamily 
+                    plotsToReturn.append(plot)
 
         return plotsToReturn
 
