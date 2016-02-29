@@ -2,9 +2,16 @@
 
 import yaml
 
-#usage : python listHisto.py (optional) suffix for yml file
+#usage : python listHisto.py [yields]
 from ROOT import * 
-import sys  
+import argparse
+
+parser = argparse.ArgumentParser(description='Facility to produce the yml with plots information.')
+parser.add_argument('--yields', help='If you just want to produce the yields and systematics.', action="store_true")
+parser.add_argument('-m', '--mass', dest='mass', default="650", help='Mass point for the yields.')
+parser.add_argument('-d', '--directory', dest='directory', default="arc_pdfunc_newElID_necessaryPlots", help='Directory of the input rootfiles.')
+args = parser.parse_args()
+
 baseDir = "/home/fynu/bfrancois/scratch/framework/oct2015/CMSSW_7_4_15/src/cp3_llbb/" 
 #fileName = baseDir+"avoidTFormula/CommonTools/histFactory/hists_TTTT_jetidT_htOrdered/GluGluToRadionToHHTo2B2VTo2L2Nu_M-500_narrow_MiniAODv2_v1.0.0+7415_HHAnalysis_2015-10-20.v4_histos.root"
 #fileName = baseDir+"CommonTools/histFactory/hists_MllLower80/GluGluToRadionToHHTo2B2VTo2L2Nu_M-500_narrow_MiniAODv2_v1.0.0+7415_HHAnalysis_2015-10-20.v4_histos.root"
@@ -22,7 +29,13 @@ baseDir = "/home/fynu/bfrancois/scratch/framework/oct2015/CMSSW_7_4_15/src/cp3_l
 
 #fileName = baseDir+"CommonTools/histFactory/hists_TTTT_jetidL_csvOrdered_2016_01_15_puweight/condor/output/TTTo2L2Nu_13TeV-powheg_MiniAODv2_v1.2.0+7415_HHAnalysis_2016-01-11.v0_histos.root"
 #fileName = baseDir+"CommonTools/histFactory/2016-02-04-fullPlots/condor/output/TTTo2L2Nu_13TeV-powheg_MiniAODv2_v2.0.3+7415_HHAnalysis_2016-01-30.v2_histos.root"
-fileName = baseDir+"CommonTools/histFactory/raisePtCut/condor/output/GluGluToRadionToHHTo2B2VTo2L2Nu_M-900_narrow_MiniAODv2_v2.0.3+7415_HHAnalysis_2016-01-30.v2_histos.root"
+#fileName = baseDir+"CommonTools/histFactory/raisePtCut/condor/output/GluGluToRadionToHHTo2B2VTo2L2Nu_M-900_narrow_MiniAODv2_v2.0.3+7415_HHAnalysis_2016-01-30.v2_histos.root"
+#fileName = baseDir+"CommonTools/histFactory/newBDT_TTonly_properControl/condor/output/GluGluToRadionToHHTo2B2VTo2L2Nu_M-900_narrow_MiniAODv2_v2.0.3+7415_HHAnalysis_2016-01-30.v3_histos.root"
+#fileName = baseDir+"/HHTools/histFactory_hh/controlRegions/condor/output/GluGluToRadionToHHTo2B2VTo2L2Nu_M-900_narrow_MiniAODv2_v2.0.3+7415_HHAnalysis_2016-01-30.v3_histos.root"
+#fileName = baseDir+"/HHTools/histFactory_hh/signalRegion/condor/output/GluGluToRadionToHHTo2B2VTo2L2Nu_M-900_narrow_MiniAODv2_v2.0.3+7415_HHAnalysis_2016-01-30.v3_histos.root"
+#fileName = baseDir+"/HHTools/histFactory_hh/2016-02-18_newBDT_HT_genericPlots/condor/output/GluGluToRadionToHHTo2B2VTo2L2Nu_M-900_narrow_MiniAODv2_v2.0.4+7415_HHAnalysis_2016-02-14.v0_histos.root"
+#fileName = baseDir+"/HHTools/histFactory_hh/forYieldsBis/condor/output/GluGluToRadionToHHTo2B2VTo2L2Nu_M-900_narrow_MiniAODv2_v2.0.4+7415_HHAnalysis_2016-02-14.v0_histos.root"
+fileName = baseDir+"/HHTools/histFactory_hh/"+args.directory+"/condor/output/GluGluToRadionToHHTo2B2VTo2L2Nu_M-900_narrow_MiniAODv2_v2.0.5+7415_HHAnalysis_2016-02-24.v0_histos.root"
 
 skim = False
 
@@ -33,8 +46,11 @@ alreadyIn = []
 # Dictionary containing all the plots
 plots = {}
 
+logY = 'both'
+if args.yields :
+    logY = False
 defaultStyle = {
-        'log-y': 'both',
+        'log-y': logY,
         'save-extensions': ['pdf', 'png'],
         'legend-columns': 2,
         'show-ratio': True,
@@ -112,9 +128,6 @@ for key in keys :
         elif "ll_M_" in key.GetName() :  
             plot['x-axis'] = "m_{ll} (GeV)"
             plot.update(defaultStyle_events_per_gev)
-        elif "jj_M_" in key.GetName() :  
-            plot['x-axis'] = "m_{jj} (GeV)"
-            plot.update(defaultStyle_events_per_gev)
         elif "ll_pt_" in key.GetName() :  
             plot['x-axis'] = "Dileptons system p_{T} (GeV)"
             plot.update(defaultStyle_events_per_gev)
@@ -126,6 +139,9 @@ for key in keys :
             plot.update(defaultStyle_events_per_gev)
         elif "met_phi" in key.GetName() :  
             plot['x-axis'] = "#phi_{#slash{E}_{T}}"
+            plot.update(defaultStyle_events)
+        elif "ll_DR_l_l_All_hh_llmetjj_HWWleptons_btagM_csv_cleaning_cut" in key.GetName() :  
+            plot['x-axis'] = "#DeltaR(leading lepton, sub-leading lepton)"
             plot.update(defaultStyle_events)
         elif "ll_DR_l_l" in key.GetName() :  
             plot['x-axis'] = "#DeltaR(leading lepton, sub-leading lepton)"
@@ -205,29 +221,67 @@ for key in keys :
         elif "cosThetaStar_CS" in key.GetName() :  
             plot['x-axis'] = "cos(#theta^{*}_{CS})"
             plot.update(defaultStyle_events)
-        elif "BDT" in key.GetName() :
+        elif "MVA" in key.GetName() and "mjj_cr" in key.GetName() :
             plot['x-axis'] = "BDT output"
             plot.update(defaultStyle_events)
-            plot['blinded-range'] = [0.1, 0.6]
-        elif "scaleFactor" in key.GetName() :
-            plot['x-axis'] = "Scale factor"
+            #plot['blinded-range'] = [0, 0.6]
+        elif "jj_M_" in key.GetName() and "_cr_" in key.GetName() :  
+            plot['x-axis'] = "m_{jj} (GeV)"
+            plot.update(defaultStyle_events_per_gev)
+            #plot['blinded-range'] = [75, 140]
+        elif "MVA_" in key.GetName() :
+            plot['x-axis'] = "BDT output"
             plot.update(defaultStyle_events)
-            plot['no-data'] = True
+            plot['blinded-range'] = [0, 0.6]
+            #plot['for-yields'] = True
+        elif "jj_M_" in key.GetName() :  
+            plot['x-axis'] = "m_{jj} (GeV)"
+            plot.update(defaultStyle_events_per_gev)
+            plot['blinded-range'] = [75, 140]
+        elif "isElEl" in key.GetName() and "highBDT_mjjP_" + args.mass in key.GetName() :
+            plot['x-axis'] = "isElEl"
+            plot.update(defaultStyle_events)
+            plot['for-yields'] = True
+            plot['yields-title'] = "high-BDT, m$_{jj}$-P"
+            plot['yields-table-order'] = 0
+        elif "isElEl" in key.GetName() and "highBDT_mjjSB_" + args.mass in key.GetName() :
+            plot['x-axis'] = "isElEl"
+            plot.update(defaultStyle_events)
+            plot['for-yields'] = True
+            plot['yields-title'] = "high-BDT, m$_{jj}$-SB"
+            plot['yields-table-order'] = 1
+        elif "isElEl" in key.GetName() and "lowBDT_mjjP_" + args.mass in key.GetName() :
+            plot['x-axis'] = "isElEl"
+            plot.update(defaultStyle_events)
+            plot['for-yields'] = True
+            plot['yields-title'] = "low-BDT, m$_{jj}$-P"
+            plot['yields-table-order'] = 2
+        elif "isElEl" in key.GetName() and "lowBDT_mjjSB_" + args.mass in key.GetName() :
+            plot['x-axis'] = "isElEl"
+            plot.update(defaultStyle_events)
+            plot['for-yields'] = True
+            plot['yields-title'] = "low-BDT, m$_{jj}$-SB"
+            plot['yields-table-order'] = 3
         else:
             plot.update(defaultStyle_events)
 
+        if "gen_" in key.GetName():
+            flavour = key.GetName().split("_")[1]
+            plot['x-axis'] = "is "+flavour
+            plot['no-data'] = True
+            plot.update(defaultStyle_events)
+        if any(x in key.GetName() for x in ['sr_400_ext', 'sr_650_ext']) :
+            plot['no-data'] = True
+        if "scaleFactor" in key.GetName() :
+            plot['x-axis'] = "Scale factor"
+            plot.update(defaultStyle_events)
+            plot['no-data'] = True
 
         label_x = 0.22
         label_y = 0.895
         if "MuMu" in key.GetName() : 
             plot['labels'] = [{
                 'text': '#mu#mu channel',
-                'position': [label_x, label_y],
-                'size': 24
-                }]
-        elif "ElEl" in key.GetName() : 
-            plot['labels'] = [{
-                'text': 'ee channel',
                 'position': [label_x, label_y],
                 'size': 24
                 }]
@@ -243,8 +297,16 @@ for key in keys :
                 'position': [label_x, label_y],
                 'size': 24
                 }]
-
-        plots[key.GetName()] = plot
+        elif "ElEl" in key.GetName() : #need to be the last one as we use isElEl to compute the yields 
+            plot['labels'] = [{
+                'text': 'ee channel',
+                'position': [label_x, label_y],
+                'size': 24
+                }]
+        if args.yields and "isElEl" in key.GetName() and args.mass in key.GetName() :
+            plots[key.GetName()] = plot
+        if not args.yields :
+            plots[key.GetName()] = plot
 
 with open("allPlots.yml", "w") as f:
     yaml.dump(plots, f)
