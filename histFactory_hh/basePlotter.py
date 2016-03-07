@@ -74,6 +74,7 @@ class BasePlotter:
         self.jet1_fwkIdx = self.jet1_str+".idx"
         self.jet2_fwkIdx = self.jet2_str+".idx"
 
+        # Ensure we have one candidate, works also for jecup etc
         if mode == "custom" :
             self.sanityCheck = "Length$(%s)>0"%baseObjectName
 
@@ -87,7 +88,7 @@ class BasePlotter:
         bdtNameTemplate = "DATE_BDT_XSPIN_MASS_SUFFIX"
         date = "2016_02_19"  #"2016_02_06"
         spins = ["0"] #, "2"]
-        masses = ["350", "400", "500", "650"] #, "900"]
+        masses = ["400", "650"]    #["350", "400", "500", "650"] #, "900"]
         suffixs = ["VS_TT_DYHTonly_tW_8var"] #["VS_TT_8var_bTagMM"]   #["VS_TT_DY_WoverSum_8var_bTagMM_noEvtW", "VS_TT_DY_WoverSum_8var_bTagMM"]# "VS_TT09_DY01_8var_bTagMM"] #, "VS_TT1_DY0_8var_bTagMM"]
         BDToutputs = {}
         bdtNames = []
@@ -108,12 +109,10 @@ class BasePlotter:
         mjj_cut_sr = "({0}.M() > 95 && {0}.M() < 135)".format(self.jj_str)
         mjj_cut_br = "({0}.M() < 95 || {0}.M() > 135)".format(self.jj_str)
         mjj_cut_cr = "({0}.M() < 70 || {0}.M() > 150)".format(self.jj_str)
-        bdt_cut_x0_400_sr = "(({0}) > 0.2)".format(BDToutputsVariable[bdtNameTemplate.replace("DATE", date).replace("SPIN", "0").replace("MASS", "400").replace("SUFFIX", suffixs[0])])
-        bdt_cut_x0_400_br = "(({0}) < 0.2)".format(BDToutputsVariable[bdtNameTemplate.replace("DATE", date).replace("SPIN", "0").replace("MASS", "400").replace("SUFFIX", suffixs[0])])
-        bdt_cut_x0_650_sr = "(({0}) > 0.2)".format(BDToutputsVariable[bdtNameTemplate.replace("DATE", date).replace("SPIN", "0").replace("MASS", "650").replace("SUFFIX", suffixs[0])])
-        bdt_cut_x0_650_br = "(({0}) < 0.2)".format(BDToutputsVariable[bdtNameTemplate.replace("DATE", date).replace("SPIN", "0").replace("MASS", "650").replace("SUFFIX", suffixs[0])])
-        bdt_cut_x0_400_cr = "(({0}) < 0)".format(BDToutputsVariable[bdtNameTemplate.replace("DATE", date).replace("SPIN", "0").replace("MASS", "400").replace("SUFFIX", suffixs[0])])
-        bdt_cut_x0_650_cr = "(({0}) < 0)".format(BDToutputsVariable[bdtNameTemplate.replace("DATE", date).replace("SPIN", "0").replace("MASS", "650").replace("SUFFIX", suffixs[0])])
+        bdt_cut_x0_400_sr = "(({0}) > 0.1)".format(BDToutputsVariable[bdtNameTemplate.replace("DATE", date).replace("SPIN", "0").replace("MASS", "400").replace("SUFFIX", suffixs[0])])
+        bdt_cut_x0_400_br = "(({0}) < 0.1)".format(BDToutputsVariable[bdtNameTemplate.replace("DATE", date).replace("SPIN", "0").replace("MASS", "400").replace("SUFFIX", suffixs[0])])
+        bdt_cut_x0_650_sr = "(({0}) > 0.1)".format(BDToutputsVariable[bdtNameTemplate.replace("DATE", date).replace("SPIN", "0").replace("MASS", "650").replace("SUFFIX", suffixs[0])])
+        bdt_cut_x0_650_br = "(({0}) < 0.1)".format(BDToutputsVariable[bdtNameTemplate.replace("DATE", date).replace("SPIN", "0").replace("MASS", "650").replace("SUFFIX", suffixs[0])])
         bdt_cut_x0_400_sr_ext = "(({0}) > 0.1)".format(BDToutputsVariable[bdtNameTemplate.replace("DATE", date).replace("SPIN", "0").replace("MASS", "400").replace("SUFFIX", suffixs[0])])
         bdt_cut_x0_650_sr_ext = "(({0}) > 0.1)".format(BDToutputsVariable[bdtNameTemplate.replace("DATE", date).replace("SPIN", "0").replace("MASS", "650").replace("SUFFIX", suffixs[0])])
         bdt_cut_x0_400_cr_ext = "(({0}) < 0.1)".format(BDToutputsVariable[bdtNameTemplate.replace("DATE", date).replace("SPIN", "0").replace("MASS", "400").replace("SUFFIX", suffixs[0])])
@@ -140,8 +139,6 @@ class BasePlotter:
                "allBDT_mjjSB_650" : "(" + self.joinCuts(mll_cut, cleaning_cut, mjj_cut_br, bdt_cut_x0_650_sr) + ") || (" + self.joinCuts(mll_cut, cleaning_cut, mjj_cut_br, bdt_cut_x0_650_br) + ")",
                "lowBDT_mjjall_650" : "(" + self.joinCuts(mll_cut, cleaning_cut, mjj_cut_sr, bdt_cut_x0_650_br) + ") || (" + self.joinCuts(mll_cut, cleaning_cut, mjj_cut_br, bdt_cut_x0_650_br) + ")",
                "mjj_cr" : self.joinCuts(mll_cut, cleaning_cut, mjj_cut_cr),
-               "bdt_400_cr" : self.joinCuts(mll_cut, cleaning_cut, bdt_cut_x0_400_cr), 
-               "bdt_650_cr" : self.joinCuts(mll_cut, cleaning_cut, bdt_cut_x0_650_cr),
                "sr_400_ext" : self.joinCuts(mll_cut, cleaning_cut, bdt_cut_x0_400_sr_ext),
                "sr_650_ext" : self.joinCuts(mll_cut, cleaning_cut, bdt_cut_x0_650_sr_ext),
                "cr_400_ext" : self.joinCuts(mll_cut, cleaning_cut, bdt_cut_x0_400_cr_ext),
@@ -163,25 +160,25 @@ class BasePlotter:
         # Lepton ID and Iso Scale Factors
         llIdIso_sfIdx = "[0]"
         llIdIso_strCommon="NOMINAL"
-        llIdIso_sf = "(common::combineScaleFactors<2>({{{{{{({0}.isEl) ? electron_sf_hww_wp[{1}][0] : muon_sf_hww_wp[{1}][0], ({0}.isEl) ? electron_sf_hww_wp[{1}]{2} : muon_sf_hww_wp[{1}]{2}}}, {{ ({3}.isEl) ? electron_sf_hww_wp[{4}][0] : muon_sf_hww_wp[{4}][0], ({3}.isEl) ? electron_sf_hww_wp[{4}]{2} : muon_sf_hww_wp[{4}]{2} }}}}}}, common::Variation::{5}) )".format(self.lep1_str, self.lep1_fwkIdx, llIdIso_sfIdx, self.lep2_str, self.lep2_fwkIdx, llIdIso_strCommon)
+        llIdIso_sf = "(common::combineScaleFactors<2>({{{{{{({0}.isEl) ? electron_sf_id_tight[{1}][0] : muon_sf_hww_wp[{1}][0], ({0}.isEl) ? electron_sf_id_tight[{1}]{2} : muon_sf_hww_wp[{1}]{2}}}, {{ ({3}.isEl) ? electron_sf_id_tight[{4}][0] : muon_sf_hww_wp[{4}][0], ({3}.isEl) ? electron_sf_id_tight[{4}]{2} : muon_sf_hww_wp[{4}]{2} }}}}}}, common::Variation::{5}) )".format(self.lep1_str, self.lep1_fwkIdx, llIdIso_sfIdx, self.lep2_str, self.lep2_fwkIdx, llIdIso_strCommon)
         # electrons
         if systematic == "elidisoup" :
             llIdIso_sfIdx = "[2]" 
             llIdIso_strCommon="UP"
-            llIdIso_sf = "(common::combineScaleFactors<2>({{{{{{({0}.isEl) ? electron_sf_hww_wp[{1}][0] : muon_sf_hww_wp[{1}][0], ({0}.isEl) ? electron_sf_hww_wp[{1}]{2} : 0 }}, {{ ({3}.isEl) ? electron_sf_hww_wp[{4}][0] : muon_sf_hww_wp[{4}][0], ({3}.isEl) ? electron_sf_hww_wp[{4}]{2} : 0 }}}}}}, common::Variation::{5}) )".format(self.lep1_str, self.lep1_fwkIdx, llIdIso_sfIdx, self.lep2_str, self.lep2_fwkIdx, llIdIso_strCommon)
+            llIdIso_sf = "(common::combineScaleFactors<2>({{{{{{({0}.isEl) ? electron_sf_id_tight[{1}][0] : muon_sf_hww_wp[{1}][0], ({0}.isEl) ? electron_sf_id_tight[{1}]{2} : 0 }}, {{ ({3}.isEl) ? electron_sf_id_tight[{4}][0] : muon_sf_hww_wp[{4}][0], ({3}.isEl) ? electron_sf_id_tight[{4}]{2} : 0 }}}}}}, common::Variation::{5}) )".format(self.lep1_str, self.lep1_fwkIdx, llIdIso_sfIdx, self.lep2_str, self.lep2_fwkIdx, llIdIso_strCommon)
         if systematic == "elidisodown" :
             llIdIso_sfIdx = "[1]"
             llIdIso_strCommon="DOWN"
-            llIdIso_sf = "(common::combineScaleFactors<2>({{{{{{({0}.isEl) ? electron_sf_hww_wp[{1}][0] : muon_sf_hww_wp[{1}][0], ({0}.isEl) ? electron_sf_hww_wp[{1}]{2} : 0 }}, {{ ({3}.isEl) ? electron_sf_hww_wp[{4}][0] : muon_sf_hww_wp[{4}][0], ({3}.isEl) ? electron_sf_hww_wp[{4}]{2} : 0 }}}}}}, common::Variation::{5}) )".format(self.lep1_str, self.lep1_fwkIdx, llIdIso_sfIdx, self.lep2_str, self.lep2_fwkIdx, llIdIso_strCommon)
+            llIdIso_sf = "(common::combineScaleFactors<2>({{{{{{({0}.isEl) ? electron_sf_id_tight[{1}][0] : muon_sf_hww_wp[{1}][0], ({0}.isEl) ? electron_sf_id_tight[{1}]{2} : 0 }}, {{ ({3}.isEl) ? electron_sf_id_tight[{4}][0] : muon_sf_hww_wp[{4}][0], ({3}.isEl) ? electron_sf_id_tight[{4}]{2} : 0 }}}}}}, common::Variation::{5}) )".format(self.lep1_str, self.lep1_fwkIdx, llIdIso_sfIdx, self.lep2_str, self.lep2_fwkIdx, llIdIso_strCommon)
         # muons
         if systematic == "muidisoup" :
             llIdIso_sfIdx = "[2]" 
             llIdIso_strCommon="UP"
-            llIdIso_sf = "(common::combineScaleFactors<2>({{{{{{({0}.isEl) ? electron_sf_hww_wp[{1}][0] : muon_sf_hww_wp[{1}][0], ({0}.isEl) ? 0. : muon_sf_hww_wp[{1}]{2}}}, {{ ({3}.isEl) ? electron_sf_hww_wp[{4}][0] : muon_sf_hww_wp[{4}][0], ({3}.isEl) ? 0. : muon_sf_hww_wp[{4}]{2} }}}}}}, common::Variation::{5}) )".format(self.lep1_str, self.lep1_fwkIdx, llIdIso_sfIdx, self.lep2_str, self.lep2_fwkIdx, llIdIso_strCommon)
+            llIdIso_sf = "(common::combineScaleFactors<2>({{{{{{({0}.isEl) ? electron_sf_id_tight[{1}][0] : muon_sf_hww_wp[{1}][0], ({0}.isEl) ? 0. : muon_sf_hww_wp[{1}]{2}}}, {{ ({3}.isEl) ? electron_sf_id_tight[{4}][0] : muon_sf_hww_wp[{4}][0], ({3}.isEl) ? 0. : muon_sf_hww_wp[{4}]{2} }}}}}}, common::Variation::{5}) )".format(self.lep1_str, self.lep1_fwkIdx, llIdIso_sfIdx, self.lep2_str, self.lep2_fwkIdx, llIdIso_strCommon)
         if systematic == "muidisodown" :
             llIdIso_sfIdx = "[1]"
             llIdIso_strCommon="DOWN"
-            llIdIso_sf = "(common::combineScaleFactors<2>({{{{{{({0}.isEl) ? electron_sf_hww_wp[{1}][0] : muon_sf_hww_wp[{1}][0], ({0}.isEl) ? 0. : muon_sf_hww_wp[{1}]{2}}}, {{ ({3}.isEl) ? electron_sf_hww_wp[{4}][0] : muon_sf_hww_wp[{4}][0], ({3}.isEl) ? 0. : muon_sf_hww_wp[{4}]{2} }}}}}}, common::Variation::{5}) )".format(self.lep1_str, self.lep1_fwkIdx, llIdIso_sfIdx, self.lep2_str, self.lep2_fwkIdx, llIdIso_strCommon)
+            llIdIso_sf = "(common::combineScaleFactors<2>({{{{{{({0}.isEl) ? electron_sf_id_tight[{1}][0] : muon_sf_hww_wp[{1}][0], ({0}.isEl) ? 0. : muon_sf_hww_wp[{1}]{2}}}, {{ ({3}.isEl) ? electron_sf_id_tight[{4}][0] : muon_sf_hww_wp[{4}][0], ({3}.isEl) ? 0. : muon_sf_hww_wp[{4}]{2} }}}}}}, common::Variation::{5}) )".format(self.lep1_str, self.lep1_fwkIdx, llIdIso_sfIdx, self.lep2_str, self.lep2_fwkIdx, llIdIso_strCommon)
 
         # BTAG SF
         jjBtag_sfIdx = "[0]"
@@ -222,8 +219,9 @@ class BasePlotter:
         if systematic == "trigeffdown" : 
             trigEff = "{0}.trigger_efficiency_downVariated".format(self.baseObject)
 
+        # Append the proper extension to the name plot if needed (scale name are down at the end of the code)
         self.systematicString = ""
-        if not systematic == "nominal" :
+        if not systematic == "nominal" and not systematic == "scale" :
             self.systematicString = "__" + systematic
 
         available_weights = {'trigeff' : trigEff, 'jjbtag' : jjBtag_sf, 'llidiso' : llIdIso_sf, 'pu' : puWeight}
@@ -235,10 +233,15 @@ class BasePlotter:
         self.csv_plot = []
         self.bdtinput_plot = []
         self.cleancut_plot = []
+        self.drllcut_plot = []
+        self.drjjcut_plot = []
+        self.dphilljjcut_plot = []
         self.isElEl_plot = []
         self.mll_plot = []
         self.mjj_plot = []
         self.bdtoutput_plot = []
+        self.bdt400_plot = []
+        self.bdt650_plot = []
         self.mjjvsbdt_plot = []
 
         self.flavour_plot = []
@@ -247,6 +250,8 @@ class BasePlotter:
         self.jjbtagWeight_plot = []
         self.trigeffWeight_plot = []
         self.puWeight_plot = []
+        self.scaleWeight_plot = []
+        self.pdfWeight_plot = []
         self.plots_gen = []
         self.plots_evt = []
 
@@ -257,6 +262,7 @@ class BasePlotter:
 
         self.forSkimmer_plot = []
 
+        # Protect against the fact that data do not have jecup collections, in the nominal case we still have to check that data have one candidate 
         sanityCheck = self.sanityCheck
         if systematic != "nominal" : 
             sanityCheck = self.joinCuts("!event_is_data", self.sanityCheck)
@@ -295,6 +301,21 @@ class BasePlotter:
                         'plot_cut' : self.totalCut,
                         'binning' : '(60, -0.6, 0.6)'
                 })
+                if '400' in bdtName : 
+                    self.bdt400_plot.append({
+                                'name' : 'MVA_%s_%s_%s_%s%s'%(bdtName, self.llFlav, self.suffix, self.extraString, self.systematicString),
+                                'variable' : BDToutputsVariable[bdtName],
+                                'plot_cut' : self.totalCut,
+                                'binning' : '(60, -0.6, 0.6)'
+                        })
+                if '650' in bdtName : 
+                    self.bdt650_plot.append({
+                                'name' : 'MVA_%s_%s_%s_%s%s'%(bdtName, self.llFlav, self.suffix, self.extraString, self.systematicString),
+                                'variable' : BDToutputsVariable[bdtName],
+                                'plot_cut' : self.totalCut,
+                                'binning' : '(60, -0.6, 0.6)'
+                        })
+
                 self.mjjvsbdt_plot.append({
                         'name' : 'MjjvsMVA_%s_%s_%s_%s%s'%(bdtName, self.llFlav, self.suffix, self.extraString, self.systematicString),
                         'variable' : BDToutputsVariable[bdtName]+":::"+self.jj_str+".M()",
@@ -304,17 +325,32 @@ class BasePlotter:
 
             # Weight Plots
             self.jjbtagWeight_plot.append(
-                        {'name':  'jjbtag_%s_%s%s'%(self.llFlav, self.suffix, self.systematicString), 'variable': available_weights["jjbtag"],
+                        {'name':  'jjbtag_%s_%s_%s%s'%(self.llFlav, self.suffix, self.extraString,  self.systematicString), 'variable': available_weights["jjbtag"],
                         'plot_cut': self.totalCut, 'binning':'(100, 0, 1.5)', 'weight': 'event_weight'})
             self.llidisoWeight_plot.append(
-                        {'name':  'llidiso_%s_%s%s'%(self.llFlav, self.suffix, self.systematicString), 'variable': available_weights["llidiso"],
+                        {'name':  'llidiso_%s_%s_%s%s'%(self.llFlav, self.suffix, self.extraString,  self.systematicString), 'variable': available_weights["llidiso"],
                         'plot_cut': self.totalCut, 'binning': '(50, 0.7, 1.3)', 'weight': 'event_weight'})
             self.trigeffWeight_plot.append(
-                        {'name':  'trigeff_%s_%s%s'%(self.llFlav, self.suffix, self.systematicString), 'variable': available_weights["trigeff"],
+                        {'name':  'trigeff_%s_%s_%s%s'%(self.llFlav, self.suffix, self.extraString,  self.systematicString), 'variable': available_weights["trigeff"],
                         'plot_cut': self.totalCut, 'binning': '(50, 0, 1.2)', 'weight': 'event_weight'})
             self.puWeight_plot.append(
-                        {'name':  'pu_%s_%s%s'%(self.llFlav, self.suffix, self.systematicString), 'variable': available_weights["pu"],
+                        {'name':  'pu_%s_%s_%s%s'%(self.llFlav, self.suffix, self.extraString,  self.systematicString), 'variable': available_weights["pu"],
                         'plot_cut': self.totalCut, 'binning': '(100, 0, 4)', 'weight': 'event_weight'})
+            self.scaleWeight_plot.extend([
+                        {'name':  'scale0_%s_%s_%s%s'%(self.llFlav, self.suffix, self.extraString,  self.systematicString), 'variable': "event_scale_weights[0]",
+                        'plot_cut': self.totalCut, 'binning': '(100, 0.5, 1.5)', 'weight': 'event_weight'},
+                        {'name':  'scale1_%s_%s_%s%s'%(self.llFlav, self.suffix, self.extraString,  self.systematicString), 'variable': "event_scale_weights[1]",
+                        'plot_cut': self.totalCut, 'binning': '(100, 0.5, 1.5)', 'weight': 'event_weight'},
+                        {'name':  'scale2_%s_%s_%s%s'%(self.llFlav, self.suffix, self.extraString,  self.systematicString), 'variable': "event_scale_weights[2]",
+                        'plot_cut': self.totalCut, 'binning': '(100, 0.5, 1.5)', 'weight': 'event_weight'},
+                        {'name':  'scale3_%s_%s_%s%s'%(self.llFlav, self.suffix, self.extraString,  self.systematicString), 'variable': "event_scale_weights[3]",
+                        'plot_cut': self.totalCut, 'binning': '(100, 0.5, 1.5)', 'weight': 'event_weight'},
+                        {'name':  'scale4_%s_%s_%s%s'%(self.llFlav, self.suffix, self.extraString,  self.systematicString), 'variable': "event_scale_weights[4]",
+                        'plot_cut': self.totalCut, 'binning': '(100, 0.5, 1.5)', 'weight': 'event_weight'},
+                        {'name':  'scale5_%s_%s_%s%s'%(self.llFlav, self.suffix, self.extraString,  self.systematicString), 'variable': "event_scale_weights[5]",
+                        'plot_cut': self.totalCut, 'binning': '(100, 0.5, 1.5)', 'weight': 'event_weight'}])
+                        
+                    
 
             self.basic_plot.extend([
                 {
@@ -363,12 +399,12 @@ class BasePlotter:
                 }
             ])
             self.cleancut_plot.extend([
-                {
-                        'name':  'll_M_%s_%s_%s%s'%(self.llFlav, self.suffix, self.extraString, self.systematicString),
-                        'variable': self.ll_str+".M()",
-                        'plot_cut': self.totalCut,
-                        'binning': '(50, 0, 250)'
-                },
+                #{
+                #        'name':  'll_M_%s_%s_%s%s'%(self.llFlav, self.suffix, self.extraString, self.systematicString),
+                #        'variable': self.ll_str+".M()",
+                #        'plot_cut': self.totalCut,
+                #        'binning': '(50, 0, 250)'
+                #},
                 {
                         'name':  'll_DR_l_l_%s_%s_%s%s'%(self.llFlav, self.suffix, self.extraString, self.systematicString),
                         'variable': self.baseObject+".DR_l_l",
@@ -388,6 +424,27 @@ class BasePlotter:
                         'binning': '(25, 0, 3.1416)'
                 }
             ])
+            self.drllcut_plot.append(
+                {
+                        'name':  'll_DR_l_l_%s_%s_%s%s'%(self.llFlav, self.suffix, self.extraString, self.systematicString),
+                        'variable': self.baseObject+".DR_l_l",
+                        'plot_cut': self.totalCut,
+                        'binning': '(50, 0, 6)'
+                })
+            self.drjjcut_plot.append(
+                {
+                        'name':  'jj_DR_j_j_%s_%s_%s%s'%(self.llFlav, self.suffix, self.extraString, self.systematicString),
+                        'variable': self.baseObject+".DR_j_j",
+                        'plot_cut': self.totalCut,
+                        'binning': '(50, 0, 6)'
+                })
+            self.dphilljjcut_plot.append(
+                {
+                        'name':  'llmetjj_DPhi_ll_jj_%s_%s_%s%s'%(self.llFlav, self.suffix, self.extraString, self.systematicString),
+                        'variable': "abs("+self.baseObject+".DPhi_ll_jj)",
+                        'plot_cut': self.totalCut,
+                        'binning': '(25, 0, 3.1416)'
+                })
 
             self.bdtinput_plot.extend([
                 {
@@ -867,14 +924,16 @@ class BasePlotter:
                 for scaleIndice in scaleIndices :
                     scaleWeight = "event_scale_weights[%s]"%scaleIndice
                     for plot in getattr(self, plotFamily+"_plot"):
+                        tempPlot = copy.deepcopy(plot)
+                        tempPlot["normalize-to"] = "scale_%s"%scaleIndice
+                        tempPlot["name"] += "__scale%s"%scaleIndice
                         if not "Weight" in plotFamily :
-                            plot["weight"] = "event_weight" + " * " + scaleWeight
-                            plot["normalize-to"] = "scale_%s"%scaleIndice
+                            tempPlot["weight"] = "event_weight" + " * " + scaleWeight
                             for weight in weights :  
-                                plot["weight"] += " * " + available_weights[weight]
+                                tempPlot["weight"] += " * " + available_weights[weight]
                         else :
                             print "No other weight then event_weight for ", plotFamily 
-                        plotsToReturn.append(plot)
+                        plotsToReturn.append(tempPlot)
             elif "pdf" in systematic :
                 for plot in getattr(self, plotFamily+"_plot"):
                     if not "Weight" in plotFamily :
