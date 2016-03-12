@@ -1,0 +1,5 @@
+'data_obs_postfit_histos.root':
+  type: data
+  #legend: "Data"
+  group: "Data"
+

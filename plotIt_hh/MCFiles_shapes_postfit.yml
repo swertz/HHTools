@@ -1,0 +1,73 @@
+# HIGGS
+
+'SMHiggs_postfit_histos.root':
+  type: mc
+  group: Higgs
+  order: 1
+
+# TTV 
+
+'ttV_postfit_histos.root':
+  type: mc
+  group: ttV
+  order: 2
+
+# VV
+
+'VV_postfit_histos.root':
+  type: mc
+  group: VV
+  order: 3
+
+# Single top
+
+'SingleTop_postfit_histos.root':
+  type: mc
+  group: t
+  order: 5
+
+# TT
+
+'ttbar_postfit_histos.root':
+  type: mc
+  group: tt
+  order: 8
+
+# DY
+
+'dy_postfit_histos.root':
+  type: mc
+  group: DY
+  order: 7
+
+# Signal
+
+'ggX0HHM400_postfit_histos.root':
+  type: signal
+  cross-section: 1000
+  #generated-events: 300000
+  line-color: '#008000'
+  legend: 'm_{X} = 400 (1 pb)'
+  legend-order: 5
+  line-width: 2
+  line-type: 1
+
+'ggX0HHM650_postfit_histos.root':
+  type: signal
+  cross-section: 1000
+  #generated-events: 300000
+  line-color: '#ff0000'
+  legend: 'm_{X} = 650 (1 pb)'
+  legend-order: 3
+  line-width: 2
+  line-type: 1
+
+'ggX0HHM900_postfit_histos.root':
+  type: signal
+  cross-section: 1000
+  #generated-events: 289200.0
+  line-color: '#000000'
+  legend: 'm_{X} = 900 (1 pb)'
+  legend-order: 1
+  line-width: 2
+  line-type: 1

@@ -1,0 +1,56 @@
+BDT:
+  labels:
+  - position: [0.22, 0.895]
+    size: 24
+    text: '#mu#mu + ee + #mue + e#mu channels'
+  legend-columns: 2
+  log-y: false
+  save-extensions: &id001 [pdf, png]
+  show-errors: true
+  show-overflow: true
+  show-ratio: true
+  x-axis: BDT output
+  y-axis: Events
+  y-axis-format: '%1% / %2$.2f'
+mjj:
+  labels:
+  - position: [0.22, 0.895]
+    size: 24
+    text: '#mu#mu + ee + #mue + e#mu channels'
+  legend-columns: 2
+  log-y: false
+  save-extensions: *id001
+  show-errors: true
+  show-overflow: true
+  show-ratio: true
+  x-axis: m_{jj} (GeV)
+  y-axis: Events
+  y-axis-format: '%1% / %2$.2f GeV'
+ptjj:
+  labels:
+  - position: [0.22, 0.895]
+    size: 24
+    text: '#mu#mu + ee + #mue + e#mu channels'
+  legend-columns: 2
+  log-y: false
+  save-extensions: *id001
+  show-errors: true
+  show-overflow: true
+  show-ratio: true
+  x-axis: Dijets system p_{T} (GeV)
+  y-axis: Events
+  y-axis-format: '%1% / %2$.2f GeV'
+ptll:
+  labels:
+  - position: [0.22, 0.895]
+    size: 24
+    text: '#mu#mu + ee + #mue + e#mu channels'
+  legend-columns: 2
+  log-y: false
+  save-extensions: *id001
+  show-errors: true
+  show-overflow: true
+  show-ratio: true
+  x-axis: Dileptons system p_{T} (GeV)
+  y-axis: Events
+  y-axis-format: '%1% / %2$.2f GeV'
