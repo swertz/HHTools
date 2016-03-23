@@ -37,7 +37,7 @@ ptjj:
   show-errors: true
   show-overflow: true
   show-ratio: true
-  x-axis: Dijets system p_{T} (GeV)
+  x-axis: Dijet system p_{T} (GeV)
   y-axis: Events
   y-axis-format: '%1% / %2$.2f GeV'
 ptll:
@@ -51,6 +51,6 @@ ptll:
   show-errors: true
   show-overflow: true
   show-ratio: true
-  x-axis: Dileptons system p_{T} (GeV)
+  x-axis: Dilepton system p_{T} (GeV)
   y-axis: Events
   y-axis-format: '%1% / %2$.2f GeV'
