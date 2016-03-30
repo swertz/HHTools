@@ -1,26 +1,12 @@
 # HHTools
-Toolbox for resonant HH analysis 
+Toolbox for resonant HH analysis
 
 ## Setup instructions
-This repository consist only of scripts to make interface with the CommonTools and PlotIt facilities. The only thing required before to launch anything is :
+This repository consists of scripts interfacing the CommonTools and PlotIt facilities. It does not require any compilation, just run the following before launching anything :
 ```
 cms_env
 cmenv
 ```
-with, in the .bashrc,
-
-```
-alias cms_env="module purge; module load grid/grid_environment_sl6; module load crab/crab3; module load cms/cmssw;"
-```
-
-## Produce TH1(2) out of the output of HHAnalyzer
-
-This step is done in ```histFactory_hh```. You need a python script to generate the plots (such as ```generatePlots.py``` based on ```basePlotter.py```). The important is that this code defines a list called ```plots```. To launch the TH1(2) production, use ```python launchHistFactory.py -o OUTPUTFOLDER -p PLOTTER.PY -s -r```. The ```-s``` option actually submit the jobs on condor, use it first without to check that there is no error with ```source OUTPUTFOLDER/condor/input/condor_1.sh```. The ```-r``` option removes ```OUTPUTFOLDER``` if it exists. NB : to avoid risky command, it first prompts the command, you need to confirm by typing "enter".
-
-## Produce stacked plots with the output of histFactory
-
-This step is done in ```plotIt_hh```.  
-=======
 with, in the .bashrc,
 
 `alias cms_env="module purge; module load grid/grid_environment_sl6; module load crab/crab3; module load cms/cmssw;"`.
@@ -50,4 +36,3 @@ Here are the key files you have to modify :
 `MCFiles.yml` and `DataFiles.yml` to specify the samples you want to run on. Usually you just need to replace the old tag by the new one (e.g. in  vim `:%s/v2.0.3+7415_HHAnalysis_2016-01-30.v3/v2.0.4+7415_HHAnalysis_2016-02-14.v0/`).
 
 `groups.yml` to specify the colors, the names and which samples should appear merged in the legend.
->>>>>>> e1980ae2dd609147960ada8eac13eb470e984c50
