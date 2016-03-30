@@ -18,7 +18,7 @@ def get_sample(name):
 
 
 date = "2016_02_19"
-suffix = "ToSeeRanking" #"VS_TT_DYHTonly_tW_8var"  #DY_WoverSum_8var_bTagMM_noEvtW"
+suffix = "VS_TT_DYHTonly_tW_8var"  #DY_WoverSum_8var_bTagMM_noEvtW"
 label_template = "DATE_BDT_XSPIN_MASS_SUFFIX"
 
 massPoints = ['400', '650'] #['350', '400', '500', '650']  #['400', '650'] #, '900']
