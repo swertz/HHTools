@@ -69,6 +69,42 @@
   group: VV
   order: 3
 
+'WZTo1L3Nu_13TeV_amcatnloFXFX_madspin_pythia8_Spring15MiniAODv2_v2.0.5+7415_HHAnalysis_2016-02-24.v0_histos.root':
+  type: mc
+  group: VV
+  order: 3
+
+#'WWTo2L2Nu_13TeV-powheg_Spring15MiniAODv2_v2.0.5+7415_HHAnalysis_2016-02-24.v0_histos.root':
+#  type: mc
+#  group: VV
+#  order: 3
+#  cross-section: 12.178
+
+'WWToLNuQQ_13TeV-powheg_Spring15MiniAODv2_v2.0.5+7415_HHAnalysis_2016-02-24.v0_histos.root':
+  type: mc
+  group: VV
+  order: 3
+
+'WZTo1L1Nu2Q_13TeV_amcatnloFXFX_madspin_pythia8_Spring15MiniAODv2_v2.0.5+7415_HHAnalysis_2016-02-24.v0_histos.root':
+  type: mc
+  group: VV
+  order: 3
+
+'WZTo2L2Q_13TeV_amcatnloFXFX_madspin_pythia8_Spring15MiniAODv2_v2.0.5+7415_HHAnalysis_2016-02-24.v0_histos.root':
+  type: mc
+  group: VV
+  order: 3
+
+'WZTo3LNu_TuneCUETP8M1_13TeV-powheg-pythia8_Spring15MiniAODv2_v2.0.5+7415_HHAnalysis_2016-02-24.v0_histos.root':
+  type: mc
+  group: VV
+  order: 3
+
+'ZZTo4L_13TeV_powheg_pythia8_Spring15MiniAODv2_v2.0.5+7415_HHAnalysis_2016-02-24.v0_histos.root':
+  type: mc
+  group: VV
+  order: 3
+
 # Single top
 
 'ST_s-channel_4f_leptonDecays_13TeV-amcatnlo_MiniAODv2_v2.0.5+7415_HHAnalysis_2016-02-24.v0_histos.root':
@@ -93,10 +129,17 @@
 
 # TT
 
+#'TTJets_TuneCUETP8M1_amcatnloFXFX_25ns_v2.0.5+7415_HHAnalysis_2016-02-24.v0_histos.root':
+#  type: mc
+#  legend : ' t#bar{t} aMC'
+#  group: tt
+#  order: 8
+
 'TT_TuneCUETP8M1_13TeV-powheg-pythia8_MiniAODv2_v2.0.5+7415_HHAnalysis_2016-02-24.v0_histos.root':
   type: mc
   group: tt
   order: 8
+
 #'TT_FL_TuneCUETP8M1_13TeV-powheg-pythia8_MiniAODv2_v2.0.5+7415_HHAnalysis_2016-02-24.v0_histos.root':
 #  type: mc
 #  group: tt
@@ -167,16 +210,6 @@
 #  group: DY
 #  order: 7
   
-#'DYJetsToLL_M-10to50_TuneCUETP8M1_13TeV-amcatnloFXFX_MiniAODv2_v2.0.5+7415_HHAnalysis_2016-02-24.v0_histos.root':
-#  type: mc
-#  group: DY
-#  order: 7
-#
-#'DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX_MiniAODv2_v2.0.5+7415_HHAnalysis_2016-02-24.v0_histos.root':
-#  type: mc
-#  group: DY
-#  order: 7
-
 #'DYJetsToLL_M-10to50_TuneCUETP8M1_13TeV-amcatnloFXFX_MiniAODv2_v2.0.5+7415_HHAnalysis_2016-02-24.v0_histos.root':
 #  type: mc
 #  group: DY

@@ -15,7 +15,7 @@ weights_llbb = []
 flavour = "All"
 categories_llbb = [flavour]
 stage_llbb = "no_cut"
-plots_llbb = ["mjj", "basic", "bdtinput", "llidisoWeight", 'jjbtagWeight', 'trigeffWeight', 'puWeight', 'forSkimmer', 'csv']
+plots_llbb = ["mjj", "basic", "bdtinput", "vertex", "ht", "other", "llidisoWeight", 'jjbtagWeight', 'trigeffWeight', 'puWeight', 'forSkimmer', 'csv']
 plots.extend(basePlotter.generatePlots(categories_llbb, stage_llbb, systematic = "nominal", weights = weights_llbb, requested_plots = plots_llbb))
 
 tree = {}
@@ -28,3 +28,6 @@ for plot in plots :
     branch["name"] = plot["name"].split("_"+flavour)[0]
     branch["variable"] = plot["variable"]
     tree["branches"].append(branch)
+    
+for banch in tree["branches"] :
+    print banch

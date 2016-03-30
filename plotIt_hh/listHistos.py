@@ -9,7 +9,7 @@ import argparse
 parser = argparse.ArgumentParser(description='Facility to produce the yml with plots information.')
 parser.add_argument('--yields', help='If you just want to produce the yields and systematics.', action="store_true")
 parser.add_argument('-m', '--mass', dest='mass', default="650", help='Mass point for the yields.')
-parser.add_argument('-d', '--directory', dest='directory', default="arc_pdfunc_newElID_necessaryPlots", help='Directory of the input rootfiles.')
+parser.add_argument('-d', '--directory', dest='directory', default="unblinding", help='Directory of the input rootfiles.')
 args = parser.parse_args()
 
 baseDir = "/home/fynu/bfrancois/scratch/framework/oct2015/CMSSW_7_4_15/src/cp3_llbb/" 
@@ -74,7 +74,7 @@ for key in keys :
     if key.GetName() not in alreadyIn  and not "__" in key.GetName():
         alreadyIn.append(key.GetName())
         plot = {
-                'x-axis': key.GetName()
+                'x-axis': key.GetName(),
                 }
 
         if "lep1_pt" in key.GetName() :
@@ -242,25 +242,25 @@ for key in keys :
             plot['x-axis'] = "isElEl"
             plot.update(defaultStyle_events)
             plot['for-yields'] = True
-            plot['yields-title'] = "high-BDT, m$_{jj}$-P"
+            plot['yields-title'] = "high-BDT %s, m$_{jj}$-P"%(args.mass)
             plot['yields-table-order'] = 0
         elif "isElEl" in key.GetName() and "highBDT_mjjSB_" + args.mass in key.GetName() :
             plot['x-axis'] = "isElEl"
             plot.update(defaultStyle_events)
             plot['for-yields'] = True
-            plot['yields-title'] = "high-BDT, m$_{jj}$-SB"
+            plot['yields-title'] = "high-BDT %s, m$_{jj}$-SB"%(args.mass)
             plot['yields-table-order'] = 1
         elif "isElEl" in key.GetName() and "lowBDT_mjjP_" + args.mass in key.GetName() :
             plot['x-axis'] = "isElEl"
             plot.update(defaultStyle_events)
             plot['for-yields'] = True
-            plot['yields-title'] = "low-BDT, m$_{jj}$-P"
+            plot['yields-title'] = "low-BDT %s, m$_{jj}$-P"%(args.mass)
             plot['yields-table-order'] = 2
         elif "isElEl" in key.GetName() and "lowBDT_mjjSB_" + args.mass in key.GetName() :
             plot['x-axis'] = "isElEl"
             plot.update(defaultStyle_events)
             plot['for-yields'] = True
-            plot['yields-title'] = "low-BDT, m$_{jj}$-SB"
+            plot['yields-title'] = "low-BDT %s, m$_{jj}$-SB"%(args.mass)
             plot['yields-table-order'] = 3
         else:
             plot.update(defaultStyle_events)
