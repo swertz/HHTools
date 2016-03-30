@@ -227,7 +227,7 @@
   cross-section: 1000
   #generated-events: 300000
   line-color: '#008000'
-  legend: 'm_{X} = 400 (1 pb)'
+  legend: 'm_{X} = 400 GeV'
   legend-order: 5
   line-width: 2
   line-type: 1
@@ -237,7 +237,7 @@
   cross-section: 1000
   #generated-events: 300000
   line-color: '#ff0000'
-  legend: 'm_{X} = 650 (1 pb)'
+  legend: 'm_{X} = 650 GeV'
   legend-order: 3
   line-width: 2
   line-type: 1
@@ -247,7 +247,7 @@
   cross-section: 1000
   #generated-events: 289200.0
   line-color: '#000000'
-  legend: 'm_{X} = 900 (1 pb)'
+  legend: 'm_{X} = 900 GeV'
   legend-order: 1
   line-width: 2
   line-type: 1

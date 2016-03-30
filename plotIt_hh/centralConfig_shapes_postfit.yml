@@ -1,0 +1,16 @@
+width: 800
+height: 800
+luminosity-label: '%1$.2f fb^{-1} (13 TeV)'
+experiment: "CMS"
+extra-label: "Preliminary"
+
+root: 'postfit_shapes'
+
+luminosity: 2299.57 # according to brilcalc 
+no-lumi-rescaling: true
+blinded-range-fill-color: "16" #"#29556270"
+blinded-range-fill-style: 3004
+
+yields-table-align: v
+
+book-keeping-file: 'plots.root'

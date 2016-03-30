@@ -129,10 +129,10 @@ for key in keys :
             plot['x-axis'] = "m_{ll} (GeV)"
             plot.update(defaultStyle_events_per_gev)
         elif "ll_pt_" in key.GetName() :  
-            plot['x-axis'] = "Dileptons system p_{T} (GeV)"
+            plot['x-axis'] = "Dilepton system p_{T} (GeV)"
             plot.update(defaultStyle_events_per_gev)
         elif "jj_pt_" in key.GetName() :  
-            plot['x-axis'] = "Dijets system p_{T} (GeV)"
+            plot['x-axis'] = "Dijet system p_{T} (GeV)"
             plot.update(defaultStyle_events_per_gev)
         elif "met_pt" in key.GetName() :  
             plot['x-axis'] = "#slash{E}_{T} (GeV)"
