@@ -31,7 +31,7 @@ extra-label: "Preliminary"
 #root: '/home/fynu/bfrancois/scratch/framework/oct2015/CMSSW_7_4_15/src/cp3_llbb/HHTools/histFactory_hh/arc_pdfunc_newElID_necessaryPlots_sumW2fixed/condor/output/'
 #root: '/home/fynu/bfrancois/scratch/framework/oct2015/CMSSW_7_4_15/src/cp3_llbb/HHTools/histFactory_hh/unblinding/condor/output/'
 
-root: '/home/fynu/bfrancois/scratch/framework/oct2015/CMSSW_7_4_15/src/cp3_llbb/HHTools/histFactory_hh/unblinding/condor/output/'
+root: '/nfs/user/llbb/HIG16011/histos_for_PUBPAS/'
 #root: '/home/fynu/bfrancois/scratch/framework/oct2015/CMSSW_7_4_15/src/cp3_llbb/HHTools/histFactory_hh/mjj_study/condor/output/'
 
 #root: '/home/fynu/bfrancois/scratch/framework/oct2015/CMSSW_7_4_15/src/cp3_llbb/CommonTools/histFactory/hists_TTTT_jetidL_csvOrdered_2016_01_14_noOverlapRemoval/condor/output/'
