@@ -9,10 +9,10 @@ import argparse
 parser = argparse.ArgumentParser(description='Facility to produce the yml with plots information.')
 parser.add_argument('--yields', help='If you just want to produce the yields and systematics.', action="store_true")
 parser.add_argument('-m', '--mass', dest='mass', default="650", help='Mass point for the yields.')
-parser.add_argument('-d', '--directory', dest='directory', default="arc_pdfunc_newElID_necessaryPlots", help='Directory of the input rootfiles.')
+parser.add_argument('-d', '--directory', dest='directory', default="histos_for_PUBPAS", help='Directory of the input rootfiles.')
 args = parser.parse_args()
 
-baseDir = "/home/fynu/bfrancois/scratch/framework/oct2015/CMSSW_7_4_15/src/cp3_llbb/" 
+baseDir = "/nfs/user/llbb/HIG16011/" 
 #fileName = baseDir+"avoidTFormula/CommonTools/histFactory/hists_TTTT_jetidT_htOrdered/GluGluToRadionToHHTo2B2VTo2L2Nu_M-500_narrow_MiniAODv2_v1.0.0+7415_HHAnalysis_2015-10-20.v4_histos.root"
 #fileName = baseDir+"CommonTools/histFactory/hists_MllLower80/GluGluToRadionToHHTo2B2VTo2L2Nu_M-500_narrow_MiniAODv2_v1.0.0+7415_HHAnalysis_2015-10-20.v4_histos.root"
 #fileName = baseDir+"CommonTools/histFactory/hists_LLLL_jetidL_csvANDhtOrdered/condor/output/VVTo2L2Nu_13TeV_amcatnloFXFX_madspin_pythia8_MiniAODv2_v1.0.0+7415_HHAnalysis_2015-10-20.v4_histos.root"
@@ -35,7 +35,7 @@ baseDir = "/home/fynu/bfrancois/scratch/framework/oct2015/CMSSW_7_4_15/src/cp3_l
 #fileName = baseDir+"/HHTools/histFactory_hh/signalRegion/condor/output/GluGluToRadionToHHTo2B2VTo2L2Nu_M-900_narrow_MiniAODv2_v2.0.3+7415_HHAnalysis_2016-01-30.v3_histos.root"
 #fileName = baseDir+"/HHTools/histFactory_hh/2016-02-18_newBDT_HT_genericPlots/condor/output/GluGluToRadionToHHTo2B2VTo2L2Nu_M-900_narrow_MiniAODv2_v2.0.4+7415_HHAnalysis_2016-02-14.v0_histos.root"
 #fileName = baseDir+"/HHTools/histFactory_hh/forYieldsBis/condor/output/GluGluToRadionToHHTo2B2VTo2L2Nu_M-900_narrow_MiniAODv2_v2.0.4+7415_HHAnalysis_2016-02-14.v0_histos.root"
-fileName = baseDir+"/HHTools/histFactory_hh/"+args.directory+"/condor/output/GluGluToRadionToHHTo2B2VTo2L2Nu_M-900_narrow_MiniAODv2_v2.0.5+7415_HHAnalysis_2016-02-24.v0_histos.root"
+fileName = baseDir+args.directory+"/GluGluToRadionToHHTo2B2VTo2L2Nu_M-900_narrow_MiniAODv2_v2.0.5+7415_HHAnalysis_2016-02-24.v0_histos.root"
 
 skim = False
 
@@ -74,7 +74,7 @@ for key in keys :
     if key.GetName() not in alreadyIn  and not "__" in key.GetName():
         alreadyIn.append(key.GetName())
         plot = {
-                'x-axis': key.GetName()
+                'x-axis': key.GetName(),
                 }
 
         if "lep1_pt" in key.GetName() :
@@ -242,25 +242,25 @@ for key in keys :
             plot['x-axis'] = "isElEl"
             plot.update(defaultStyle_events)
             plot['for-yields'] = True
-            plot['yields-title'] = "high-BDT, m$_{jj}$-P"
+            plot['yields-title'] = "high-BDT %s, m$_{jj}$-P"%(args.mass)
             plot['yields-table-order'] = 0
         elif "isElEl" in key.GetName() and "highBDT_mjjSB_" + args.mass in key.GetName() :
             plot['x-axis'] = "isElEl"
             plot.update(defaultStyle_events)
             plot['for-yields'] = True
-            plot['yields-title'] = "high-BDT, m$_{jj}$-SB"
+            plot['yields-title'] = "high-BDT %s, m$_{jj}$-SB"%(args.mass)
             plot['yields-table-order'] = 1
         elif "isElEl" in key.GetName() and "lowBDT_mjjP_" + args.mass in key.GetName() :
             plot['x-axis'] = "isElEl"
             plot.update(defaultStyle_events)
             plot['for-yields'] = True
-            plot['yields-title'] = "low-BDT, m$_{jj}$-P"
+            plot['yields-title'] = "low-BDT %s, m$_{jj}$-P"%(args.mass)
             plot['yields-table-order'] = 2
         elif "isElEl" in key.GetName() and "lowBDT_mjjSB_" + args.mass in key.GetName() :
             plot['x-axis'] = "isElEl"
             plot.update(defaultStyle_events)
             plot['for-yields'] = True
-            plot['yields-title'] = "low-BDT, m$_{jj}$-SB"
+            plot['yields-title'] = "low-BDT %s, m$_{jj}$-SB"%(args.mass)
             plot['yields-table-order'] = 3
         else:
             plot.update(defaultStyle_events)

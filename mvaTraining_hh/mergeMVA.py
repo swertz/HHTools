@@ -3,21 +3,26 @@ from trainMVA import *
 from multiprocessing import Pool
 
 #inFileDir = "/home/fynu/bfrancois/scratch/framework/oct2015/CMSSW_7_4_15/src/cp3_llbb/CommonTools/treeFactory/allFlavour_trigger_btagMM/condor/output/"
-inFileDir = "/home/fynu/bfrancois/scratch/framework/oct2015/CMSSW_7_4_15/src/cp3_llbb/CommonTools/treeFactory/allFlavour_trigger_btagMM_2016_01_14/condor/output/"
-outFileDir = inFileDir + "withMVAoutCorrect/"
+#inFileDir = "/home/fynu/bfrancois/scratch/framework/oct2015/CMSSW_7_4_15/src/cp3_llbb/CommonTools/treeFactory/allFlavour_trigger_btagMM_2016_01_14/condor/output/"
+inFileDir = "/home/fynu/bfrancois/scratch/framework/oct2015/CMSSW_7_4_15/src/cp3_llbb/HHTools/treeFactory_hh/2016-02-18/condor/output/"
+outFileDir = inFileDir + "withMVAout/"
 #outFileDir = inFileDir + "/withMVAout_DYevtSum/"
 
-filesForMerging  = [file for file in os.listdir(inFileDir) if "_histos.root" in file and not ("WJetsToLNu" in file or "M-650" in file or "M-400" in file or "M-900" in file or "DY" in file or "Run2015D" in file or "TTTo2L2Nu" in file or "VVTo2L2Nu" in file or "ST_tW" in file) and "ToHHTo2B" in file]
+filesForMerging  = [file for file in os.listdir(inFileDir) if "_histos.root" in file and not ("WJetsToLNu" in file or "QCD" in file)]
 #xmlFileDir = "/home/fynu/bfrancois/scratch/framework/oct2015/CMSSW_7_4_15/src/cp3_llbb/CommonTools/mvaTraining/HHAnalysis/weights/"
 xmlFileDir = "/home/fynu/bfrancois/scratch/framework/oct2015/CMSSW_7_4_15/src/cp3_llbb/HHTools/mvaTraining_hh/weights/"
 
-massToMerge = ["400", "650", "900"]
-spinToMerge = ["0", "2"]
+date = "2016_02_19"
+suffix = "VS_TT_DYHTonly_tW_8var"  #DY_WoverSum_8var_bTagMM_noEvtW"
+label_template = "DATE_BDT_XSPIN_MASS_SUFFIX"
+
+massToMerge = ['350', '400', '500', '650']
+spinToMerge = ["0"]
 list_dict_xmlFile_label = []
 for massPoint in massToMerge :
     for spin in spinToMerge :
         tempdict = {}
-        label = "2016_01_17_BDT_X%s_%s_VS_TT09_DY01_8var_bTagMM"%(spin, massPoint)
+        label = "2016_02_19_BDT_X%s_%s_VS_TT_DYHTonly_tW_8var"%(spin, massPoint)
         tempdict["label"] = label
         tempdict["discriList"] = discriList
         tempdict["spectatorList"] = spectatorList

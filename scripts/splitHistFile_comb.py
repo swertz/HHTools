@@ -2,8 +2,8 @@ import ROOT as R
 import yaml
 import copy
 
-yamlDir = "../../plotIt/test/files/"
-yamlTemplate = "personal/templateCombinatoric.yml"
+yamlDir = "/home/fynu/bfrancois/scratch/framework/oct2015/CMSSW_7_4_15/src/cp3_llbb/HHTools/plotIt_hh/forBDTREGIONS/"
+yamlTemplate = "/home/fynu/bfrancois/scratch/framework/oct2015/CMSSW_7_4_15/src/cp3_llbb/HHTools/plotIt_hh/forBDTREGIONS/template.yml"
 
 yamlFileTemplate = {"type" : "signal", "line-type" : 1, "line-width" : 2, "line-color" : "COLOR", "legend": "LEGEND"}
 
