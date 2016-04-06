@@ -205,26 +205,35 @@ class BasePlotter:
 
         # Lepton ID and Iso Scale Factors
         llIdIso_sfIdx = "[0]"
-        llIdIso_strCommon="NOMINAL"
-        llIdIso_sf = "(common::combineScaleFactors<2>({{{{{{({0}.isEl) ? electron_sf_id_tight[{1}][0] : muon_sf_hww_wp[{1}][0], ({0}.isEl) ? electron_sf_id_tight[{1}]{2} : muon_sf_hww_wp[{1}]{2}}}, {{ ({3}.isEl) ? electron_sf_id_tight[{4}][0] : muon_sf_hww_wp[{4}][0], ({3}.isEl) ? electron_sf_id_tight[{4}]{2} : muon_sf_hww_wp[{4}]{2} }}}}}}, common::Variation::{5}) )".format(self.lep1_str, self.lep1_fwkIdx, llIdIso_sfIdx, self.lep2_str, self.lep2_fwkIdx, llIdIso_strCommon)
+        llIdIso_strCommon = "NOMINAL"
+        llIdIso_sf = "(common::combineScaleFactors<2>({{{{{{({0}.isEl) ? electron_sf_id_tight[{1}][0] : muon_sf_id_hww[{1}][0]*muon_sf_iso_tight_id_hww[{1}][0], ({0}.isEl) ? electron_sf_id_tight[{1}]{2} : muon_sf_id_hww[{1}]{2}*muon_sf_iso_tight_id_hww[{1}]{2}}}, {{ ({3}.isEl) ? electron_sf_id_tight[{4}][0] : muon_sf_id_hww[{4}][0]*muon_sf_iso_tight_id_hww[{4}][0], ({3}.isEl) ? electron_sf_id_tight[{4}]{2} : muon_sf_id_hww[{4}]{2}*muon_sf_iso_tight_id_hww[{4}]{2} }}}}}}, common::Variation::{5}) )".format(self.lep1_str, self.lep1_fwkIdx, llIdIso_sfIdx, self.lep2_str, self.lep2_fwkIdx, llIdIso_strCommon)
         # electrons
         if systematic == "elidisoup" :
             llIdIso_sfIdx = "[2]" 
-            llIdIso_strCommon="UP"
-            llIdIso_sf = "(common::combineScaleFactors<2>({{{{{{({0}.isEl) ? electron_sf_id_tight[{1}][0] : muon_sf_hww_wp[{1}][0], ({0}.isEl) ? electron_sf_id_tight[{1}]{2} : 0 }}, {{ ({3}.isEl) ? electron_sf_id_tight[{4}][0] : muon_sf_hww_wp[{4}][0], ({3}.isEl) ? electron_sf_id_tight[{4}]{2} : 0 }}}}}}, common::Variation::{5}) )".format(self.lep1_str, self.lep1_fwkIdx, llIdIso_sfIdx, self.lep2_str, self.lep2_fwkIdx, llIdIso_strCommon)
+            llIdIso_strCommon = "UP"
+            llIdIso_sf = "(common::combineScaleFactors<2>({{{{{{({0}.isEl) ? electron_sf_id_tight[{1}][0] :muon_sf_id_hww[{1}][0]*muon_sf_iso_tight_id_hww[{1}][0], ({0}.isEl) ? electron_sf_id_tight[{1}]{2} : 0 }}, {{ ({3}.isEl) ? electron_sf_id_tight[{4}][0] :muon_sf_id_hww[{4}][0]*muon_sf_iso_tight_id_hww[{4}][0], ({3}.isEl) ? electron_sf_id_tight[{4}]{2} : 0 }}}}}}, common::Variation::{5}) )".format(self.lep1_str, self.lep1_fwkIdx, llIdIso_sfIdx, self.lep2_str, self.lep2_fwkIdx, llIdIso_strCommon)
         if systematic == "elidisodown" :
             llIdIso_sfIdx = "[1]"
-            llIdIso_strCommon="DOWN"
-            llIdIso_sf = "(common::combineScaleFactors<2>({{{{{{({0}.isEl) ? electron_sf_id_tight[{1}][0] : muon_sf_hww_wp[{1}][0], ({0}.isEl) ? electron_sf_id_tight[{1}]{2} : 0 }}, {{ ({3}.isEl) ? electron_sf_id_tight[{4}][0] : muon_sf_hww_wp[{4}][0], ({3}.isEl) ? electron_sf_id_tight[{4}]{2} : 0 }}}}}}, common::Variation::{5}) )".format(self.lep1_str, self.lep1_fwkIdx, llIdIso_sfIdx, self.lep2_str, self.lep2_fwkIdx, llIdIso_strCommon)
+            llIdIso_strCommon = "DOWN"
+            llIdIso_sf = "(common::combineScaleFactors<2>({{{{{{({0}.isEl) ? electron_sf_id_tight[{1}][0] :muon_sf_id_hww[{1}][0]*muon_sf_iso_tight_id_hww[{1}][0], ({0}.isEl) ? electron_sf_id_tight[{1}]{2} : 0 }}, {{ ({3}.isEl) ? electron_sf_id_tight[{4}][0] :muon_sf_id_hww[{4}][0]*muon_sf_iso_tight_id_hww[{4}][0], ({3}.isEl) ? electron_sf_id_tight[{4}]{2} : 0 }}}}}}, common::Variation::{5}) )".format(self.lep1_str, self.lep1_fwkIdx, llIdIso_sfIdx, self.lep2_str, self.lep2_fwkIdx, llIdIso_strCommon)
         # muons
-        if systematic == "muidisoup" :
+        if systematic == "muidup" :
             llIdIso_sfIdx = "[2]" 
             llIdIso_strCommon="UP"
-            llIdIso_sf = "(common::combineScaleFactors<2>({{{{{{({0}.isEl) ? electron_sf_id_tight[{1}][0] : muon_sf_hww_wp[{1}][0], ({0}.isEl) ? 0. : muon_sf_hww_wp[{1}]{2}}}, {{ ({3}.isEl) ? electron_sf_id_tight[{4}][0] : muon_sf_hww_wp[{4}][0], ({3}.isEl) ? 0. : muon_sf_hww_wp[{4}]{2} }}}}}}, common::Variation::{5}) )".format(self.lep1_str, self.lep1_fwkIdx, llIdIso_sfIdx, self.lep2_str, self.lep2_fwkIdx, llIdIso_strCommon)
-        if systematic == "muidisodown" :
+            # if we compute muon id error, the muon iso SF should not be inside the combineScaleFactors (above, for electron id error, it can be inside because it won't be use together with the error
+            llIdIso_sf = "((({0}.isEl) ? 1 : muon_sf_iso_tight_id_hww[{1}][0]) * (({3}.isEl) ? 1 : muon_sf_iso_tight_id_hww[{4}][0]) * (common::combineScaleFactors<2>({{{{{{({0}.isEl) ? electron_sf_id_tight[{1}][0] :muon_sf_id_hww[{1}][0], ({0}.isEl) ? 0. :muon_sf_id_hww[{1}]{2}}}, {{ ({3}.isEl) ? electron_sf_id_tight[{4}][0] :muon_sf_id_hww[{4}][0], ({3}.isEl) ? 0. :muon_sf_id_hww[{4}]{2} }}}}}}, common::Variation::{5}) ))".format(self.lep1_str, self.lep1_fwkIdx, llIdIso_sfIdx, self.lep2_str, self.lep2_fwkIdx, llIdIso_strCommon)
+        if systematic == "muiddown" :
             llIdIso_sfIdx = "[1]"
             llIdIso_strCommon="DOWN"
-            llIdIso_sf = "(common::combineScaleFactors<2>({{{{{{({0}.isEl) ? electron_sf_id_tight[{1}][0] : muon_sf_hww_wp[{1}][0], ({0}.isEl) ? 0. : muon_sf_hww_wp[{1}]{2}}}, {{ ({3}.isEl) ? electron_sf_id_tight[{4}][0] : muon_sf_hww_wp[{4}][0], ({3}.isEl) ? 0. : muon_sf_hww_wp[{4}]{2} }}}}}}, common::Variation::{5}) )".format(self.lep1_str, self.lep1_fwkIdx, llIdIso_sfIdx, self.lep2_str, self.lep2_fwkIdx, llIdIso_strCommon)
+            llIdIso_sf = "((({0}.isEl) ? 1 : muon_sf_iso_tight_id_hww[{1}][0]) * (({3}.isEl) ? 1 : muon_sf_iso_tight_id_hww[{4}][0]) * (common::combineScaleFactors<2>({{{{{{({0}.isEl) ? electron_sf_id_tight[{1}][0] :muon_sf_id_hww[{1}][0], ({0}.isEl) ? 0. :muon_sf_id_hww[{1}]{2}}}, {{ ({3}.isEl) ? electron_sf_id_tight[{4}][0] :muon_sf_id_hww[{4}][0], ({3}.isEl) ? 0. :muon_sf_id_hww[{4}]{2} }}}}}}, common::Variation::{5})))".format(self.lep1_str, self.lep1_fwkIdx, llIdIso_sfIdx, self.lep2_str, self.lep2_fwkIdx, llIdIso_strCommon)
+        if systematic == "muisoup" :
+            llIdIso_sfIdx = "[2]" 
+            llIdIso_strCommon="UP"
+            llIdIso_sf = "((({0}.isEl) ? 1 : muon_sf_id_hww[{1}][0]) * (({3}.isEl) ? 1 : muon_sf_id_hww[{4}][0]) * (common::combineScaleFactors<2>({{{{{{({0}.isEl) ? electron_sf_id_tight[{1}][0] :muon_sf_iso_tight_id_hww[{1}][0], ({0}.isEl) ? 0. :muon_sf_iso_tight_id_hww[{1}]{2}}}, {{ ({3}.isEl) ? electron_sf_id_tight[{4}][0] :muon_sf_iso_tight_id_hww[{4}][0], ({3}.isEl) ? 0. :muon_sf_iso_tight_id_hww[{4}]{2} }}}}}}, common::Variation::{5}) ))".format(self.lep1_str, self.lep1_fwkIdx, llIdIso_sfIdx, self.lep2_str, self.lep2_fwkIdx, llIdIso_strCommon)
+        if systematic == "muisodown" :
+            llIdIso_sfIdx = "[1]"
+            llIdIso_strCommon="DOWN"
+            llIdIso_sf = "((({0}.isEl) ? 1 : muon_sf_id_hww[{1}][0]) * (({3}.isEl) ? 1 : muon_sf_id_hww[{4}][0]) * (common::combineScaleFactors<2>({{{{{{({0}.isEl) ? electron_sf_id_tight[{1}][0] :muon_sf_iso_tight_id_hww[{1}][0], ({0}.isEl) ? 0. :muon_sf_iso_tight_id_hww[{1}]{2}}}, {{ ({3}.isEl) ? electron_sf_id_tight[{4}][0] :muon_sf_iso_tight_id_hww[{4}][0], ({3}.isEl) ? 0. :muon_sf_iso_tight_id_hww[{4}]{2} }}}}}}, common::Variation::{5}) ))".format(self.lep1_str, self.lep1_fwkIdx, llIdIso_sfIdx, self.lep2_str, self.lep2_fwkIdx, llIdIso_strCommon)
 
         # BTAG SF
         jjBtag_sfIdx = "[0]"
