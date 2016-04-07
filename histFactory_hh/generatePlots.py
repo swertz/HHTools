@@ -27,7 +27,7 @@ baseObjectName_llbb = "hh_llmetjj_HWWleptons_btagM_csv"
 stage_llbb_clean = "cleaning_cut"
 
 #systematics = {"modifObjects" : ["nominal"]}
-systematics = {"modifObjects" : ["nominal", "jecup", "jecdown", "jerup", "jerdown"], "SF" : ["elidisoup", "elidisodown", "muidisoup", "muidisodown", "jjbtagup", "jjbtagdown", "puup", "pudown", "trigeffup", "trigeffdown", "pdfup", "pdfdown", "scale"]}
+systematics = {"modifObjects" : ["nominal", "jecup", "jecdown", "jerup", "jerdown"], "SF" : ["elidisoup", "elidisodown", "muidup", "muiddown", "muisoup", "muisodown", "jjbtagup", "jjbtagdown", "puup", "pudown", "trigeffup", "trigeffdown", "pdfup", "pdfdown", "scale"]}
 extraSys = []
 for systematicType in systematics.keys() :
     for systematic in systematics[systematicType]:
