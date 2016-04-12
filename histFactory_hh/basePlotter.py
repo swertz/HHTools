@@ -340,7 +340,7 @@ class BasePlotter:
                         'name':  'jj_M_%s_%s_%s%s'%(self.llFlav, self.suffix, self.extraString, self.systematicString),
                         'variable': self.jj_str+".M()",
                         'plot_cut': self.totalCut,
-                        'binning': '(25, 0, 250)'
+                        'binning': '(50, 0, 250)'
                 })
             # Plot to compute yields (ensure we have not over/under flow)
             self.isElEl_plot.append({

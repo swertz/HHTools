@@ -8,34 +8,15 @@ import argparse
 
 parser = argparse.ArgumentParser(description='Facility to produce the yml with plots information.')
 parser.add_argument('--yields', help='If you just want to produce the yields and systematics.', action="store_true")
+parser.add_argument('--dyamc', help='If you just want to produce the Mll histograms.', action="store_true")
 parser.add_argument('-m', '--mass', dest='mass', default="650", help='Mass point for the yields.')
-parser.add_argument('-d', '--directory', dest='directory', default="histos_for_PUBPAS", help='Directory of the input rootfiles.')
+parser.add_argument('-d', '--directory', dest='directory', default="76_mjjStudy", help='Directory of the input rootfiles.')
+parser.add_argument('--blinded', dest='unblinded', help='If you want to produce blinded plots', action="store_false")
+parser.add_argument('--mjj', help='Use if you want to produce plots related to Mjj', action="store_true")
 args = parser.parse_args()
 
-baseDir = "/nfs/user/llbb/HIG16011/" 
-#fileName = baseDir+"avoidTFormula/CommonTools/histFactory/hists_TTTT_jetidT_htOrdered/GluGluToRadionToHHTo2B2VTo2L2Nu_M-500_narrow_MiniAODv2_v1.0.0+7415_HHAnalysis_2015-10-20.v4_histos.root"
-#fileName = baseDir+"CommonTools/histFactory/hists_MllLower80/GluGluToRadionToHHTo2B2VTo2L2Nu_M-500_narrow_MiniAODv2_v1.0.0+7415_HHAnalysis_2015-10-20.v4_histos.root"
-#fileName = baseDir+"CommonTools/histFactory/hists_LLLL_jetidL_csvANDhtOrdered/condor/output/VVTo2L2Nu_13TeV_amcatnloFXFX_madspin_pythia8_MiniAODv2_v1.0.0+7415_HHAnalysis_2015-10-20.v4_histos.root"
-#fileName = baseDir+"CommonTools/histFactory/histMllmetAbove650/condor/output/VVTo2L2Nu_13TeV_amcatnloFXFX_madspin_pythia8_MiniAODv2_v1.0.0+7415_HHAnalysis_2015-10-20.v4_histos.root"
-#fileName = baseDir+"CommonTools/histFactory/hists_TTTT_jetidL_csvOrdered/condor/output/VVTo2L2Nu_13TeV_amcatnloFXFX_madspin_pythia8_MiniAODv2_v1.0.0+7415_HHAnalysis_2015-10-20.v4_histos.root"
-#fileName = baseDir+"CommonTools/histFactory/MllZ_MjjZ/condor/output/VVTo2L2Nu_13TeV_amcatnloFXFX_madspin_pythia8_MiniAODv2_v1.2.0+7415_HHAnalysis_2016-01-11.v0_histos.root"
-#fileName = baseDir+"CommonTools/histFactory/hists_withMVA650/TT_TuneCUETP8M1_13TeV-powheg-pythia8_MiniAODv2_v1.2.0+7415_HHAnalysis_2016-01-11.v0_histos.root"
-#fileName = baseDir+"CommonTools/histFactory/hists_withAllMVA/GluGluToRadionToHHTo2B2VTo2L2Nu_M-900_narrow_MiniAODv2_v1.2.0+7415_HHAnalysis_2016-01-11.v0_histos.root"
-#fileName = baseDir+"CommonTools/histFactory/hists_skimmed_btagLL_nocut_2016_01_14/GluGluToRadionToHHTo2B2VTo2L2Nu_M-900_narrow_MiniAODv2_v1.2.0+7415_HHAnalysis_2016-01-11.v0_histos.root"
-#fileName = baseDir+"CommonTools/histFactory/hists_TTTT_jetidL_csvOrdered_2016_01_14/condor/output/GluGluToRadionToHHTo2B2VTo2L2Nu_M-900_narrow_MiniAODv2_v1.2.0+7415_HHAnalysis_2016-01-11.v0_histos.root"
-#fileName = baseDir+"CommonTools/histFactory/hists_skimmed_btagLL_plentyMVA_2016_01_14/GluGluToRadionToHHTo2B2VTo2L2Nu_M-900_narrow_MiniAODv2_v1.2.0+7415_HHAnalysis_2016-01-11.v0_histos.root"
-#fileName = baseDir+"CommonTools/histFactory/hists_skimmed_btagMM_bdtCut_2016_01_17/GluGluToRadionToHHTo2B2VTo2L2Nu_M-900_narrow_MiniAODv2_v1.2.0+7415_HHAnalysis_2016-01-11.v0_histos.root"
-#fileName = baseDir+"CommonTools/histFactory/hists_TTTT_jetidL_csvOrdered_2016_01_14_noOverlapRemoval/condor/output/GluGluToRadionToHHTo2B2VTo2L2Nu_M-900_narrow_MiniAODv2_v1.2.0+7415_HHAnalysis_2016-01-11.v0_histos.root"
-
-#fileName = baseDir+"CommonTools/histFactory/hists_TTTT_jetidL_csvOrdered_2016_01_15_puweight/condor/output/TTTo2L2Nu_13TeV-powheg_MiniAODv2_v1.2.0+7415_HHAnalysis_2016-01-11.v0_histos.root"
-#fileName = baseDir+"CommonTools/histFactory/2016-02-04-fullPlots/condor/output/TTTo2L2Nu_13TeV-powheg_MiniAODv2_v2.0.3+7415_HHAnalysis_2016-01-30.v2_histos.root"
-#fileName = baseDir+"CommonTools/histFactory/raisePtCut/condor/output/GluGluToRadionToHHTo2B2VTo2L2Nu_M-900_narrow_MiniAODv2_v2.0.3+7415_HHAnalysis_2016-01-30.v2_histos.root"
-#fileName = baseDir+"CommonTools/histFactory/newBDT_TTonly_properControl/condor/output/GluGluToRadionToHHTo2B2VTo2L2Nu_M-900_narrow_MiniAODv2_v2.0.3+7415_HHAnalysis_2016-01-30.v3_histos.root"
-#fileName = baseDir+"/HHTools/histFactory_hh/controlRegions/condor/output/GluGluToRadionToHHTo2B2VTo2L2Nu_M-900_narrow_MiniAODv2_v2.0.3+7415_HHAnalysis_2016-01-30.v3_histos.root"
-#fileName = baseDir+"/HHTools/histFactory_hh/signalRegion/condor/output/GluGluToRadionToHHTo2B2VTo2L2Nu_M-900_narrow_MiniAODv2_v2.0.3+7415_HHAnalysis_2016-01-30.v3_histos.root"
-#fileName = baseDir+"/HHTools/histFactory_hh/2016-02-18_newBDT_HT_genericPlots/condor/output/GluGluToRadionToHHTo2B2VTo2L2Nu_M-900_narrow_MiniAODv2_v2.0.4+7415_HHAnalysis_2016-02-14.v0_histos.root"
-#fileName = baseDir+"/HHTools/histFactory_hh/forYieldsBis/condor/output/GluGluToRadionToHHTo2B2VTo2L2Nu_M-900_narrow_MiniAODv2_v2.0.4+7415_HHAnalysis_2016-02-14.v0_histos.root"
-fileName = baseDir+args.directory+"/GluGluToRadionToHHTo2B2VTo2L2Nu_M-900_narrow_MiniAODv2_v2.0.5+7415_HHAnalysis_2016-02-24.v0_histos.root"
+baseDir = "/home/fynu/bfrancois/scratch/framework/oct2015/CMSSW_7_4_15/src/cp3_llbb/" 
+fileName = baseDir+"/HHTools/histFactory_hh/"+args.directory+"/condor/output/GluGluToRadionToHHTo2B2VTo2L2Nu_M-900_narrow_Fall15MiniAODv2_v0.1.0+76X_HHAnalysis_2016-04-04.v0_histos.root"
 
 skim = False
 
@@ -69,9 +50,14 @@ defaultStyle_events.update({
         'y-axis': 'Events',
         'y-axis-format': '%1% / %2$.2f',
         })
+print args
 
 for key in keys :
     if key.GetName() not in alreadyIn  and not "__" in key.GetName():
+
+        if not "jj_M_" in key.GetName() and args.mjj : 
+            continue
+
         alreadyIn.append(key.GetName())
         plot = {
                 'x-axis': key.GetName(),
@@ -224,20 +210,24 @@ for key in keys :
         elif "MVA" in key.GetName() and "mjj_cr" in key.GetName() :
             plot['x-axis'] = "BDT output"
             plot.update(defaultStyle_events)
-            #plot['blinded-range'] = [0, 0.6]
+            if not args.unblinded :
+                plot['blinded-range'] = [0, 0.6]
         elif "jj_M_" in key.GetName() and "_cr_" in key.GetName() :  
             plot['x-axis'] = "m_{jj} (GeV)"
             plot.update(defaultStyle_events_per_gev)
-            #plot['blinded-range'] = [75, 140]
+            if not args.unblinded :
+                plot['blinded-range'] = [75, 140]
         elif "MVA_" in key.GetName() :
             plot['x-axis'] = "BDT output"
             plot.update(defaultStyle_events)
-            plot['blinded-range'] = [0, 0.6]
-            #plot['for-yields'] = True
+            if not args.unblinded :
+                plot['blinded-range'] = [0, 0.6]
+                plot['for-yields'] = True
         elif "jj_M_" in key.GetName() :  
             plot['x-axis'] = "m_{jj} (GeV)"
             plot.update(defaultStyle_events_per_gev)
-            plot['blinded-range'] = [75, 140]
+            if not args.unblinded :
+                plot['blinded-range'] = [75, 140]
         elif "isElEl" in key.GetName() and "highBDT_mjjP_" + args.mass in key.GetName() :
             plot['x-axis'] = "isElEl"
             plot.update(defaultStyle_events)
@@ -270,7 +260,7 @@ for key in keys :
             plot['x-axis'] = "is "+flavour
             plot['no-data'] = True
             plot.update(defaultStyle_events)
-        if any(x in key.GetName() for x in ['sr_400_ext', 'sr_650_ext']) :
+        if any(x in key.GetName() for x in ['sr_400_ext', 'sr_650_ext']) and not args.unblinded :
             plot['no-data'] = True
         if "scaleFactor" in key.GetName() :
             plot['x-axis'] = "Scale factor"
@@ -305,7 +295,9 @@ for key in keys :
                 }]
         if args.yields and "isElEl" in key.GetName() and args.mass in key.GetName() :
             plots[key.GetName()] = plot
-        if not args.yields :
+        if args.dyamc and "ll_M_" in key.GetName() :
+            plots[key.GetName()] = plot
+        if not args.yields and not args.dyamc :
             plots[key.GetName()] = plot
 
 with open("allPlots.yml", "w") as f:
