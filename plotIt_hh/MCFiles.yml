@@ -1,201 +1,201 @@
 # HIGGS
 
-'VBFHToWWTo2L2Nu_M125_13TeV_powheg_JHUgen_pythia8_Fall15MiniAODv2_v0.1.0+76X_HHAnalysis_2016-04-04.v0_histos.root':
-  type: mc
-  group: Higgs
-  order: 1
-
-'GluGluHToWWTo2L2Nu_M125_13TeV_powheg_JHUgen_pythia8_Fall15MiniAODv2_v0.1.0+76X_HHAnalysis_2016-04-04.v0_histos.root':
-  type: mc
-  group: Higgs
-  order: 1
-
-'HWminusJ_HToWW_M125_13TeV_powheg_pythia8_Fall15MiniAODv2_v0.1.0+76X_HHAnalysis_2016-04-04.v0_histos.root':
-  type: mc
-  group: Higgs
-  order: 1
-
-'HWplusJ_HToWW_M125_13TeV_powheg_pythia8_Fall15MiniAODv2_v0.1.0+76X_HHAnalysis_2016-04-04.v0_histos.root':
-  type: mc
-  group: Higgs
-  order: 1
-
-'HZJ_HToWW_M125_13TeV_powheg_pythia8_Fall15MiniAODv2_v0.1.0+76X_HHAnalysis_2016-04-04.v0_histos.root':
-  type: mc
-  group: Higgs
-  order: 1
-
-'ttHToNonbb_M125_13TeV_powheg_pythia8_v0.1.0+76X_HHAnalysis_2016-04-04.v0_histos.root':
-  type: mc
-  group: Higgs
-  order: 1
-
-'ttHTobb_M125_13TeV_powheg_pythia8_v0.1.0+76X_HHAnalysis_2016-04-04.v0_histos.root':
-  type: mc
-  group: Higgs
-  order: 1
+#'VBFHToWWTo2L2Nu_M125_13TeV_powheg_JHUgen_pythia8_Fall15MiniAODv2_v0.1.2+76X_HHAnalysis_2016-05-02.v0_histos.root':
+#  type: mc
+#  group: Higgs
+#  order: 1
+#
+#'GluGluHToWWTo2L2Nu_M125_13TeV_powheg_JHUgen_pythia8_Fall15MiniAODv2_v0.1.2+76X_HHAnalysis_2016-05-02.v0_histos.root':
+#  type: mc
+#  group: Higgs
+#  order: 1
+#
+#'HWminusJ_HToWW_M125_13TeV_powheg_pythia8_Fall15MiniAODv2_v0.1.2+76X_HHAnalysis_2016-05-02.v0_histos.root':
+#  type: mc
+#  group: Higgs
+#  order: 1
+#
+#'HWplusJ_HToWW_M125_13TeV_powheg_pythia8_Fall15MiniAODv2_v0.1.2+76X_HHAnalysis_2016-05-02.v0_histos.root':
+#  type: mc
+#  group: Higgs
+#  order: 1
+#
+#'HZJ_HToWW_M125_13TeV_powheg_pythia8_Fall15MiniAODv2_v0.1.2+76X_HHAnalysis_2016-05-02.v0_histos.root':
+#  type: mc
+#  group: Higgs
+#  order: 1
+#
+#'ttHToNonbb_M125_13TeV_powheg_pythia8_v0.1.2+76X_HHAnalysis_2016-05-02.v0_histos.root':
+#  type: mc
+#  group: Higgs
+#  order: 1
+#
+#'ttHTobb_M125_13TeV_powheg_pythia8_v0.1.2+76X_HHAnalysis_2016-05-02.v0_histos.root':
+#  type: mc
+#  group: Higgs
+#  order: 1
 
 # TTV 
 
-'TTWJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-madspin-pythia8_Fall15MiniAODv2_v0.1.0+76X_HHAnalysis_2016-04-04.v0_histos.root':
-  type: mc
-  group: ttV
-  order: 2
-
-'TTWJetsToQQ_TuneCUETP8M1_13TeV-amcatnloFXFX-madspin-pythia8_Fall15MiniAODv2_v0.1.0+76X_HHAnalysis_2016-04-04.v0_histos.root':
-  type: mc
-  group: ttV
-  order: 2
-
-'TTZToLLNuNu_M-10_TuneCUETP8M1_13TeV-amcatnlo-pythia8_Fall15MiniAODv2_v0.1.0+76X_HHAnalysis_2016-04-04.v0_histos.root':
-  type: mc
-  group: ttV
-  order: 2
-
-'TTZToQQ_TuneCUETP8M1_13TeV-amcatnlo-pythia8_Fall15MiniAODv2_v0.1.0+76X_HHAnalysis_2016-04-04.v0_histos.root':
-  type: mc
-  group: ttV
-  order: 2
+#'TTWJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-madspin-pythia8_Fall15MiniAODv2_v0.1.2+76X_HHAnalysis_2016-05-02.v0_histos.root':
+#  type: mc
+#  group: ttV
+#  order: 2
+#
+#'TTWJetsToQQ_TuneCUETP8M1_13TeV-amcatnloFXFX-madspin-pythia8_Fall15MiniAODv2_v0.1.2+76X_HHAnalysis_2016-05-02.v0_histos.root':
+#  type: mc
+#  group: ttV
+#  order: 2
+#
+#'TTZToLLNuNu_M-10_TuneCUETP8M1_13TeV-amcatnlo-pythia8_Fall15MiniAODv2_v0.1.2+76X_HHAnalysis_2016-05-02.v0_histos.root':
+#  type: mc
+#  group: ttV
+#  order: 2
+#
+#'TTZToQQ_TuneCUETP8M1_13TeV-amcatnlo-pythia8_Fall15MiniAODv2_v0.1.2+76X_HHAnalysis_2016-05-02.v0_histos.root':
+#  type: mc
+#  group: ttV
+#  order: 2
 
 # VV
 
-'VVTo2L2Nu_13TeV_amcatnloFXFX_madspin_pythia8_Fall15MiniAODv2_v0.1.0+76X_HHAnalysis_2016-04-04.v0_histos.root':
-  type: mc
-  group: VV
-  order: 3
-
-'ZZTo2L2Q_13TeV_amcatnloFXFX_madspin_pythia8_Fall15MiniAODv2_v0.1.0+76X_HHAnalysis_2016-04-04.v0_histos.root':
-  type: mc
-  group: VV
-  order: 3
-
-'WZTo1L3Nu_13TeV_amcatnloFXFX_madspin_pythia8_Fall15MiniAODv2_v0.1.0+76X_HHAnalysis_2016-04-04.v0_histos.root':
-  type: mc
-  group: VV
-  order: 3
-
-#'WWTo2L2Nu_13TeV-powheg_Fall15MiniAODv2_v0.1.0+76X_HHAnalysis_2016-04-04.v0_histos.root':
+#'VVTo2L2Nu_13TeV_amcatnloFXFX_madspin_pythia8_Fall15MiniAODv2_v0.1.2+76X_HHAnalysis_2016-05-02.v0_histos.root':
 #  type: mc
 #  group: VV
 #  order: 3
-#  cross-section: 12.178
-
-'WWToLNuQQ_13TeV-powheg_Fall15MiniAODv2_v0.1.0+76X_HHAnalysis_2016-04-04.v0_histos.root':
-  type: mc
-  group: VV
-  order: 3
-
-'WZTo1L1Nu2Q_13TeV_amcatnloFXFX_madspin_pythia8_Fall15MiniAODv2_v0.1.0+76X_HHAnalysis_2016-04-04.v0_histos.root':
-  type: mc
-  group: VV
-  order: 3
-
-'WZTo2L2Q_13TeV_amcatnloFXFX_madspin_pythia8_Fall15MiniAODv2_v0.1.0+76X_HHAnalysis_2016-04-04.v0_histos.root':
-  type: mc
-  group: VV
-  order: 3
-
-'WZTo3LNu_TuneCUETP8M1_13TeV-powheg-pythia8_Fall15MiniAODv2_v0.1.0+76X_HHAnalysis_2016-04-04.v0_histos.root':
-  type: mc
-  group: VV
-  order: 3
-
-'ZZTo4L_13TeV_powheg_pythia8_Fall15MiniAODv2_v0.1.0+76X_HHAnalysis_2016-04-04.v0_histos.root':
-  type: mc
-  group: VV
-  order: 3
+#
+#'ZZTo2L2Q_13TeV_amcatnloFXFX_madspin_pythia8_Fall15MiniAODv2_v0.1.2+76X_HHAnalysis_2016-05-02.v0_histos.root':
+#  type: mc
+#  group: VV
+#  order: 3
+#
+#'WZTo1L3Nu_13TeV_amcatnloFXFX_madspin_pythia8_Fall15MiniAODv2_v0.1.2+76X_HHAnalysis_2016-05-02.v0_histos.root':
+#  type: mc
+#  group: VV
+#  order: 3
+#
+##'WWTo2L2Nu_13TeV-powheg_Fall15MiniAODv2_v0.1.2+76X_HHAnalysis_2016-05-02.v0_histos.root':
+##  type: mc
+##  group: VV
+##  order: 3
+##  cross-section: 12.178
+#
+#'WWToLNuQQ_13TeV-powheg_Fall15MiniAODv2_v0.1.2+76X_HHAnalysis_2016-05-02.v0_histos.root':
+#  type: mc
+#  group: VV
+#  order: 3
+#
+#'WZTo1L1Nu2Q_13TeV_amcatnloFXFX_madspin_pythia8_Fall15MiniAODv2_v0.1.2+76X_HHAnalysis_2016-05-02.v0_histos.root':
+#  type: mc
+#  group: VV
+#  order: 3
+#
+#'WZTo2L2Q_13TeV_amcatnloFXFX_madspin_pythia8_Fall15MiniAODv2_v0.1.2+76X_HHAnalysis_2016-05-02.v0_histos.root':
+#  type: mc
+#  group: VV
+#  order: 3
+#
+#'WZTo3LNu_TuneCUETP8M1_13TeV-powheg-pythia8_Fall15MiniAODv2_v0.1.2+76X_HHAnalysis_2016-05-02.v0_histos.root':
+#  type: mc
+#  group: VV
+#  order: 3
+#
+#'ZZTo4L_13TeV_powheg_pythia8_Fall15MiniAODv2_v0.1.2+76X_HHAnalysis_2016-05-02.v0_histos.root':
+#  type: mc
+#  group: VV
+#  order: 3
 
 # Single top
 
-'ST_s-channel_4f_leptonDecays_13TeV-amcatnlo_Fall15MiniAODv2_v0.1.0+76X_HHAnalysis_2016-04-04.v0_histos.root':
+#'ST_s-channel_4f_leptonDecays_13TeV-amcatnlo_Fall15MiniAODv2_v0.1.2+76X_HHAnalysis_2016-05-02.v0_histos.root':
+#  type: mc
+#  group: t
+#  order: 5
+
+'ST_t-channel_4f_leptonDecays_13TeV-amcatnlo_Fall15MiniAODv2_v0.1.2+76X_HHAnalysis_2016-05-02.v0_histos.root':
   type: mc
   group: t
   order: 5
 
-'ST_t-channel_4f_leptonDecays_13TeV-amcatnlo_Fall15MiniAODv2_v0.1.0+76X_HHAnalysis_2016-04-04.v0_histos.root':
+'ST_tW_antitop_5f_inclusiveDecays_13TeV-powheg_Fall15MiniAODv2_v0.1.2+76X_HHAnalysis_2016-05-02.v0_histos.root':
   type: mc
   group: t
   order: 5
 
-'ST_tW_antitop_5f_inclusiveDecays_13TeV-powheg_Fall15MiniAODv2_v0.1.0+76X_HHAnalysis_2016-04-04.v0_histos.root':
-  type: mc
-  group: t
-  order: 5
-
-'ST_tW_top_5f_inclusiveDecays_13TeV-powheg_Fall15MiniAODv2_v0.1.0+76X_HHAnalysis_2016-04-04.v0_histos.root':
+'ST_tW_top_5f_inclusiveDecays_13TeV-powheg_Fall15MiniAODv2_v0.1.2+76X_HHAnalysis_2016-05-02.v0_histos.root':
   type: mc
   group: t
   order: 6
 
 # TT
 
-#'TTJets_TuneCUETP8M1_amcatnloFXFX_25ns_v0.1.0+76X_HHAnalysis_2016-04-04.v0_histos.root':
+#'TTJets_TuneCUETP8M1_amcatnloFXFX_25ns_v0.1.2+76X_HHAnalysis_2016-05-02.v0_histos.root':
 #  type: mc
 #  legend : ' t#bar{t} aMC'
 #  group: tt
 #  order: 8
 
-'TT_TuneCUETP8M1_13TeV-powheg-pythia8_Fall15MiniAODv2_v0.1.0+76X_HHAnalysis_2016-04-04.v0_histos.root':
+'TT_TuneCUETP8M1_13TeV-powheg-pythia8_Fall15MiniAODv2_v0.1.2+76X_HHAnalysis_2016-05-02.v0_histos.root':
   type: mc
   group: tt
   order: 8
 
-#'TT_FL_TuneCUETP8M1_13TeV-powheg-pythia8_Fall15MiniAODv2_v0.1.0+76X_HHAnalysis_2016-04-04.v0_histos.root':
+#'TT_FL_TuneCUETP8M1_13TeV-powheg-pythia8_Fall15MiniAODv2_v0.1.2+76X_HHAnalysis_2016-05-02.v0_histos.root':
 #  type: mc
 #  group: tt
 #  order: 8
-#'TT_SL_TuneCUETP8M1_13TeV-powheg-pythia8_Fall15MiniAODv2_v0.1.0+76X_HHAnalysis_2016-04-04.v0_histos.root':
+#'TT_SL_TuneCUETP8M1_13TeV-powheg-pythia8_Fall15MiniAODv2_v0.1.2+76X_HHAnalysis_2016-05-02.v0_histos.root':
 #  type: mc
 #  group: tt
 #  order: 8
-#'TT_FH_TuneCUETP8M1_13TeV-powheg-pythia8_Fall15MiniAODv2_v0.1.0+76X_HHAnalysis_2016-04-04.v0_histos.root':
+#'TT_FH_TuneCUETP8M1_13TeV-powheg-pythia8_Fall15MiniAODv2_v0.1.2+76X_HHAnalysis_2016-05-02.v0_histos.root':
 #  type: mc
 #  group: tt
 #  order: 8
 
-#'TTTo2L2Nu_13TeV-powheg_Fall15MiniAODv2_v0.1.0+76X_HHAnalysis_2016-04-04.v0_histos.root':
+#'TTTo2L2Nu_13TeV-powheg_Fall15MiniAODv2_v0.1.2+76X_HHAnalysis_2016-05-02.v0_histos.root':
 #  type: mc
 #  group: tt
 #  order: 7
 
 # DY
 
-#'DYJetsToLL_M-5to50_HT-100to200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_extended_1327_plus_1405_v0.1.0+76X_HHAnalysis_2016-04-04.v0_histos.root':
+#'DYJetsToLL_M-5to50_HT-100to200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_extended_1327_plus_1405_v0.1.2+76X_HHAnalysis_2016-05-02.v0_histos.root':
 #  type: mc
 #  group: DY
 #  order: 7
 #
-#'DYJetsToLL_M-5to50_HT-200to400_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_extended_1394_plus_1325_v0.1.0+76X_HHAnalysis_2016-04-04.v0_histos.root':
+#'DYJetsToLL_M-5to50_HT-200to400_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_extended_1394_plus_1325_v0.1.2+76X_HHAnalysis_2016-05-02.v0_histos.root':
 #  type: mc
 #  group: DY
 #  order: 7
 #
-#'DYJetsToLL_M-5to50_HT-400to600_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_extended_1328_plus_1418_v0.1.0+76X_HHAnalysis_2016-04-04.v0_histos.root':
+#'DYJetsToLL_M-5to50_HT-400to600_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_extended_1328_plus_1418_v0.1.2+76X_HHAnalysis_2016-05-02.v0_histos.root':
 #  type: mc
 #  group: DY
 #  order: 7
 #
-#'DYJetsToLL_M-5to50_HT-600toInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_extended_1332_plus_1331_v0.1.0+76X_HHAnalysis_2016-04-04.v0_histos.root':
+#'DYJetsToLL_M-5to50_HT-600toInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_extended_1332_plus_1331_v0.1.2+76X_HHAnalysis_2016-05-02.v0_histos.root':
 #  type: mc
 #  group: DY
 #  order: 7
 #
-#'DYJetsToLL_M-50_HT-100to200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_extended_1397_plus_1398_v0.1.0+76X_HHAnalysis_2016-04-04.v0_histos.root':
+#'DYJetsToLL_M-50_HT-100to200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_extended_1397_plus_1398_v0.1.2+76X_HHAnalysis_2016-05-02.v0_histos.root':
 #  type: mc
 #  group: DY
 #  order: 7
 #
-#'DYJetsToLL_M-50_HT-200to400_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_extended_1392_plus_1326_v0.1.0+76X_HHAnalysis_2016-04-04.v0_histos.root':
+#'DYJetsToLL_M-50_HT-200to400_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_extended_1392_plus_1326_v0.1.2+76X_HHAnalysis_2016-05-02.v0_histos.root':
 #  type: mc
 #  group: DY
 #  order: 7
 #
-#'DYJetsToLL_M-50_HT-400to600_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_extended_1395_plus_1419_v0.1.0+76X_HHAnalysis_2016-04-04.v0_histos.root':
+#'DYJetsToLL_M-50_HT-400to600_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_extended_1395_plus_1419_v0.1.2+76X_HHAnalysis_2016-05-02.v0_histos.root':
 #  type: mc
 #  group: DY
 #  order: 7
 #
-#'DYJetsToLL_M-50_HT-600toInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_extended_1402_plus_1329_v0.1.0+76X_HHAnalysis_2016-04-04.v0_histos.root':
+#'DYJetsToLL_M-50_HT-600toInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_extended_1402_plus_1329_v0.1.2+76X_HHAnalysis_2016-05-02.v0_histos.root':
 #  type: mc
 #  group: DY
 #  order: 7
@@ -210,49 +210,201 @@
 #  group: DY
 #  order: 7
   
-'DYJetsToLL_M-10to50_TuneCUETP8M1_13TeV-amcatnloFXFX_Fall15MiniAODv2_v0.1.0+76X_HHAnalysis_2016-04-04.v0_histos.root':
+#'DYJetsToLL_M-10to50_TuneCUETP8M1_13TeV-amcatnloFXFX_Fall15MiniAODv2_v0.1.2+76X_HHAnalysis_2016-05-02.v0_histos.root':
+#  type: mc
+#  group: DY
+#  order: 7
+#
+#'DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX_Fall15MiniAODv2_v0.1.2+76X_HHAnalysis_2016-05-02.v0_histos.root':
+#  type: mc
+#  group: DY
+#  order: 7
+
+'DYJetsToLL_M-10to50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_extended_ext0_plus_ext1_plus_ext3_v0.1.2+76X_HHAnalysis_2016-05-02.v0_histos.root':
   type: mc
   group: DY
   order: 7
 
-'DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX_Fall15MiniAODv2_v0.1.0+76X_HHAnalysis_2016-04-04.v0_histos.root':
+'DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_extended_ext0_plus_ext1_plus_ext4_v0.1.2+76X_HHAnalysis_2016-05-02.v0_histos.root':
   type: mc
   group: DY
   order: 7
 
-# Signal
+# Signal, non-resonant
 
-'GluGluToRadionToHHTo2B2VTo2L2Nu_M-400_narrow_Fall15MiniAODv2_v0.1.0+76X_HHAnalysis_2016-04-04.v0_histos.root':
+'GluGluToHHTo2B2VTo2L2Nu_node_SM_13TeV-madgraph_v0.1.2+76X_HHAnalysis_2016-05-02.v0_histos.root':
   type: signal
-  cross-section: 1000
+  cross-section: 10000
   #generated-events: 300000
-  line-color: '#008000'
-  legend: 'm_{X} = 400 GeV'
+  line-color: '#008A00'
+  legend: 'SM'
   legend-order: 5
   line-width: 2
   line-type: 1
 
-'GluGluToRadionToHHTo2B2VTo2L2Nu_M-650_narrow_Fall15MiniAODv2_v0.1.0+76X_HHAnalysis_2016-04-04.v0_histos.root':
+'GluGluToHHTo2B2VTo2L2Nu_node_box_13TeV-madgraph_v0.1.2+76X_HHAnalysis_2016-05-02.v0_histos.root':
   type: signal
-  cross-section: 1000
+  cross-section: 10000
   #generated-events: 300000
-  line-color: '#ff0000'
-  legend: 'm_{X} = 650 GeV'
-  legend-order: 3
+  line-color: '#00ABA9'
+  legend: 'Box'
+  legend-order: 5
   line-width: 2
   line-type: 1
 
-'GluGluToRadionToHHTo2B2VTo2L2Nu_M-900_narrow_Fall15MiniAODv2_v0.1.0+76X_HHAnalysis_2016-04-04.v0_histos.root':
+#'GluGluToHHTo2B2VTo2L2Nu_node_2_13TeV-madgraph_v0.1.2+76X_HHAnalysis_2016-05-02.v0_histos.root':
+#  type: signal
+#  cross-section: 10000
+#  #generated-events: 300000
+#  line-color: '#FA6800'
+#  legend: 'BM2'
+#  legend-order: 5
+#  line-width: 2
+#  line-type: 1
+#
+#'GluGluToHHTo2B2VTo2L2Nu_node_3_13TeV-madgraph_v0.1.2+76X_HHAnalysis_2016-05-02.v0_histos.root':
+#  type: signal
+#  cross-section: 10000
+#  #generated-events: 300000
+#  line-color: '#E51400'
+#  legend: 'BM3'
+#  legend-order: 5
+#  line-width: 2
+#  line-type: 1
+#
+#'GluGluToHHTo2B2VTo2L2Nu_node_4_13TeV-madgraph_v0.1.2+76X_HHAnalysis_2016-05-02.v0_histos.root':
+#  type: signal
+#  cross-section: 10000
+#  #generated-events: 300000
+#  line-color: '#A20025'
+#  legend: 'BM4'
+#  legend-order: 5
+#  line-width: 2
+#  line-type: 1
+
+'GluGluToHHTo2B2VTo2L2Nu_node_5_13TeV-madgraph_v0.1.2+76X_HHAnalysis_2016-05-02.v0_histos.root':
   type: signal
-  cross-section: 1000
-  #generated-events: 289200.0
-  line-color: '#000000'
-  legend: 'm_{X} = 900 GeV'
-  legend-order: 1
+  cross-section: 10000
+  #generated-events: 300000
+  line-color: '#0050EF'
+  legend: 'BM5'
+  legend-order: 5
   line-width: 2
   line-type: 1
 
-#'GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-400_narrow_Fall15MiniAODv2_v0.1.0+76X_HHAnalysis_2016-04-04.v0_histos.root':
+#'GluGluToHHTo2B2VTo2L2Nu_node_6_13TeV-madgraph_v0.1.2+76X_HHAnalysis_2016-05-02.v0_histos.root':
+#  type: signal
+#  cross-section: 10000
+#  #generated-events: 300000
+#  line-color: '#AA00FF'
+#  legend: 'BM6'
+#  legend-order: 5
+#  line-width: 2
+#  line-type: 1
+#
+#'GluGluToHHTo2B2VTo2L2Nu_node_7_13TeV-madgraph_v0.1.2+76X_HHAnalysis_2016-05-02.v0_histos.root':
+#  type: signal
+#  cross-section: 10000
+#  #generated-events: 300000
+#  line-color: '#D80073'
+#  legend: 'BM7'
+#  legend-order: 5
+#  line-width: 2
+#  line-type: 1
+
+'GluGluToHHTo2B2VTo2L2Nu_node_8_13TeV-madgraph_v0.1.2+76X_HHAnalysis_2016-05-02.v0_histos.root':
+  type: signal
+  cross-section: 10000
+  #generated-events: 300000
+  line-color: '#A4C500'
+  legend: 'BM8'
+  legend-order: 5
+  line-width: 2
+  line-type: 1
+
+#'GluGluToHHTo2B2VTo2L2Nu_node_9_13TeV-madgraph_v0.1.2+76X_HHAnalysis_2016-05-02.v0_histos.root':
+#  type: signal
+#  cross-section: 10000
+#  #generated-events: 300000
+#  line-color: '#F0A30A'
+#  legend: 'BM9'
+#  legend-order: 5
+#  line-width: 2
+#  line-type: 1
+#
+#'GluGluToHHTo2B2VTo2L2Nu_node_10_13TeV-madgraph_v0.1.2+76X_HHAnalysis_2016-05-02.v0_histos.root':
+#  type: signal
+#  cross-section: 10000
+#  #generated-events: 300000
+#  line-color: '#825A2C'
+#  legend: 'BM10'
+#  legend-order: 5
+#  line-width: 2
+#  line-type: 1
+#
+#'GluGluToHHTo2B2VTo2L2Nu_node_11_13TeV-madgraph_v0.1.2+76X_HHAnalysis_2016-05-02.v0_histos.root':
+#  type: signal
+#  cross-section: 10000
+#  #generated-events: 300000
+#  line-color: '#6D8764'
+#  legend: 'BM11'
+#  legend-order: 5
+#  line-width: 2
+#  line-type: 1
+#
+#'GluGluToHHTo2B2VTo2L2Nu_node_12_13TeV-madgraph_v0.1.2+76X_HHAnalysis_2016-05-02.v0_histos.root':
+#  type: signal
+#  cross-section: 10000
+#  #generated-events: 300000
+#  line-color: '#647687'
+#  legend: 'BM12'
+#  legend-order: 5
+#  line-width: 2
+#  line-type: 1
+
+'GluGluToHHTo2B2VTo2L2Nu_node_13_13TeV-madgraph_v0.1.2+76X_HHAnalysis_2016-05-02.v0_histos.root':
+  type: signal
+  cross-section: 10000
+  #generated-events: 300000
+  line-color: '#76608A'
+  legend: 'BM13'
+  legend-order: 5
+  line-width: 2
+  line-type: 1
+
+# Signal, resonant
+
+#'GluGluToRadionToHHTo2B2VTo2L2Nu_M-400_narrow_Fall15MiniAODv2_v0.1.2+76X_HHAnalysis_2016-05-02.v0_histos.root':
+#  type: signal
+#  cross-section: 1000
+#  #generated-events: 300000
+#  line-color: '#008000'
+#  legend: 'm_{X} = 400 GeV'
+#  legend-order: 5
+#  line-width: 2
+#  line-type: 1
+#
+#'GluGluToRadionToHHTo2B2VTo2L2Nu_M-650_narrow_Fall15MiniAODv2_v0.1.2+76X_HHAnalysis_2016-05-02.v0_histos.root':
+#  type: signal
+#  cross-section: 1000
+#  #generated-events: 300000
+#  line-color: '#ff0000'
+#  legend: 'm_{X} = 650 GeV'
+#  legend-order: 3
+#  line-width: 2
+#  line-type: 1
+#
+#'GluGluToRadionToHHTo2B2VTo2L2Nu_M-900_narrow_Fall15MiniAODv2_v0.1.2+76X_HHAnalysis_2016-05-02.v0_histos.root':
+#  type: signal
+#  cross-section: 1000
+#  #generated-events: 289200.0
+#  line-color: '#000000'
+#  legend: 'm_{X} = 900 GeV'
+#  legend-order: 1
+#  line-width: 2
+#  line-type: 1
+
+#'GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-400_narrow_Fall15MiniAODv2_v0.1.2+76X_HHAnalysis_2016-05-02.v0_histos.root':
 #  type: signal
 #  cross-section: 2000
 #  #generated-events: 298800
@@ -262,7 +414,7 @@
 #  line-width: 2
 #  line-type: 2
 #
-#'GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-650_narrow_Fall15MiniAODv2_v0.1.0+76X_HHAnalysis_2016-04-04.v0_histos.root':
+#'GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-650_narrow_Fall15MiniAODv2_v0.1.2+76X_HHAnalysis_2016-05-02.v0_histos.root':
 #  type: signal
 #  cross-section: 250
 #  #generated-events: 299800.0
@@ -272,7 +424,7 @@
 #  line-width: 2
 #  line-type: 2
 #
-#'GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-900_narrow_Fall15MiniAODv2_v0.1.0+76X_HHAnalysis_2016-04-04.v0_histos.root':
+#'GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-900_narrow_Fall15MiniAODv2_v0.1.2+76X_HHAnalysis_2016-05-02.v0_histos.root':
 #  type: signal
 #  cross-section: 200
 #  #generated-events: 289200.0
@@ -293,52 +445,52 @@
 
 ## QCD and W+jets
 #
-#'QCD_Pt-20toInf_MuEnrichedPt15_TuneCUETP8M1_13TeV_pythia8_Fall15MiniAODv2_v0.1.0+76X_HHAnalysis_2016-04-04.v0_histos.root':
+#'QCD_Pt-20toInf_MuEnrichedPt15_TuneCUETP8M1_13TeV_pythia8_Fall15MiniAODv2_v0.1.2+76X_HHAnalysis_2016-05-02.v0_histos.root':
 #  type: mc
 #  group: Other
 #  order: 0
 #
-#'QCD_Pt-15to20_EMEnriched_TuneCUETP8M1_13TeV_pythia8_Fall15MiniAODv2_v0.1.0+76X_HHAnalysis_2016-04-04.v0_histos.root':
+#'QCD_Pt-15to20_EMEnriched_TuneCUETP8M1_13TeV_pythia8_Fall15MiniAODv2_v0.1.2+76X_HHAnalysis_2016-05-02.v0_histos.root':
 #  type: mc
 #  group: Other
 #  order: 0
 #
-#'QCD_Pt-20to30_EMEnriched_TuneCUETP8M1_13TeV_pythia8_Fall15MiniAODv2_v0.1.0+76X_HHAnalysis_2016-04-04.v0_histos.root':
+#'QCD_Pt-20to30_EMEnriched_TuneCUETP8M1_13TeV_pythia8_Fall15MiniAODv2_v0.1.2+76X_HHAnalysis_2016-05-02.v0_histos.root':
 #  type: mc
 #  group: Other
 #  order: 0
 #
-#'QCD_Pt-30to50_EMEnriched_TuneCUETP8M1_13TeV_pythia8_Fall15MiniAODv2_v0.1.0+76X_HHAnalysis_2016-04-04.v0_histos.root':
+#'QCD_Pt-30to50_EMEnriched_TuneCUETP8M1_13TeV_pythia8_Fall15MiniAODv2_v0.1.2+76X_HHAnalysis_2016-05-02.v0_histos.root':
 #  type: mc
 #  group: Other
 #  order: 0
 #
-#'QCD_Pt-50to80_EMEnriched_TuneCUETP8M1_13TeV_pythia8_Fall15MiniAODv2_v0.1.0+76X_HHAnalysis_2016-04-04.v0_histos.root':
+#'QCD_Pt-50to80_EMEnriched_TuneCUETP8M1_13TeV_pythia8_Fall15MiniAODv2_v0.1.2+76X_HHAnalysis_2016-05-02.v0_histos.root':
 #  type: mc
 #  group: Other
 #  order: 0
 #
-#'QCD_Pt-80to120_EMEnriched_TuneCUETP8M1_13TeV_pythia8_Fall15MiniAODv2_v0.1.0+76X_HHAnalysis_2016-04-04.v0_histos.root':
+#'QCD_Pt-80to120_EMEnriched_TuneCUETP8M1_13TeV_pythia8_Fall15MiniAODv2_v0.1.2+76X_HHAnalysis_2016-05-02.v0_histos.root':
 #  type: mc
 #  group: Other
 #  order: 0
 #
-#'QCD_Pt-120to170_EMEnriched_TuneCUETP8M1_13TeV_pythia8_Fall15MiniAODv2_v0.1.0+76X_HHAnalysis_2016-04-04.v0_histos.root':
+#'QCD_Pt-120to170_EMEnriched_TuneCUETP8M1_13TeV_pythia8_Fall15MiniAODv2_v0.1.2+76X_HHAnalysis_2016-05-02.v0_histos.root':
 #  type: mc
 #  group: Other
 #  order: 0
 #
-#'QCD_Pt-170to300_EMEnriched_TuneCUETP8M1_13TeV_pythia8_Fall15MiniAODv2_v0.1.0+76X_HHAnalysis_2016-04-04.v0_histos.root':
+#'QCD_Pt-170to300_EMEnriched_TuneCUETP8M1_13TeV_pythia8_Fall15MiniAODv2_v0.1.2+76X_HHAnalysis_2016-05-02.v0_histos.root':
 #  type: mc
 #  group: Other
 #  order: 0
 #
-#'QCD_Pt-300toInf_EMEnriched_TuneCUETP8M1_13TeV_pythia8_25ns_v0.1.0+76X_HHAnalysis_2016-04-04.v0_histos.root':
+#'QCD_Pt-300toInf_EMEnriched_TuneCUETP8M1_13TeV_pythia8_25ns_v0.1.2+76X_HHAnalysis_2016-05-02.v0_histos.root':
 #  type: mc
 #  group: Other
 #  order: 0
 #
-#'WJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_Fall15MiniAODv2_v0.1.0+76X_HHAnalysis_2016-04-04.v0_histos.root':
+#'WJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_Fall15MiniAODv2_v0.1.2+76X_HHAnalysis_2016-05-02.v0_histos.root':
 #  type: mc
 #  group: Other
 #  order: 0

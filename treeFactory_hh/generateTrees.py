@@ -4,6 +4,7 @@ import copy, sys, os, inspect
 # Usage from histFactory/plots/HHAnalysis/ : ./../../build/createHistoWithMultiDraw.exe -d ../../samples.json generatePlots.py 
 scriptDir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 sys.path.append(scriptDir)
+sys.path.append(os.path.join(scriptDir, "../histFactory_hh"))
 from basePlotter import *
 #includes = ["/home/fynu/bfrancois/scratch/framework/oct2015/CMSSW_7_4_15/src/cp3_llbb/HHTools/histFactory_hh/readMVA.h"]
 
@@ -15,7 +16,7 @@ weights_llbb = []
 flavour = "All"
 categories_llbb = [flavour]
 stage_llbb = "no_cut"
-plots_llbb = ["mjj", "basic", "bdtinput", "vertex", "ht", "other", "llidisoWeight", 'jjbtagWeight', 'trigeffWeight', 'puWeight', 'forSkimmer', 'csv']
+plots_llbb = ["mll", "mjj", "basic", "bdtinput", "ht", "other", "llidisoWeight", 'jjbtagWeight', 'trigeffWeight', 'puWeight', 'forSkimmer', 'csv']
 plots.extend(basePlotter.generatePlots(categories_llbb, stage_llbb, systematic = "nominal", weights = weights_llbb, requested_plots = plots_llbb))
 
 tree = {}

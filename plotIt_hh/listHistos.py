@@ -15,8 +15,8 @@ parser.add_argument('--blinded', dest='unblinded', help='If you want to produce 
 parser.add_argument('--mjj', help='Use if you want to produce plots related to Mjj', action="store_true")
 args = parser.parse_args()
 
-baseDir = "/home/fynu/bfrancois/scratch/framework/oct2015/CMSSW_7_4_15/src/cp3_llbb/" 
-fileName = baseDir+"/HHTools/histFactory_hh/"+args.directory+"/condor/output/GluGluToRadionToHHTo2B2VTo2L2Nu_M-900_narrow_Fall15MiniAODv2_v0.1.0+76X_HHAnalysis_2016-04-04.v0_histos.root"
+baseDir = "/home/fynu/swertz/scratch/CMSSW_7_6_3_patch2/src/cp3_llbb/HHTools/condor/"
+fileName = baseDir + args.directory + "/condor/output/GluGluToHHTo2B2VTo2L2Nu_node_SM_13TeV-madgraph_v0.1.2+76X_HHAnalysis_2016-05-02.v0_histos.root"
 
 skim = False
 

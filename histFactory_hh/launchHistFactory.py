@@ -30,8 +30,48 @@ IDsToSplitMore = []
 IDsToSplitLitleMore = []
 
 #POSTMORIOND
-IDs.extend([1507, 1508, 1509, 1510, 1511, 1512, 1513, 1514, 1515, 1516, 1517, 1518, 1519, 1520, 1521, 1522, 1523, 1524, 1525, 1526, 1527, 1528, 1529, 1530, 1531, 1532, 1533, 1534, 1535, 1536, 1537, 1538, 1539, 1540, 1541, 1542, 1543, 1544, 1545, 1546, 1547, 1548, 1549, 1550, 1551, 1552, 1553, 1554, 1555, 1556, 1557, 1558, 1559, 1560, 1561, 1562, 1563, 1564, 1566, 1567, 1568, 1569, 1570, 1571, 1572, 1573, 1574, 1575, 1576, 1577, 1578, 1579, 1580, 1581, 1582, 1583, 1584, 1585, 1586, 1587, 1588, 1589, 1590, 1591, 1592, 1593, 1594, 1595, 1596, 1597, 1598, 1599, 1600, 1601, 1602, 1603, 1604, 1605, 1606, 1607, 1608, 1609, 1610])
-IDsToSplitMore.extend([1507, 1511, 1512, 1514, 1516, 1520, 1522, 1523, 1524, 1525, 1526, 1528, 1529, 1531, 1532, 1533, 1534, 1537, 1542, 1546, 1556, 1558, 1564, 1568, 1569, 1570, 1571, 1572, 1573, 1574, 1575, 1576, 1577, 1578, 1580, 1581, 1587, 1588, 1598, 1601, 1604])
+#IDs.extend([1507, 1508, 1509, 1510, 1511, 1512, 1513, 1514, 1515, 1516, 1517, 1518, 1519, 1520, 1521, 1522, 1523, 1524, 1525, 1526, 1527, 1528, 1529, 1530, 1531, 1532, 1533, 1534, 1535, 1536, 1537, 1538, 1539, 1540, 1541, 1542, 1543, 1544, 1545, 1546, 1547, 1548, 1549, 1550, 1551, 1552, 1553, 1554, 1555, 1556, 1557, 1558, 1559, 1560, 1561, 1562, 1563, 1564, 1566, 1567, 1568, 1569, 1570, 1571, 1572, 1573, 1574, 1575, 1576, 1577, 1578, 1579, 1580, 1581, 1582, 1583, 1584, 1585, 1586, 1587, 1588, 1589, 1590, 1591, 1592, 1593, 1594, 1595, 1596, 1597, 1598, 1599, 1600, 1601, 1602, 1603, 1604, 1605, 1606, 1607, 1608, 1609, 1610])
+#IDsToSplitMore.extend([1507, 1511, 1512, 1514, 1516, 1520, 1522, 1523, 1524, 1525, 1526, 1528, 1529, 1531, 1532, 1533, 1534, 1537, 1542, 1546, 1556, 1558, 1564, 1568, 1569, 1570, 1571, 1572, 1573, 1574, 1575, 1576, 1577, 1578, 1580, 1581, 1587, 1588, 1598, 1601, 1604])
+
+# ICHEPv0
+
+# All backgrounds and signals:
+#IDs.extend([1614, 1615, 1616, 1617, 1618, 1619, 1620, 1621, 1622, 1623, 1624, 1625, 1626, 1627, 1628, 1629, 1630, 1631, 1632, 1633, 1634, 1635, 1636, 1637, 1638, 1639, 1640, 1641, 1642, 1643, 1644, 1645, 1646, 1647, 1648, 1649, 1650, 1651, 1652, 1653, 1654, 1655, 1656, 1657, 1658, 1659, 1660, 1661, 1662, 1663, 1664, 1665, 1666, 1667, 1668, 1669, 1670, 1671, 1672, 1673, 1674, 1675, 1676, 1677, 1678, 1679, 1680, 1681, 1682, 1683, 1684, 1685, 1686, 1687, 1688, 1689, 1690, 1691, 1692, 1693, 1694, 1695, 1696, 1697, 1698, 1699, 1700, 1701, 1702, 1703, 1704, 1705, 1706, 1707, 1708, 1709, 1710, 1711, 1712, 1713, 1714, 1715, 1716, 1717, 1718, 1719, 1720, 1721, 1722, 1723, 1724, 1725, 1726, 1727, 1728, 1729, 1730, 1731, 1732, 1733, 1734, 1735, 1736, 1737, 1738, 1739])
+
+# Main backgrounds:
+#IDs.extend([
+#    1658, # tW 
+#    1666, # tW
+#    1715, # sT t-chan
+#    1718, # TT incl NLO
+#    #1733, # DY M10-50 NLO merged
+#    #1734, # DY M-50 NLO merged 
+#    ])
+#
+## DY LO
+#IDs.extend([
+#    # M-50 incl. merged
+#    1739,
+#    # M-50, binned HT > 100
+#    1731,
+#    1679,
+#    1736,
+#    1737,
+#    # M-5to50 incl.
+#    1717,
+#    # M-5to50, binned HT
+#    1738,
+#    1705,
+#    1680,
+#    1735,
+#    ])
+IDs.extend([1737])
+
+# Resonant
+#IDs.extend([1617, 1625, 1630, 1631, 1638, 1640, 1647, 1652, 1654, 1660, 1665, 1668, 1669, 1674, 1676, 1678, 1685, 1686, 1689, 1695, 1699, 1700, 1704, 1706, 1708, 1728])
+
+# NonResonant
+IDs.extend([1614, 1618, 1626, 1634, 1635, 1639, 1651, 1672, 1673, 1677, 1684, 1697, 1698, 1722])
 
 parser = argparse.ArgumentParser(description='Facility to submit histFactory jobs on condor.')
 parser.add_argument('-o', '--output', dest='output', default=str(datetime.date.today()), help='Name of the output directory.')
@@ -41,6 +81,7 @@ parser.add_argument('-t', '--test', help='Run on the output of HHAnalyzer not ye
 parser.add_argument('-p', '--plotter', dest='plotter', default="generatePlots.py", help='Code generating the plots.')
 parser.add_argument('-r', '--remove', help='Overwrite output directory if it already exists.', action="store_true")
 parser.add_argument('--skip', help='Skip the building part.', action="store_true")
+parser.add_argument('--tree', dest='treeFactory', action='store_true', default=False, help='Use treeFactory instead of histFactory')
 
 args = parser.parse_args()
 
@@ -57,9 +98,9 @@ if args.test :
 
 samples = []
 for ID in IDs:
-    filesperJob = 4
+    filesperJob = 10
     if ID in IDsToSplitMore :
-        filesperJob = 1
+        filesperJob = 5
     if ID in IDsToSplitLitleMore :
         filesperJob = 2
     samples.append(
@@ -78,14 +119,24 @@ if args.remove :
         os.system("rm -r " + args.output)
         print "Deleted ", args.output, " folder."
 
-#print rootFileName
+## Use treeFactory or histFactory
+
+toolDir = "histFactory"
+toolScript = "createPlotter.sh"
+executable = "plotter.exe"
+
+if args.treeFactory: 
+    toolDir = "treeFactory"
+    executable = "skimmer.exe"
+    toolScript = "createSkimmer.sh"
+
 if not args.skip :
     if args.test : 
-        os.system("../../CommonTools/histFactory/build/createPlotter.sh %s %s %s"%(rootFileName, args.plotter, args.output))
+        os.system(os.path.join("../../", "CommonTools", toolDir, "build", toolScript) + " %s %s %s"%(rootFileName, args.plotter, args.output))
     else : 
-        os.system("../../CommonTools/histFactory/build/createPlotter.sh %s %s %s"%(files[0], args.plotter, args.output))
+        os.system(os.path.join("../../", "CommonTools", toolDir, "build", toolScript) + " %s %s %s"%(files[0], args.plotter, args.output))
 
-mySub = condorSubmitter(samples, "%s/build/plotter.exe"%args.output, "DUMMY", args.output+"/", rescale = True)
+mySub = condorSubmitter(samples, "%s/build/" % args.output + executable, "DUMMY", args.output+"/", rescale = True)
 
 ## Create test_condor directory and subdirs
 mySub.setupCondorDirs()

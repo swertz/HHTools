@@ -17,56 +17,63 @@ def get_sample(name):
     return resultset.one()
 
 
-date = "2016_02_19"
-suffix = "VS_TT_DYHTonly_tW_8var"  #DY_WoverSum_8var_bTagMM_noEvtW"
-label_template = "DATE_BDT_XSPIN_MASS_SUFFIX"
+date = "2016_05_27"
+suffix = "VS_TT_DYHTonly_tW_8var"
+label_template = "DATE_BDT_NODE_SUFFIX"
 
-massPoints = ['400', '650'] #['350', '400', '500', '650']  #['400', '650'] #, '900']
-spins = ["0"]
-inFileDir = "/home/fynu/bfrancois/scratch/framework/oct2015/CMSSW_7_4_15/src/cp3_llbb/HHTools/treeFactory_hh/2016-02-18/condor/output/"
+#nodes = ["SM"]
+#nodes = ["SM", "box", "5", "8", "13"]
+nodes = ["box", "5", "8", "13"]
+inFileDir = "/home/fynu/swertz/scratch/CMSSW_7_6_3_patch2/src/cp3_llbb/HHTools/condor/skim_160527_0/condor/output/"
 
 # SAMPLES FOR THE TRAINING
 
-ttSample = "TTTo2L2Nu_13TeV-powheg_MiniAODv2_v2.0.4+7415_HHAnalysis_2016-02-14.v0"
+ttSample = "TT_TuneCUETP8M1_13TeV-powheg-pythia8_Fall15MiniAODv2_v0.1.2+76X_HHAnalysis_2016-05-02.v0"
 ttDbSample = get_sample(unicode(ttSample))
 
-DY50_HT100to200 = "DYJetsToLL_M-50_HT-100to200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_ext1_Spring15MiniAODv2_v2.0.4+7415_HHAnalysis_2016-02-14.v0"
+DY50_incl = "DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_extended_ext0_plus_ext1_v0.1.2+76X_HHAnalysis_2016-05-02.v0" 
+DY50_incl_db = get_sample(unicode(DY50_incl))
+
+DY50_HT100to200 = "DYJetsToLL_M-50_HT-100to200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_Fall15MiniAODv2_v0.1.2+76X_HHAnalysis_2016-05-02.v0"
 DY50_HT100to200_db = get_sample(unicode(DY50_HT100to200))
 
-DY50_HT200to400 = "DYJetsToLL_M-50_HT-200to400_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_ext1_Spring15MiniAODv2_v2.0.4+7415_HHAnalysis_2016-02-14.v0"
+DY50_HT200to400 = "DYJetsToLL_M-50_HT-200to400_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_Fall15MiniAODv2_v0.1.2+76X_HHAnalysis_2016-05-02.v0"
 DY50_HT200to400_db = get_sample(unicode(DY50_HT200to400))
 
-DY50_HT400to600 = "DYJetsToLL_M-50_HT-400to600_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_ext1_Spring15MiniAODv2_v2.0.4+7415_HHAnalysis_2016-02-14.v0"
+DY50_HT400to600 = "DYJetsToLL_M-50_HT-400to600_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_extended_ext0_plus_ext1_v0.1.2+76X_HHAnalysis_2016-05-02.v0"
 DY50_HT400to600_db = get_sample(unicode(DY50_HT400to600))
 
-DY50_HT600toInf = "DYJetsToLL_M-50_HT-600toInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_ext1_Spring15MiniAODv2_v2.0.4+7415_HHAnalysis_2016-02-14.v0"
+DY50_HT600toInf = "DYJetsToLL_M-50_HT-600toInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_extended_ext0_plus_ext1_v0.1.2+76X_HHAnalysis_2016-05-02.v0"
 DY50_HT600toInf_db = get_sample(unicode(DY50_HT600toInf))
 
-DY5to50_HT100to200 = "DYJetsToLL_M-5to50_HT-100to200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_ext1_Spring15MiniAODv2_v2.0.4+7415_HHAnalysis_2016-02-14.v0"
+DY5to50_incl = "DYJetsToLL_M-5to50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_Fall15MiniAODv2_v0.1.2+76X_HHAnalysis_2016-05-02.v0" 
+DY5to50_incl_db = get_sample(unicode(DY5to50_incl))
+
+DY5to50_HT100to200 = "DYJetsToLL_M-5to50_HT-100to200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_extended_ext0_plus_ext1_v0.1.2+76X_HHAnalysis_2016-05-02.v0"
 DY5to50_HT100to200_db = get_sample(unicode(DY5to50_HT100to200))
 
-DY5to50_HT200to400 = "DYJetsToLL_M-5to50_HT-200to400_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_ext1_Spring15MiniAODv2_v2.0.4+7415_HHAnalysis_2016-02-14.v0"
+DY5to50_HT200to400 = "DYJetsToLL_M-5to50_HT-200to400_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_Fall15MiniAODv2_v0.1.2+76X_HHAnalysis_2016-05-02.v0"
 DY5to50_HT200to400_db = get_sample(unicode(DY5to50_HT200to400))
 
-DY5to50_HT400to600 = "DYJetsToLL_M-5to50_HT-400to600_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_ext1_Spring15MiniAODv2_v2.0.4+7415_HHAnalysis_2016-02-14.v0"
+DY5to50_HT400to600 = "DYJetsToLL_M-5to50_HT-400to600_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_Fall15MiniAODv2_v0.1.2+76X_HHAnalysis_2016-05-02.v0"
 DY5to50_HT400to600_db = get_sample(unicode(DY5to50_HT400to600))
 
-DY5to50_HT600toInf = "DYJetsToLL_M-5to50_HT-600toInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_ext1_Spring15MiniAODv2_v2.0.4+7415_HHAnalysis_2016-02-14.v0"
+DY5to50_HT600toInf = "DYJetsToLL_M-5to50_HT-600toInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_extended_ext0_plus_ext1_v0.1.2+76X_HHAnalysis_2016-05-02.v0"
 DY5to50_HT600toInf_db = get_sample(unicode(DY5to50_HT600toInf))
 
-ST_tw = "ST_tW_top_5f_inclusiveDecays_13TeV-powheg_MiniAODv2_v2.0.4+7415_HHAnalysis_2016-02-14.v0"
+ST_tw = "ST_tW_top_5f_inclusiveDecays_13TeV-powheg_Fall15MiniAODv2_v0.1.2+76X_HHAnalysis_2016-05-02.v0"
 ST_tw_db = get_sample(unicode(ST_tw))
-ST_tbarw = "ST_tW_antitop_5f_inclusiveDecays_13TeV-powheg_MiniAODv2_v2.0.4+7415_HHAnalysis_2016-02-14.v0"
+ST_tbarw = "ST_tW_antitop_5f_inclusiveDecays_13TeV-powheg_Fall15MiniAODv2_v0.1.2+76X_HHAnalysis_2016-05-02.v0"
 ST_tbarw_db = get_sample(unicode(ST_tbarw))
 
-#dy10Sample = "DYJetsToLL_M-10to50_TuneCUETP8M1_13TeV-amcatnloFXFX_MiniAODv2_v2.0.4+7415_HHAnalysis_2016-02-14.v0"
-#dy10DbSample = get_sample(unicode(dy10Sample))
-#dy50Sample = "DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX_MiniAODv2_v2.0.4+7415_HHAnalysis_2016-02-14.v0"
-#dy50DbSample = get_sample(unicode(dy50Sample))
 bkgFiles = { 
         "TT" : { 
                     "files" : [inFileDir+ttSample+"_histos.root"],
                     "relativeWeight" : ttDbSample.source_dataset.xsection/ttDbSample.event_weight_sum
+                },
+        "DY50_incl" : { 
+                    "files" : [inFileDir+DY50_incl+"_histos.root"],
+                    "relativeWeight" : DY50_incl_db.source_dataset.xsection/DY50_incl_db.event_weight_sum
                 },
         "DY50_HT100to200" : { 
                     "files" : [inFileDir+DY50_HT100to200+"_histos.root"],
@@ -83,6 +90,10 @@ bkgFiles = {
         "DY50_HT600toInf" : { 
                     "files" : [inFileDir+DY50_HT600toInf+"_histos.root"],
                     "relativeWeight" : DY50_HT600toInf_db.source_dataset.xsection/DY50_HT600toInf_db.event_weight_sum
+                },
+        "DY5to50_incl" : { 
+                    "files" : [inFileDir+DY5to50_incl+"_histos.root"],
+                    "relativeWeight" : DY5to50_incl_db.source_dataset.xsection/DY5to50_incl_db.event_weight_sum
                 },
         "DY5to50_HT100to200" : { 
                     "files" : [inFileDir+DY5to50_HT100to200+"_histos.root"],
@@ -108,16 +119,10 @@ bkgFiles = {
                     "files" : [inFileDir+ST_tbarw+"_histos.root"],
                     "relativeWeight" : ST_tbarw_db.source_dataset.xsection/ST_tbarw_db.event_weight_sum
                 },
-        #"DY10-50" : { 
-        #            "files" : [inFileDir+dy10Sample+"_histos.root"],
-        #            "relativeWeight" : dy10DbSample.source_dataset.xsection/dy10DbSample.event_weight_sum
-        #        },
-        #"DY50" : { 
-        #            "files" : [inFileDir+dy50Sample+"_histos.root"],
-        #            "relativeWeight" : dy50DbSample.source_dataset.xsection/dy50DbSample.event_weight_sum
-        #        }
         }
+
 print bkgFiles
+
 discriList = [
         "jj_pt",
         "ll_pt",
@@ -126,36 +131,29 @@ discriList = [
         "jj_DR_j_j",
         "llmetjj_DPhi_ll_jj",
         "llmetjj_minDR_l_j",
-        #"llmetjj_projMET",
         "llmetjj_MTformula"
         ]
+
 spectatorList = []
-cut = "(91 - ll_M) > 15 && ll_DR_l_l < 2.2 && jj_DR_j_j < 3.1 && llmetjj_DPhi_ll_jj > 1.5"
+cut = "(91 - ll_M) > 15"
 MVAmethods = ["kBDT"]
 weightExpr = "event_weight * trigeff * jjbtag * llidiso * pu"
 
 if __name__ == '__main__':
-    for mass in massPoints :
-        for spin in spins :
-            if spin == "0" :
-                sigFiles = {
-                            "X%s_%s"%(spin, mass) : 
-                            {
-                                "files" : [inFileDir+"GluGluToRadionToHHTo2B2VTo2L2Nu_M-%s_narrow_MiniAODv2_v2.0.4+7415_HHAnalysis_2016-02-14.v0_histos.root"%mass],
-                                "relativeWeight" : 1.
-                            }
+    
+    for node in nodes:
+            
+        sigFiles = {
+                        node: 
+                        {
+                            "files" : [ inFileDir + "GluGluToHHTo2B2VTo2L2Nu_node_{}_13TeV-madgraph_v0.1.2+76X_HHAnalysis_2016-05-02.v0_histos.root".format(node) ],
+                            "relativeWeight" : 1.
                         }
-            elif spin == "2" : 
-                sigFiles = {
-                            "X%s_%s"%(spin, mass) : 
-                            {
-                                "files" : [inFileDir+"GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-%s_narrow_MiniAODv2_v2.0.4+7415_HHAnalysis_2016-02-14.v0_histos.root"%mass],
-                                "relativeWeight" : 1.
-                            }
-                        }
-            else : 
-                print "Spin choice has to be '0' or '2'."
-            label = label_template.replace("DATE", date).replace("SPIN", spin).replace("MASS", mass).replace("SUFFIX", suffix)
-            print bkgFiles, sigFiles
-            trainMVA(bkgFiles, sigFiles, discriList, cut, weightExpr, MVAmethods, spectatorList, label)
+                    }
+            
+        label = label_template.replace("DATE", date).replace("NODE", node).replace("SUFFIX", suffix)
+        
+        print bkgFiles, sigFiles
+        
+        trainMVA(bkgFiles, sigFiles, discriList, cut, weightExpr, MVAmethods, spectatorList, label)
 
