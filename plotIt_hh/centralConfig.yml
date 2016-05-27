@@ -5,9 +5,11 @@ experiment: "CMS"
 extra-label: "Preliminary"
 
 # NTUPLE
-root: '/home/fynu/bfrancois/scratch/framework/oct2015/CMSSW_7_4_15/src/cp3_llbb/HHTools/histFactory_hh/76_mjjStudy/condor/output/'
+#root: '/home/fynu/bfrancois/scratch/framework/oct2015/CMSSW_7_4_15/src/cp3_llbb/HHTools/histFactory_hh/76_mjjStudy/condor/output/'
 # SKIM
 #root: '/home/fynu/bfrancois/scratch/framework/oct2015/CMSSW_7_4_15/src/cp3_llbb/CommonTools/histFactory/hists_skimmed_btagMM_bdtCut_2016_01_17/'
+
+root: '/home/fynu/swertz/scratch/CMSSW_7_6_3_patch2/src/cp3_llbb/HHTools/condor/160525_0/condor/output/'
 
 luminosity: 2300  # according to brilcalc 
 luminosity-error: 0.027

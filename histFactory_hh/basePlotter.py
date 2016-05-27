@@ -334,13 +334,13 @@ class BasePlotter:
                         'name':  'll_M_%s_%s_%s%s'%(self.llFlav, self.suffix, self.extraString, self.systematicString),
                         'variable': self.ll_str+".M()",
                         'plot_cut': self.totalCut,
-                        'binning': '(50, 0, 250)'
+                        'binning': '(50, 10, 250)'
                 })
             self.mjj_plot.append({
                         'name':  'jj_M_%s_%s_%s%s'%(self.llFlav, self.suffix, self.extraString, self.systematicString),
                         'variable': self.jj_str+".M()",
                         'plot_cut': self.totalCut,
-                        'binning': '(50, 0, 250)'
+                        'binning': '(50, 10, 410)'
                 })
             # Plot to compute yields (ensure we have not over/under flow)
             self.isElEl_plot.append({
@@ -413,31 +413,31 @@ class BasePlotter:
                         'name':  'lep1_pt_%s_%s_%s%s'%(self.llFlav, self.suffix, self.extraString, self.systematicString),
                         'variable': self.lep1_str+".p4.Pt()",
                         'plot_cut': self.totalCut,
-                        'binning': '(50, 0, 300)'
+                        'binning': '(50, 15, 400)'
                 },
                 {
                         'name':  'lep2_pt_%s_%s_%s%s'%(self.llFlav, self.suffix, self.extraString, self.systematicString),
                         'variable': self.lep2_str+".p4.Pt()",
                         'plot_cut': self.totalCut,
-                        'binning': '(50, 0, 100)'
+                        'binning': '(50, 10, 200)'
                 },
                 {
                         'name':  'jet1_pt_%s_%s_%s%s'%(self.llFlav, self.suffix, self.extraString, self.systematicString),
                         'variable': self.jet1_str+".p4.Pt()",
                         'plot_cut': self.totalCut,
-                        'binning': '(50, 0, 300)'
+                        'binning': '(50, 20, 400)'
                 },
                 {
                         'name':  'jet2_pt_%s_%s_%s%s'%(self.llFlav, self.suffix, self.extraString, self.systematicString),
                         'variable': self.jet2_str+".p4.Pt()",
                         'plot_cut': self.totalCut,
-                        'binning': '(50, 0, 250)'
+                        'binning': '(50, 20, 300)'
                 },
                 {
                         'name':  'met_pt_%s_%s_%s%s'%(self.llFlav, self.suffix, self.extraString, self.systematicString),
                         'variable': "met_p4.Pt()",
                         'plot_cut': self.totalCut,
-                        'binning': '(50, 0, 400)'
+                        'binning': '(50, 0, 450)'
                 }
             ])
             self.csv_plot.extend([
@@ -513,44 +513,56 @@ class BasePlotter:
                         'name':  'll_DR_l_l_%s_%s_%s%s'%(self.llFlav, self.suffix, self.extraString, self.systematicString),
                         'variable': self.baseObject+".DR_l_l",
                         'plot_cut': self.totalCut,
-                        'binning': '(50, 0, 2.2)'
+                        'binning': '(50, 0, 6)'
                 },
                 {
                         'name':  'jj_DR_j_j_%s_%s_%s%s'%(self.llFlav, self.suffix, self.extraString, self.systematicString),
                         'variable': self.baseObject+".DR_j_j",
                         'plot_cut': self.totalCut,
-                        'binning': '(50, 0, 3.1)'
+                        'binning': '(50, 0, 6)'
                 },
                 {
                         'name':  'llmetjj_DPhi_ll_jj_%s_%s_%s%s'%(self.llFlav, self.suffix, self.extraString, self.systematicString),
                         'variable': "abs("+self.baseObject+".DPhi_ll_jj)",
                         'plot_cut': self.totalCut,
-                        'binning': '(25, 1.5, 3.1416)'
+                        'binning': '(25, 0, 3.1416)'
                 },
                 {
                         'name':  'll_pt_%s_%s_%s%s'%(self.llFlav, self.suffix, self.extraString, self.systematicString),
                         'variable': self.ll_str+".Pt()",
                         'plot_cut': self.totalCut,
-                        'binning': '(50, 0, 400)'
+                        'binning': '(50, 0, 450)'
                 },
                 {
                         'name':  'jj_pt_%s_%s_%s%s'%(self.llFlav, self.suffix, self.extraString, self.systematicString),
                         'variable': self.jj_str+".Pt()",
                         'plot_cut': self.totalCut,
-                        'binning': '(50, 0, 400)'
+                        'binning': '(50, 0, 450)'
                 },
                 {
                         'name':  'llmetjj_minDR_l_j_%s_%s_%s%s'%(self.llFlav, self.suffix, self.extraString, self.systematicString),
                         'variable': self.baseObject+".minDR_l_j",
                         'plot_cut': self.totalCut,
-                        'binning': '(50, 0, 6)'
+                        'binning': '(50, 0, 5)'
                 },
                 {
                         'name':  'llmetjj_MTformula_%s_%s_%s%s'%(self.llFlav, self.suffix, self.extraString, self.systematicString),
                         'variable': self.baseObject+".MT_formula", # std::sqrt(2 * ll[ill].p4.Pt() * met[imet].p4.Pt() * (1-std::cos(dphi)));
                         'plot_cut': self.totalCut,
                         'binning': '(50, 0, 500)'
-                }
+                },
+                {
+                        'name':  'llmetjj_M_%s_%s_%s%s'%(self.llFlav, self.suffix, self.extraString, self.systematicString),
+                        'variable': self.baseObject+".p4.M()",
+                        'plot_cut': self.totalCut,
+                        'binning': '(50, 100, 1500)'
+                },
+                {
+                        'name':  'cosThetaStar_%s_%s_%s%s'%(self.llFlav, self.suffix, self.extraString, self.systematicString),
+                        'variable': self.baseObject + ".cosThetaStar_CS",
+                        'plot_cut': self.totalCut,
+                        'binning': '(25, 0, 1)'
+                },
             ])
 
             self.other_plot.extend([
