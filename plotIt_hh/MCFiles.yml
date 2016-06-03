@@ -160,82 +160,73 @@
 
 # DY
 
-#'DYJetsToLL_M-5to50_HT-100to200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_extended_1327_plus_1405_v0.1.2+76X_HHAnalysis_2016-05-02.v0_histos.root':
-#  type: mc
-#  group: DY
-#  order: 7
-#
-#'DYJetsToLL_M-5to50_HT-200to400_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_extended_1394_plus_1325_v0.1.2+76X_HHAnalysis_2016-05-02.v0_histos.root':
-#  type: mc
-#  group: DY
-#  order: 7
-#
-#'DYJetsToLL_M-5to50_HT-400to600_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_extended_1328_plus_1418_v0.1.2+76X_HHAnalysis_2016-05-02.v0_histos.root':
-#  type: mc
-#  group: DY
-#  order: 7
-#
-#'DYJetsToLL_M-5to50_HT-600toInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_extended_1332_plus_1331_v0.1.2+76X_HHAnalysis_2016-05-02.v0_histos.root':
-#  type: mc
-#  group: DY
-#  order: 7
-#
-#'DYJetsToLL_M-50_HT-100to200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_extended_1397_plus_1398_v0.1.2+76X_HHAnalysis_2016-05-02.v0_histos.root':
-#  type: mc
-#  group: DY
-#  order: 7
-#
-#'DYJetsToLL_M-50_HT-200to400_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_extended_1392_plus_1326_v0.1.2+76X_HHAnalysis_2016-05-02.v0_histos.root':
-#  type: mc
-#  group: DY
-#  order: 7
-#
-#'DYJetsToLL_M-50_HT-400to600_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_extended_1395_plus_1419_v0.1.2+76X_HHAnalysis_2016-05-02.v0_histos.root':
-#  type: mc
-#  group: DY
-#  order: 7
-#
-#'DYJetsToLL_M-50_HT-600toInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_extended_1402_plus_1329_v0.1.2+76X_HHAnalysis_2016-05-02.v0_histos.root':
+#LO
+'DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_extended_ext0_plus_ext1_v0.1.2+76X_HHAnalysis_2016-05-02.v0_histos.root':
+  type: mc
+  group: DY
+  order: 7
+
+'DYJetsToLL_M-50_HT-100to200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_Fall15MiniAODv2_v0.1.2+76X_HHAnalysis_2016-05-02.v0_histos.root':
+  type: mc
+  group: DY
+  order: 7
+
+'DYJetsToLL_M-50_HT-200to400_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_Fall15MiniAODv2_v0.1.2+76X_HHAnalysis_2016-05-02.v0_histos.root':
+  type: mc
+  group: DY
+  order: 7
+
+'DYJetsToLL_M-50_HT-400to600_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_extended_ext0_plus_ext1_v0.1.2+76X_HHAnalysis_2016-05-02.v0_histos.root':
+  type: mc
+  group: DY
+  order: 7
+
+'DYJetsToLL_M-50_HT-600toInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_extended_ext0_plus_ext1_v0.1.2+76X_HHAnalysis_2016-05-02.v0_histos.root':
+  type: mc
+  group: DY
+  order: 7
+
+#'DYJetsToLL_M-5to50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_Fall15MiniAODv2_v0.1.2+76X_HHAnalysis_2016-05-02.v0_histos.root':
 #  type: mc
 #  group: DY
 #  order: 7
 
-#'DY-M-5toInfHadded.root':
-#  type: mc
-#  group: DY
-#  order: 7
+'DYJetsToLL_M-5to50_HT-100to200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_extended_ext0_plus_ext1_v0.1.2+76X_HHAnalysis_2016-05-02.v0_histos.root':
+  type: mc
+  group: DY
+  order: 7
 
-#'DY-M-5toInfonlyHT.root':
-#  type: mc
-#  group: DY
-#  order: 7
+'DYJetsToLL_M-5to50_HT-200to400_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_Fall15MiniAODv2_v0.1.2+76X_HHAnalysis_2016-05-02.v0_histos.root':
+  type: mc
+  group: DY
+  order: 7
+
+'DYJetsToLL_M-5to50_HT-400to600_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_Fall15MiniAODv2_v0.1.2+76X_HHAnalysis_2016-05-02.v0_histos.root':
+  type: mc
+  group: DY
+  order: 7
+
+'DYJetsToLL_M-5to50_HT-600toInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_extended_ext0_plus_ext1_v0.1.2+76X_HHAnalysis_2016-05-02.v0_histos.root':
+  type: mc
+  group: DY
+  order: 7
   
-#'DYJetsToLL_M-10to50_TuneCUETP8M1_13TeV-amcatnloFXFX_Fall15MiniAODv2_v0.1.2+76X_HHAnalysis_2016-05-02.v0_histos.root':
+# NLO
+#'DYJetsToLL_M-10to50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_extended_ext0_plus_ext1_plus_ext3_v0.1.2+76X_HHAnalysis_2016-05-02.v0_histos.root':
 #  type: mc
 #  group: DY
 #  order: 7
 #
-#'DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX_Fall15MiniAODv2_v0.1.2+76X_HHAnalysis_2016-05-02.v0_histos.root':
+#'DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_extended_ext0_plus_ext1_plus_ext4_v0.1.2+76X_HHAnalysis_2016-05-02.v0_histos.root':
 #  type: mc
 #  group: DY
 #  order: 7
-
-'DYJetsToLL_M-10to50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_extended_ext0_plus_ext1_plus_ext3_v0.1.2+76X_HHAnalysis_2016-05-02.v0_histos.root':
-  type: mc
-  group: DY
-  order: 7
-
-'DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_extended_ext0_plus_ext1_plus_ext4_v0.1.2+76X_HHAnalysis_2016-05-02.v0_histos.root':
-  type: mc
-  group: DY
-  order: 7
 
 # Signal, non-resonant
 
 'GluGluToHHTo2B2VTo2L2Nu_node_SM_13TeV-madgraph_v0.1.2+76X_HHAnalysis_2016-05-02.v0_histos.root':
   type: signal
   cross-section: 10000
-  #generated-events: 300000
   line-color: '#008A00'
   legend: 'SM'
   legend-order: 5
@@ -245,8 +236,7 @@
 'GluGluToHHTo2B2VTo2L2Nu_node_box_13TeV-madgraph_v0.1.2+76X_HHAnalysis_2016-05-02.v0_histos.root':
   type: signal
   cross-section: 10000
-  #generated-events: 300000
-  line-color: '#00ABA9'
+  line-color: '#F0A30A'
   legend: 'Box'
   legend-order: 5
   line-width: 2
@@ -255,7 +245,6 @@
 #'GluGluToHHTo2B2VTo2L2Nu_node_2_13TeV-madgraph_v0.1.2+76X_HHAnalysis_2016-05-02.v0_histos.root':
 #  type: signal
 #  cross-section: 10000
-#  #generated-events: 300000
 #  line-color: '#FA6800'
 #  legend: 'BM2'
 #  legend-order: 5
@@ -265,7 +254,6 @@
 #'GluGluToHHTo2B2VTo2L2Nu_node_3_13TeV-madgraph_v0.1.2+76X_HHAnalysis_2016-05-02.v0_histos.root':
 #  type: signal
 #  cross-section: 10000
-#  #generated-events: 300000
 #  line-color: '#E51400'
 #  legend: 'BM3'
 #  legend-order: 5
@@ -275,7 +263,6 @@
 #'GluGluToHHTo2B2VTo2L2Nu_node_4_13TeV-madgraph_v0.1.2+76X_HHAnalysis_2016-05-02.v0_histos.root':
 #  type: signal
 #  cross-section: 10000
-#  #generated-events: 300000
 #  line-color: '#A20025'
 #  legend: 'BM4'
 #  legend-order: 5
@@ -285,7 +272,6 @@
 'GluGluToHHTo2B2VTo2L2Nu_node_5_13TeV-madgraph_v0.1.2+76X_HHAnalysis_2016-05-02.v0_histos.root':
   type: signal
   cross-section: 10000
-  #generated-events: 300000
   line-color: '#0050EF'
   legend: 'BM5'
   legend-order: 5
@@ -295,9 +281,8 @@
 #'GluGluToHHTo2B2VTo2L2Nu_node_6_13TeV-madgraph_v0.1.2+76X_HHAnalysis_2016-05-02.v0_histos.root':
 #  type: signal
 #  cross-section: 10000
-#  #generated-events: 300000
-#  line-color: '#AA00FF'
 #  legend: 'BM6'
+#  line-color: '#A4C500'
 #  legend-order: 5
 #  line-width: 2
 #  line-type: 1
@@ -305,7 +290,6 @@
 #'GluGluToHHTo2B2VTo2L2Nu_node_7_13TeV-madgraph_v0.1.2+76X_HHAnalysis_2016-05-02.v0_histos.root':
 #  type: signal
 #  cross-section: 10000
-#  #generated-events: 300000
 #  line-color: '#D80073'
 #  legend: 'BM7'
 #  legend-order: 5
@@ -315,8 +299,7 @@
 'GluGluToHHTo2B2VTo2L2Nu_node_8_13TeV-madgraph_v0.1.2+76X_HHAnalysis_2016-05-02.v0_histos.root':
   type: signal
   cross-section: 10000
-  #generated-events: 300000
-  line-color: '#A4C500'
+  line-color: '#AA00FF'
   legend: 'BM8'
   legend-order: 5
   line-width: 2
@@ -325,8 +308,7 @@
 #'GluGluToHHTo2B2VTo2L2Nu_node_9_13TeV-madgraph_v0.1.2+76X_HHAnalysis_2016-05-02.v0_histos.root':
 #  type: signal
 #  cross-section: 10000
-#  #generated-events: 300000
-#  line-color: '#F0A30A'
+#  line-color: '#00ABA9'
 #  legend: 'BM9'
 #  legend-order: 5
 #  line-width: 2
@@ -335,7 +317,6 @@
 #'GluGluToHHTo2B2VTo2L2Nu_node_10_13TeV-madgraph_v0.1.2+76X_HHAnalysis_2016-05-02.v0_histos.root':
 #  type: signal
 #  cross-section: 10000
-#  #generated-events: 300000
 #  line-color: '#825A2C'
 #  legend: 'BM10'
 #  legend-order: 5
@@ -345,7 +326,6 @@
 #'GluGluToHHTo2B2VTo2L2Nu_node_11_13TeV-madgraph_v0.1.2+76X_HHAnalysis_2016-05-02.v0_histos.root':
 #  type: signal
 #  cross-section: 10000
-#  #generated-events: 300000
 #  line-color: '#6D8764'
 #  legend: 'BM11'
 #  legend-order: 5
@@ -355,7 +335,6 @@
 #'GluGluToHHTo2B2VTo2L2Nu_node_12_13TeV-madgraph_v0.1.2+76X_HHAnalysis_2016-05-02.v0_histos.root':
 #  type: signal
 #  cross-section: 10000
-#  #generated-events: 300000
 #  line-color: '#647687'
 #  legend: 'BM12'
 #  legend-order: 5
@@ -365,7 +344,6 @@
 'GluGluToHHTo2B2VTo2L2Nu_node_13_13TeV-madgraph_v0.1.2+76X_HHAnalysis_2016-05-02.v0_histos.root':
   type: signal
   cross-section: 10000
-  #generated-events: 300000
   line-color: '#76608A'
   legend: 'BM13'
   legend-order: 5

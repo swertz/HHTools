@@ -4,53 +4,13 @@ import copy, sys
 
 
 class BasePlotter:
-    def __init__(self, mode = "custom", baseObjectName = "hh_llmetjj_allTight_btagM_csv", btagWP_str = 'medium', objects = "nominal", WP = ["T", "T", "T", "T", "L", "L", "M", "M", "csv"]):
-        # mode can be "custom" or "map", if you are in map mode you need to modify baseObjectName and specify a WP
+    def __init__(self, baseObjectName = "hh_llmetjj_allTight_btagM_csv", btagWP_str = 'medium', objects = "nominal", WP = ["T", "T", "T", "T", "L", "L", "M", "M", "csv"]):
         # systematic should be jecup, jecdown, jerup or jerdown. The one for lepton, btag, etc, have to be treated with the "weight" parameter in generatePlots.py (so far)
 
-        if mode == "map" :
-            print "Deprecated mode"
-            sys.exit()
-            #lepid1 = getattr(HH.lepID, WP[0])
-            #lepiso1 = getattr(HH.lepIso, WP[1])
-            #lepid2 = getattr(HH.lepID, WP[2])
-            #lepiso2 = getattr(HH.lepIso, WP[3])
-            #jetid1 = getattr(HH.jetID, WP[4])
-            #jetid2 = getattr(HH.jetID, WP[5])
-            #btagWP1 = getattr(HH.btagWP, WP[6])
-            #btagWP2 = getattr(HH.btagWP, WP[7])
-            #pair = getattr(HH.jetPair, WP[8])
-
-            #map = "hh_map_llmetjj"
-            #mapWP = HH.leplepIDIsojetjetIDbtagWPPair(lepid1, lepiso1, lepid2, lepiso2, jetid1, jetid2, btagWP1, btagWP2, pair)
-            #mapIndices = "%s[%s]"%(map, mapWP)
-            #self.baseObject = "%s[%s[0]]"%(baseObjectName, mapIndices)
-            #self.sanityCheck = "Length$(%s)>0"%mapIndices # ensure to have an entry in the map
-
-            #llIsoCat = HH.lepIso.map.at(lepiso1)+HH.lepIso.map.at(lepiso2) # This is to extract string from WP
-            #llIDCat = HH.lepID.map.at(lepid1)+HH.lepID.map.at(lepid2)
-            #jjIDCat = HH.jetID.map.at(jetid1)+HH.jetID.map.at(jetid2)
-            #jjBtagCat = HH.btagWP.map.at(btagWP1)+HH.btagWP.map.at(btagWP2)
-            #order = HH.jetPair.map.at(pair)
-            #self.suffix = 'lepIso_%s_lepID_%s_jetID_%s_btag_%s_order_%s'%(llIsoCat, llIDCat, jjIDCat, jjBtagCat, order)
-
-            ## Deprecated (but may be useful at some point)
-            #lepMap = "hh_map_l"
-            #jetMap = "hh_map_j"
-            #lepMapWP = HH.lepIDIso(lepid1, lepiso1)
-            #jetMapWP = btagWP1 # To Be Updated once jet map includes jetID
-            #lepMapIndices = "%s[%s]"%(lepMap, lepMapWP)
-            #jetMapIndices = "%s[%s]"%(jetMap, jetMapWP)
-
-        elif mode == "custom" :
-            self.baseObject = baseObjectName+"[0]"
-            self.suffix = baseObjectName
-            self.btagWP_str = btagWP_str
-
-        else : 
-            print "Mode has to be 'custom' or 'map'"
-            sys.exit()
-
+        self.baseObject = baseObjectName+"[0]"
+        self.suffix = baseObjectName
+        self.btagWP_str = btagWP_str
+        
         self.lep1_str = "hh_leptons[%s.ilep1]"%self.baseObject
         self.lep2_str = "hh_leptons[%s.ilep2]"%self.baseObject
         self.jet1_str = "hh_jets[%s.ijet1]"%self.baseObject
@@ -75,118 +35,34 @@ class BasePlotter:
         self.jet2_fwkIdx = self.jet2_str+".idx"
 
         # Ensure we have one candidate, works also for jecup etc
-        if mode == "custom" :
-            self.sanityCheck = "Length$(%s)>0"%baseObjectName
+        self.sanityCheck = "Length$(%s)>0"%baseObjectName
 
     def generatePlots(self, categories = ["All"], stage = "cleaning_cut", requested_plots = [], weights = ['trigeff', 'jjbtag', 'llidiso', 'pu'], extraCut = "", systematic = "nominal", extraString = ""):
 
         # MVA evaluation : ugly but necessary part
-        baseStringForMVA_part1 = 'evaluateMVA("/home/fynu/bfrancois/scratch/framework/oct2015/CMSSW_7_4_15/src/cp3_llbb/HHTools/mvaTraining_hh/weights/BDTNAME_kBDT.weights.xml", '
-        baseStringForMVA_part2 = '{{"jj_pt", %s}, {"ll_pt", %s}, {"ll_M", %s}, {"ll_DR_l_l", %s}, {"jj_DR_j_j", %s}, {"llmetjj_DPhi_ll_jj", %s}, {"llmetjj_minDR_l_j", %s}, {"llmetjj_MTformula", %s}})'%(self.jj_str+".Pt()", self.ll_str+".Pt()", self.ll_str+".M()", self.baseObject+".DR_l_l", self.baseObject+".DR_j_j", self.baseObject+".minDR_l_j", self.baseObject+".DPhi_ll_jj", self.baseObject+".MT_formula")
+        baseStringForMVA_part1 = 'evaluateMVA("/home/fynu/swertz/scratch/CMSSW_7_6_3_patch2/src/cp3_llbb/HHTools/mvaTraining_hh/weights/BDTNAME_kBDT.weights.xml", '
+        baseStringForMVA_part2 = '{{"jj_pt", %s}, {"ll_pt", %s}, {"ll_M", %s}, {"ll_DR_l_l", %s}, {"jj_DR_j_j", %s}, {"llmetjj_DPhi_ll_jj", %s}, {"llmetjj_minDR_l_j", %s}, {"llmetjj_MTformula", %s}})' % ( self.jj_str + ".Pt()", self.ll_str + ".Pt()", self.ll_str + ".M()", self.baseObject + ".DR_l_l", self.baseObject + ".DR_j_j", self.baseObject + ".minDR_l_j", self.baseObject + ".DPhi_ll_jj", self.baseObject + ".MT_formula")
         stringForMVA = baseStringForMVA_part1 + baseStringForMVA_part2
+        
         # The following will need to be modified each time the name of the BDT output changes
-        bdtNameTemplate = "DATE_BDT_XSPIN_MASS_SUFFIX"
-        date = "2016_02_19"  #"2016_02_06"
-        spins = ["0"] #, "2"]
-        masses = ["400", "650"]    #["350", "400", "500", "650"] #, "900"]
-        suffixs = ["VS_TT_DYHTonly_tW_8var"] #["VS_TT_8var_bTagMM"]   #["VS_TT_DY_WoverSum_8var_bTagMM_noEvtW", "VS_TT_DY_WoverSum_8var_bTagMM"]# "VS_TT09_DY01_8var_bTagMM"] #, "VS_TT1_DY0_8var_bTagMM"]
+        bdtNameTemplate = "DATE_BDT_NODE_SUFFIX"
+        date = "2016_05_27"
+        nodes = ["SM", "box", "5", "8", "13", "all"]
+        suffixes = ["VS_TT_DYHTonly_tW_8var"]
         BDToutputs = {}
         bdtNames = []
         BDToutputsVariable = {}
-        for spin in spins :
-            for mass in masses :
-                for suffix in suffixs :
-                    bdtName = bdtNameTemplate.replace("DATE", date).replace("SPIN", spin).replace("MASS", mass).replace("SUFFIX", suffix)
-                    bdtNames.append(bdtName)
-                    BDToutputsVariable[bdtName] = baseStringForMVA_part1.replace("BDTNAME", bdtName) + baseStringForMVA_part2
+        for node in nodes:
+            for suffix in suffixes :
+                bdtName = bdtNameTemplate.replace("DATE", date).replace("NODE", node).replace("SUFFIX", suffix)
+                bdtNames.append(bdtName)
+                BDToutputsVariable[bdtName] = baseStringForMVA_part1.replace("BDTNAME", bdtName) + baseStringForMVA_part2
 
         # Possible stages
         mll_cut = "((91 - {0}.M()) > 15)".format(self.ll_str) 
-        cleaning_cut = "({0}.DR_l_l < 2.2 && {1}.DR_j_j < 3.1 && {2}.DPhi_ll_jj > 1.5)".format(self.baseObject, self.baseObject, self.baseObject)
-        nminusonedrll_cut = "({0}.DR_j_j < 3.1 && {1}.DPhi_ll_jj > 1.5)".format(self.baseObject, self.baseObject)
-        nminusonedrjj_cut = "({0}.DR_l_l < 2.2 && {1}.DPhi_ll_jj > 1.5)".format(self.baseObject, self.baseObject)
-        nminusonedphilljj_cut = "({0}.DR_l_l < 2.2 && {1}.DR_j_j < 3.1)".format(self.baseObject, self.baseObject)
-        mjj_cut_sr = "({0}.M() > 95 && {0}.M() < 135)".format(self.jj_str)
-        mjj_cut_br = "({0}.M() < 95 || {0}.M() > 135)".format(self.jj_str)
-        mjj_cut_cr = "({0}.M() < 70 || {0}.M() > 150)".format(self.jj_str)
-        bdt_cut_x0_400_sr = "(({0}) > 0.1)".format(BDToutputsVariable[bdtNameTemplate.replace("DATE", date).replace("SPIN", "0").replace("MASS", "400").replace("SUFFIX", suffixs[0])])
-        bdt_cut_x0_400_br = "(({0}) < 0.1)".format(BDToutputsVariable[bdtNameTemplate.replace("DATE", date).replace("SPIN", "0").replace("MASS", "400").replace("SUFFIX", suffixs[0])])
-        bdt_cut_x0_650_sr = "(({0}) > 0.1)".format(BDToutputsVariable[bdtNameTemplate.replace("DATE", date).replace("SPIN", "0").replace("MASS", "650").replace("SUFFIX", suffixs[0])])
-        bdt_cut_x0_650_br = "(({0}) < 0.1)".format(BDToutputsVariable[bdtNameTemplate.replace("DATE", date).replace("SPIN", "0").replace("MASS", "650").replace("SUFFIX", suffixs[0])])
-        bdt_cut_x0_400_sr_ext = "(({0}) > 0.1)".format(BDToutputsVariable[bdtNameTemplate.replace("DATE", date).replace("SPIN", "0").replace("MASS", "400").replace("SUFFIX", suffixs[0])])
-        bdt_cut_x0_650_sr_ext = "(({0}) > 0.1)".format(BDToutputsVariable[bdtNameTemplate.replace("DATE", date).replace("SPIN", "0").replace("MASS", "650").replace("SUFFIX", suffixs[0])])
-        bdt_cut_x0_400_cr_ext = "(({0}) < 0.1)".format(BDToutputsVariable[bdtNameTemplate.replace("DATE", date).replace("SPIN", "0").replace("MASS", "400").replace("SUFFIX", suffixs[0])])
-        bdt_cut_x0_650_cr_ext = "(({0}) < 0.1)".format(BDToutputsVariable[bdtNameTemplate.replace("DATE", date).replace("SPIN", "0").replace("MASS", "650").replace("SUFFIX", suffixs[0])])
-        safe_cut = "(%s.p4.Pt() > 30 && %s.p4.Pt() > 30 && %s.p4.Pt() > 20 && %s.p4.Pt() > 20)"%(self.jet1_str, self.jet2_str, self.lep1_str, self.lep2_str)
-        jet_pt30 = "(%s.p4.Pt() > 30 && %s.p4.Pt() > 30)"%(self.jet1_str, self.jet2_str)
-        subleadjet_pt20_30 = "(%s.p4.Pt() < 30)"%(self.jet2_str)
-        subleadjet_pt20_30_leadjet_pt30 = "(%s.p4.Pt() > 30 && %s.p4.Pt() < 30)"%(self.jet1_str, self.jet2_str)
-        mjj_cut_study = "({0}.M() > 75 && {0}.M() < 85)".format(self.jj_str)
         dict_stage_cut = {
                "no_cut" : "", 
-               "safe_cut" : safe_cut,
-               "jet_pt30" : jet_pt30,
                "mll_cut" : mll_cut,
-               "mjj_cut_study" : self.joinCuts(mjj_cut_study, mll_cut, cleaning_cut),
-               "subleadjet_pt20_30_mjj_cut_study" : self.joinCuts(mjj_cut_study, subleadjet_pt20_30, cleaning_cut, mll_cut),
-               "subleadjet_pt20_30" : self.joinCuts(subleadjet_pt20_30, cleaning_cut, mll_cut),
-               "subleadjet_pt20_30_leadjet_pt30" : self.joinCuts(subleadjet_pt20_30_leadjet_pt30, cleaning_cut, mll_cut),
-               "nminusonedrll_cut" : self.joinCuts(mll_cut, nminusonedrll_cut),
-               "nminusonedrjj_cut" : self.joinCuts(mll_cut, nminusonedrjj_cut),
-               "nminusonedphilljj_cut" : self.joinCuts(mll_cut, nminusonedphilljj_cut),
-               "cleaning_cut" : self.joinCuts(mll_cut, cleaning_cut),
-               "cleaning_cut_jet_pt30" : self.joinCuts(mll_cut, cleaning_cut, jet_pt30),
-               ###############
-               # Four regions#
-               ###############
-               "highBDT_mjjP_400" : self.joinCuts(mll_cut, cleaning_cut, mjj_cut_sr, bdt_cut_x0_400_sr),
-               "highBDT_mjjSB_400" : self.joinCuts(mll_cut, cleaning_cut, mjj_cut_br, bdt_cut_x0_400_sr),
-               "lowBDT_mjjP_400" : self.joinCuts(mll_cut, cleaning_cut, mjj_cut_sr, bdt_cut_x0_400_br),
-               "lowBDT_mjjSB_400" : self.joinCuts(mll_cut, cleaning_cut, mjj_cut_br, bdt_cut_x0_400_br),
-               "highBDT_mjjP_650" : self.joinCuts(mll_cut, cleaning_cut, mjj_cut_sr, bdt_cut_x0_650_sr),
-               "highBDT_mjjSB_650" : self.joinCuts(mll_cut, cleaning_cut, mjj_cut_br, bdt_cut_x0_650_sr),
-               "lowBDT_mjjP_650" : self.joinCuts(mll_cut, cleaning_cut, mjj_cut_sr, bdt_cut_x0_650_br),
-               "lowBDT_mjjSB_650" : self.joinCuts(mll_cut, cleaning_cut, mjj_cut_br, bdt_cut_x0_650_br),
-               # BDT 400 asking high BDT 650
-               "highBDT_mjjP_400_highBDT650" : self.joinCuts(mll_cut, cleaning_cut, mjj_cut_sr, bdt_cut_x0_400_sr, bdt_cut_x0_650_sr),
-               "highBDT_mjjSB_400_highBDT650" : self.joinCuts(mll_cut, cleaning_cut, mjj_cut_br, bdt_cut_x0_400_sr, bdt_cut_x0_650_sr),
-               "lowBDT_mjjP_400_highBDT650" : self.joinCuts(mll_cut, cleaning_cut, mjj_cut_sr, bdt_cut_x0_400_br, bdt_cut_x0_650_sr),
-               "lowBDT_mjjSB_400_highBDT650" : self.joinCuts(mll_cut, cleaning_cut, mjj_cut_br, bdt_cut_x0_400_br, bdt_cut_x0_650_sr),
-               # BDT 400 asking low BDT 650
-               "highBDT_mjjP_400_lowBDT650" : self.joinCuts(mll_cut, cleaning_cut, mjj_cut_sr, bdt_cut_x0_400_sr, bdt_cut_x0_650_br),
-               "highBDT_mjjSB_400_lowBDT650" : self.joinCuts(mll_cut, cleaning_cut, mjj_cut_br, bdt_cut_x0_400_sr, bdt_cut_x0_650_br),
-               "lowBDT_mjjP_400_lowBDT650" : self.joinCuts(mll_cut, cleaning_cut, mjj_cut_sr, bdt_cut_x0_400_br, bdt_cut_x0_650_br),
-               "lowBDT_mjjSB_400_lowBDT650" : self.joinCuts(mll_cut, cleaning_cut, mjj_cut_br, bdt_cut_x0_400_br, bdt_cut_x0_650_br),
-               # BDT 650 asking high BDT 400
-               "highBDT_mjjP_650_highBDT400" : self.joinCuts(mll_cut, cleaning_cut, mjj_cut_sr, bdt_cut_x0_650_sr, bdt_cut_x0_400_sr),
-               "highBDT_mjjSB_650_highBDT400" : self.joinCuts(mll_cut, cleaning_cut, mjj_cut_br, bdt_cut_x0_650_sr, bdt_cut_x0_400_sr),
-               "lowBDT_mjjP_650_highBDT400" : self.joinCuts(mll_cut, cleaning_cut, mjj_cut_sr, bdt_cut_x0_650_br, bdt_cut_x0_400_sr),
-               "lowBDT_mjjSB_650_highBDT400" : self.joinCuts(mll_cut, cleaning_cut, mjj_cut_br, bdt_cut_x0_650_br, bdt_cut_x0_400_sr),
-               # BDT 650 asking low BDT 400
-               "highBDT_mjjP_650_lowBDT400" : self.joinCuts(mll_cut, cleaning_cut, mjj_cut_sr, bdt_cut_x0_650_sr, bdt_cut_x0_400_br),
-               "highBDT_mjjSB_650_lowBDT400" : self.joinCuts(mll_cut, cleaning_cut, mjj_cut_br, bdt_cut_x0_650_sr, bdt_cut_x0_400_br),
-               "lowBDT_mjjP_650_lowBDT400" : self.joinCuts(mll_cut, cleaning_cut, mjj_cut_sr, bdt_cut_x0_650_br, bdt_cut_x0_400_br),
-               "lowBDT_mjjSB_650_lowBDT400" : self.joinCuts(mll_cut, cleaning_cut, mjj_cut_br, bdt_cut_x0_650_br, bdt_cut_x0_400_br),
-
-               "highBDT_mjjP_400_jet_pt30" : self.joinCuts(mll_cut, cleaning_cut, mjj_cut_sr, bdt_cut_x0_400_sr, jet_pt30),
-               "highBDT_mjjSB_400_jet_pt30" : self.joinCuts(mll_cut, cleaning_cut, mjj_cut_br, bdt_cut_x0_400_sr, jet_pt30),
-               "lowBDT_mjjP_400_jet_pt30" : self.joinCuts(mll_cut, cleaning_cut, mjj_cut_sr, bdt_cut_x0_400_br, jet_pt30),
-               "lowBDT_mjjSB_400_jet_pt30" : self.joinCuts(mll_cut, cleaning_cut, mjj_cut_br, bdt_cut_x0_400_br, jet_pt30),
-               "highBDT_mjjP_650_jet_pt30" : self.joinCuts(mll_cut, cleaning_cut, mjj_cut_sr, bdt_cut_x0_650_sr, jet_pt30),
-               "highBDT_mjjSB_650_jet_pt30" : self.joinCuts(mll_cut, cleaning_cut, mjj_cut_br, bdt_cut_x0_650_sr, jet_pt30),
-               "lowBDT_mjjP_650_jet_pt30" : self.joinCuts(mll_cut, cleaning_cut, mjj_cut_sr, bdt_cut_x0_650_br, jet_pt30),
-               "lowBDT_mjjSB_650_jet_pt30" : self.joinCuts(mll_cut, cleaning_cut, mjj_cut_br, bdt_cut_x0_650_br, jet_pt30),
-
-               "allBDT_mjjSB_400" : "(" + self.joinCuts(mll_cut, cleaning_cut, mjj_cut_br, bdt_cut_x0_400_sr) + ") || (" + self.joinCuts(mll_cut, cleaning_cut, mjj_cut_br, bdt_cut_x0_400_br) + ")",
-               "allBDT_mjjSB_650" : "(" + self.joinCuts(mll_cut, cleaning_cut, mjj_cut_br, bdt_cut_x0_650_sr) + ") || (" + self.joinCuts(mll_cut, cleaning_cut, mjj_cut_br, bdt_cut_x0_650_br) + ")",
-               "lowBDT_mjjall_400" : "(" + self.joinCuts(mll_cut, cleaning_cut, mjj_cut_sr, bdt_cut_x0_400_br) + ") || (" + self.joinCuts(mll_cut, cleaning_cut, mjj_cut_br, bdt_cut_x0_400_br) + ")",
-               "lowBDT_mjjall_650" : "(" + self.joinCuts(mll_cut, cleaning_cut, mjj_cut_sr, bdt_cut_x0_650_br) + ") || (" + self.joinCuts(mll_cut, cleaning_cut, mjj_cut_br, bdt_cut_x0_650_br) + ")",
-
-               "mjj_cr" : self.joinCuts(mll_cut, cleaning_cut, mjj_cut_cr),
-               "sr_400_ext" : self.joinCuts(mll_cut, cleaning_cut, bdt_cut_x0_400_sr_ext),
-               "sr_650_ext" : self.joinCuts(mll_cut, cleaning_cut, bdt_cut_x0_650_sr_ext),
-               "cr_400_ext" : self.joinCuts(mll_cut, cleaning_cut, bdt_cut_x0_400_cr_ext),
-               "cr_650_ext" : self.joinCuts(mll_cut, cleaning_cut, bdt_cut_x0_650_cr_ext),
                }
         # Categories
         self.dict_cat_cut =  {
@@ -352,31 +228,10 @@ class BasePlotter:
             # BDT output plots
             for bdtName in bdtNames :
                 self.bdtoutput_plot.append({
-                        'name' : 'MVA_%s_%s_%s_%s%s'%(bdtName, self.llFlav, self.suffix, self.extraString, self.systematicString),
+                        'name' : 'MVA_%s_%s_%s_%s%s' % (bdtName, self.llFlav, self.suffix, self.extraString, self.systematicString),
                         'variable' : BDToutputsVariable[bdtName],
                         'plot_cut' : self.totalCut,
-                        'binning' : '(60, -0.6, 0.7)'
-                })
-                if '400' in bdtName : 
-                    self.bdt400_plot.append({
-                                'name' : 'MVA_%s_%s_%s_%s%s'%(bdtName, self.llFlav, self.suffix, self.extraString, self.systematicString),
-                                'variable' : BDToutputsVariable[bdtName],
-                                'plot_cut' : self.totalCut,
-                                'binning' : '(60, -0.6, 0.7)'
-                        })
-                if '650' in bdtName : 
-                    self.bdt650_plot.append({
-                                'name' : 'MVA_%s_%s_%s_%s%s'%(bdtName, self.llFlav, self.suffix, self.extraString, self.systematicString),
-                                'variable' : BDToutputsVariable[bdtName],
-                                'plot_cut' : self.totalCut,
-                                'binning' : '(60, -0.6, 0.7)'
-                        })
-
-                self.mjjvsbdt_plot.append({
-                        'name' : 'MjjvsMVA_%s_%s_%s_%s%s'%(bdtName, self.llFlav, self.suffix, self.extraString, self.systematicString),
-                        'variable' : BDToutputsVariable[bdtName]+":::"+self.jj_str+".M()",
-                        'plot_cut' : self.totalCut,
-                        'binning' : '(60, -0.6, 0.7, 50, 0, 250)'
+                        'binning' : '(50, -0.6, 0.6)'
                 })
 
             # Weight Plots

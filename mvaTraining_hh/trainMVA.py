@@ -23,7 +23,7 @@ label_template = "DATE_BDT_NODE_SUFFIX"
 
 #nodes = ["SM"]
 #nodes = ["SM", "box", "5", "8", "13"]
-nodes = ["box", "5", "8", "13"]
+nodes = ["SM", "box", "2", "3", "4", "5", "7", "8", "9", "10", "11", "12", "13"]
 inFileDir = "/home/fynu/swertz/scratch/CMSSW_7_6_3_patch2/src/cp3_llbb/HHTools/condor/skim_160527_0/condor/output/"
 
 # SAMPLES FOR THE TRAINING
@@ -91,10 +91,10 @@ bkgFiles = {
                     "files" : [inFileDir+DY50_HT600toInf+"_histos.root"],
                     "relativeWeight" : DY50_HT600toInf_db.source_dataset.xsection/DY50_HT600toInf_db.event_weight_sum
                 },
-        "DY5to50_incl" : { 
-                    "files" : [inFileDir+DY5to50_incl+"_histos.root"],
-                    "relativeWeight" : DY5to50_incl_db.source_dataset.xsection/DY5to50_incl_db.event_weight_sum
-                },
+        #"DY5to50_incl" : { 
+        #            "files" : [inFileDir+DY5to50_incl+"_histos.root"],
+        #            "relativeWeight" : DY5to50_incl_db.source_dataset.xsection/DY5to50_incl_db.event_weight_sum
+        #        },
         "DY5to50_HT100to200" : { 
                     "files" : [inFileDir+DY5to50_HT100to200+"_histos.root"],
                     "relativeWeight" : DY5to50_HT100to200_db.source_dataset.xsection/DY5to50_HT100to200_db.event_weight_sum
@@ -140,20 +140,19 @@ MVAmethods = ["kBDT"]
 weightExpr = "event_weight * trigeff * jjbtag * llidiso * pu"
 
 if __name__ == '__main__':
+
+    sigFiles = {}
     
     for node in nodes:
             
-        sigFiles = {
-                        node: 
-                        {
+        sigFiles[node] = {
                             "files" : [ inFileDir + "GluGluToHHTo2B2VTo2L2Nu_node_{}_13TeV-madgraph_v0.1.2+76X_HHAnalysis_2016-05-02.v0_histos.root".format(node) ],
                             "relativeWeight" : 1.
                         }
-                    }
             
-        label = label_template.replace("DATE", date).replace("NODE", node).replace("SUFFIX", suffix)
+    label = label_template.replace("DATE", date).replace("NODE", "all").replace("SUFFIX", suffix)
         
-        print bkgFiles, sigFiles
+    print bkgFiles, sigFiles
         
-        trainMVA(bkgFiles, sigFiles, discriList, cut, weightExpr, MVAmethods, spectatorList, label)
+    trainMVA(bkgFiles, sigFiles, discriList, cut, weightExpr, MVAmethods, spectatorList, label)
 
