@@ -29,49 +29,137 @@ IDs = []
 IDsToSplitMore = []
 IDsToSplitLitleMore = []
 
-#POSTMORIOND
-#IDs.extend([1507, 1508, 1509, 1510, 1511, 1512, 1513, 1514, 1515, 1516, 1517, 1518, 1519, 1520, 1521, 1522, 1523, 1524, 1525, 1526, 1527, 1528, 1529, 1530, 1531, 1532, 1533, 1534, 1535, 1536, 1537, 1538, 1539, 1540, 1541, 1542, 1543, 1544, 1545, 1546, 1547, 1548, 1549, 1550, 1551, 1552, 1553, 1554, 1555, 1556, 1557, 1558, 1559, 1560, 1561, 1562, 1563, 1564, 1566, 1567, 1568, 1569, 1570, 1571, 1572, 1573, 1574, 1575, 1576, 1577, 1578, 1579, 1580, 1581, 1582, 1583, 1584, 1585, 1586, 1587, 1588, 1589, 1590, 1591, 1592, 1593, 1594, 1595, 1596, 1597, 1598, 1599, 1600, 1601, 1602, 1603, 1604, 1605, 1606, 1607, 1608, 1609, 1610])
-#IDsToSplitMore.extend([1507, 1511, 1512, 1514, 1516, 1520, 1522, 1523, 1524, 1525, 1526, 1528, 1529, 1531, 1532, 1533, 1534, 1537, 1542, 1546, 1556, 1558, 1564, 1568, 1569, 1570, 1571, 1572, 1573, 1574, 1575, 1576, 1577, 1578, 1580, 1581, 1587, 1588, 1598, 1601, 1604])
-
-# ICHEPv0
-
-# All backgrounds and signals:
-#IDs.extend([1614, 1615, 1616, 1617, 1618, 1619, 1620, 1621, 1622, 1623, 1624, 1625, 1626, 1627, 1628, 1629, 1630, 1631, 1632, 1633, 1634, 1635, 1636, 1637, 1638, 1639, 1640, 1641, 1642, 1643, 1644, 1645, 1646, 1647, 1648, 1649, 1650, 1651, 1652, 1653, 1654, 1655, 1656, 1657, 1658, 1659, 1660, 1661, 1662, 1663, 1664, 1665, 1666, 1667, 1668, 1669, 1670, 1671, 1672, 1673, 1674, 1675, 1676, 1677, 1678, 1679, 1680, 1681, 1682, 1683, 1684, 1685, 1686, 1687, 1688, 1689, 1690, 1691, 1692, 1693, 1694, 1695, 1696, 1697, 1698, 1699, 1700, 1701, 1702, 1703, 1704, 1705, 1706, 1707, 1708, 1709, 1710, 1711, 1712, 1713, 1714, 1715, 1716, 1717, 1718, 1719, 1720, 1721, 1722, 1723, 1724, 1725, 1726, 1727, 1728, 1729, 1730, 1731, 1732, 1733, 1734, 1735, 1736, 1737, 1738, 1739])
-
-# Main backgrounds:
+## Data
 #IDs.extend([
-#    1658, # tW 
-#    1666, # tW
-#    1715, # sT t-chan
-#    1718, # TT incl NLO
-#    #1733, # DY M10-50 NLO merged
-#    #1734, # DY M-50 NLO merged 
+#    1642, # DoubleEG
+#    1662, # MuonEG
+#    1716, # DoubleMuon
 #    ])
 #
-## DY LO
+## Main backgrounds:
+IDs.extend([
+    1658, # tW 
+    1666, # tW
+    1715, # sT t-chan
+    1718, # TT incl NLO
+    1733, # DY M10-50 NLO merged
+    1734, # DY M-50 NLO merged 
+    ])
+
+### DY LO
+IDs.extend([
+    # M-50 incl. merged
+    1739,
+    # M-50, binned HT > 100
+    1731,
+    1679,
+    1736,
+    1737,
+    # M-5to50 incl.: forget it...
+    1717,
+    # M-5to50, binned HT
+    1738,
+    1705,
+    1680,
+    1735,
+    ])
+#
+# Other backgrounds
+# VV
 #IDs.extend([
-#    # M-50 incl. merged
-#    1739,
-#    # M-50, binned HT > 100
-#    1731,
-#    1679,
-#    1736,
-#    1737,
-#    # M-5to50 incl.
-#    1717,
-#    # M-5to50, binned HT
-#    1738,
-#    1705,
-#    1680,
-#    1735,
+#    #1624, # VV(2L2Nu)
+#    
+#    1691, # WW(LNuQQ)
+#    1703, # WW(2L2Nu)
+#    
+#    1615, # WZ(3LNu)
+#    1701, # WZ(L3Nu)
+#    1721, # WZ(LNu2Q)
+#    1725, # WZ(2L2Q)
+#    
+#    1723, # ZZ(4L)
+#    1727, # ZZ(2L2Nu)
+#    1729, # ZZ(2L2Q)
+#    
+#    1633, # WZZ
 #    ])
-IDs.extend([1737])
+#
+## Higgs
+#IDs.extend([
+#    # ggH ==> no H(ZZ)?
+#    1650, # H(WW(2L2Nu))
+#    1656, # H(BB)
+#
+#    # ZH
+#    1616, # ggZ(LL)H(WW(2L2Nu))
+#    1653, # ZH(WW)
+#    1628, # ggZ(LL)H(BB)
+#    1644, # Z(LL)H(BB)
+#    1657, # Z(NuNu)H(BB)
+#    
+#    # VBF
+#    1629, # VBFH(BB)
+#    1690, # VBFH(WW(2L2Nu))
+#
+#    # WH
+#    1643, # W+(LNu)H(BB)
+#    1692, # W-(LNu)H(BB)
+#    1659, # W+H(WW)
+#    1664, # W-H(WW)
+#
+#    # bbH
+#    1687, # bbH(BB) ybyt
+#    1641, # bbH(BB) yb2
+#    ])
+#
+## Wjets
+#IDs.extend([
+#    1648, # JetsLNu
+#    ])
+#
+## QCD ==> 30to50 missing
+#IDs.extend([
+#    1661, # Pt-15to20EMEnriched
+#    1671, # Pt-20to30EMEnriched
+#    1681, # Pt-50to80EMEnriched
+#    1637, # Pt-80to120EMEnriched
+#    1632, # Pt-120to170EMEnriched
+#    1670, # Pt-170to300EMEnriched
+#    1645, # Pt-300toInfEMEnriched
+#    #1719, # Pt-20toInfMuEnriched
+#    ])
+#
+## Top
+#IDs.extend([
+#    1688, # sT s-channel
+#    1622, # TTW(LNu)
+#    1675, # TTW(QQ)
+#    1693, # TTZ(2L2Nu)
+#    1702, # TTZ(QQ),
+#    1694, # ttH(bb)
+#    1710, # ttH(nonbb)
+#    #1711, # TT(2L2Nu)
+#    ])
 
 # Resonant
 #IDs.extend([1617, 1625, 1630, 1631, 1638, 1640, 1647, 1652, 1654, 1660, 1665, 1668, 1669, 1674, 1676, 1678, 1685, 1686, 1689, 1695, 1699, 1700, 1704, 1706, 1708, 1728])
 
 # NonResonant
-IDs.extend([1614, 1618, 1626, 1634, 1635, 1639, 1651, 1672, 1673, 1677, 1684, 1697, 1698, 1722])
+#IDs.extend([
+#    #1651, # SM
+#    1672, # box
+#    ])
+#IDs.extend([1614, 1618, 1626, 1634, 1635, 1639, 1673, 1677, 1684, 1697, 1698, 1722])
+
+# NonResonant with GEN info
+IDs.extend([
+    1765, # SM
+    1760, # box
+    ])
+#IDs.extend([1768, 1767, 1748, 1763, 1753, 1757, 1764, 1756, 1759, 1751, 1755, 1762])
+
+# NonResonant merged
+IDs.append(1769)
 
 parser = argparse.ArgumentParser(description='Facility to submit histFactory jobs on condor.')
 parser.add_argument('-o', '--output', dest='output', default=str(datetime.date.today()), help='Name of the output directory.')
@@ -85,7 +173,7 @@ parser.add_argument('--tree', dest='treeFactory', action='store_true', default=F
 
 args = parser.parse_args()
 
-sample = get_sample(IDs[0])
+sample = get_sample(1769)
 files = ["/storage/data/cms/" + x.lfn for x  in sample.files]
 
 if args.test : 
@@ -98,7 +186,7 @@ if args.test :
 
 samples = []
 for ID in IDs:
-    filesperJob = 10
+    filesperJob = 7
     if ID in IDsToSplitMore :
         filesperJob = 5
     if ID in IDsToSplitLitleMore :
@@ -150,27 +238,39 @@ if args.filter :
     for jsonSampleFilePath in jsonSampleFileList : 
         with open(jsonSampleFilePath, 'r') as jsonSampleFile :
             jsonSample = json.load(jsonSampleFile)
-            for sampleName in  jsonSample.keys():
-#                if 'TT_TuneCUETP8M1_13TeV-powheg-pythia8_MiniAODv2' in sampleName : 
-#
-#                    ttflname = sampleName.replace("TT_Tune", "TT_FL_Tune")
-#                    jsonSample[ttflname] = copy.deepcopy(jsonSample[sampleName])
-#                    jsonSample[ttflname]["sample_cut"] = "(hh_gen_ttbar_decay_type >= 4 && hh_gen_ttbar_decay_type <= 10 && hh_gen_ttbar_decay_type != 7)"
-#                    jsonSample[ttflname]["output_name"] = jsonSample[sampleName]["output_name"].replace("TT_Tune", "TT_FL_Tune")
-#
-#                    ttslname = sampleName.replace("TT_Tune", "TT_SL_Tune")
-#                    jsonSample[ttslname] = copy.deepcopy(jsonSample[sampleName])
-#                    jsonSample[ttslname]["sample_cut"] = "(hh_gen_ttbar_decay_type == 2 || hh_gen_ttbar_decay_type == 3 || hh_gen_ttbar_decay_type == 7)"
-#                    jsonSample[ttslname]["output_name"] = jsonSample[sampleName]["output_name"].replace("TT_Tune", "TT_SL_Tune")
-#
-#                    ttfhname = sampleName.replace("TT_Tune", "TT_FH_Tune")
-#                    jsonSample[ttfhname] = copy.deepcopy(jsonSample[sampleName])
-#                    jsonSample[ttfhname]["sample_cut"] = "(hh_gen_ttbar_decay_type == 1)"
-#                    jsonSample[ttfhname]["output_name"] = jsonSample[sampleName]["output_name"].replace("TT_Tune", "TT_FH_Tune")
-#                    jsonSample.pop(sampleName)
+            for sampleName in jsonSample.keys():
+                if 'TT_TuneCUETP8M1_13TeV-powheg-pythia8_Fall15MiniAODv2' in sampleName : 
+
+                    ttflname = sampleName.replace("TT_Tune", "TT_FL_Tune")
+                    jsonSample[ttflname] = copy.deepcopy(jsonSample[sampleName])
+                    jsonSample[ttflname]["sample_cut"] = "(hh_gen_ttbar_decay_type >= 4 && hh_gen_ttbar_decay_type <= 10 && hh_gen_ttbar_decay_type != 7)"
+                    jsonSample[ttflname]["output_name"] = jsonSample[sampleName]["output_name"].replace("TT_Tune", "TT_FL_Tune")
+
+                    ttslname = sampleName.replace("TT_Tune", "TT_SL_Tune")
+                    jsonSample[ttslname] = copy.deepcopy(jsonSample[sampleName])
+                    jsonSample[ttslname]["sample_cut"] = "(hh_gen_ttbar_decay_type == 2 || hh_gen_ttbar_decay_type == 3 || hh_gen_ttbar_decay_type == 7)"
+                    jsonSample[ttslname]["output_name"] = jsonSample[sampleName]["output_name"].replace("TT_Tune", "TT_SL_Tune")
+
+                    ttfhname = sampleName.replace("TT_Tune", "TT_FH_Tune")
+                    jsonSample[ttfhname] = copy.deepcopy(jsonSample[sampleName])
+                    jsonSample[ttfhname]["sample_cut"] = "(hh_gen_ttbar_decay_type == 1)"
+                    jsonSample[ttfhname]["output_name"] = jsonSample[sampleName]["output_name"].replace("TT_Tune", "TT_FH_Tune")
+                    
+                    jsonSample.pop(sampleName)
+                
                 if 'DYJetsToLL_M-5to50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8' in sampleName or 'DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8' in sampleName : 
                 #if 'DYJetsToLL_M-10to50_TuneCUETP8M1_13TeV-amcatnloFXFX_MiniAODv2' in sampleName or 'DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX_MiniAODv2' in sampleName : 
                     jsonSample[sampleName]["sample_cut"] = "event_ht < 100"
+
+                # Handle the cluster v1tov3 reweighting
+                if "all_nodes" in sampleName:
+                    for node in range(1, 13):
+                        node_str = "node_" + str(node)
+                        newName = sampleName.replace("all_nodes", node_str)
+                        jsonSample[newName] = copy.deepcopy(jsonSample[sampleName])
+                        jsonSample[newName]["sample-weight"] = "cluster_" + node_str
+                        jsonSample[newName]["output_name"] = jsonSample[sampleName]["output_name"].replace("all_nodes", node_str)
+                    jsonSample.pop(sampleName)
 
         with open(jsonSampleFilePath, 'w+') as jsonSampleFile :
             json.dump(jsonSample, jsonSampleFile)
