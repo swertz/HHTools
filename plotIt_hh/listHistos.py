@@ -16,7 +16,7 @@ parser.add_argument('--mjj', help='Use if you want to produce plots related to M
 args = parser.parse_args()
 
 baseDir = "/home/fynu/swertz/scratch/CMSSW_7_6_3_patch2/src/cp3_llbb/HHTools/condor/"
-fileName = baseDir + args.directory + "/condor/output/GluGluToHHTo2B2VTo2L2Nu_node_SM_13TeV-madgraph_v0.1.2+76X_HHAnalysis_2016-05-02.v0_histos.root"
+fileName = baseDir + args.directory + "/condor/output/GluGluToHHTo2B2VTo2L2Nu_node_SM_13TeV-madgraph_v0.1.3+76X_HHAnalysis_2016-06-03.v0_histos.root"
 
 skim = False
 

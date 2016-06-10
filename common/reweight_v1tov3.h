@@ -59,7 +59,7 @@ class BenchmarkReweighter {
                     exit(1);
                 }
                 
-                TH2 *th2 = static_cast<TH2*>(file->Get("weights"));
+                TH2 *th2 = static_cast<TH2*>(file->Get("weights_unfolded"));
                 if (!th2 || !th2->InheritsFrom("TH2") ) {
                     std::cerr << "Error: could not find TH2 \"weights\" in file " << fileName << std::endl;
                     exit(1);

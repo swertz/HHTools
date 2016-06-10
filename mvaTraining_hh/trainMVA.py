@@ -17,14 +17,20 @@ def get_sample(name):
     return resultset.one()
 
 
-date = "2016_05_27"
+#date = "2016_05_27"
+date = "2016_06_10"
 suffix = "VS_TT_DYHTonly_tW_8var"
 label_template = "DATE_BDT_NODE_SUFFIX"
 
-#nodes = ["SM"]
-#nodes = ["SM", "box", "5", "8", "13"]
-nodes = ["SM", "box", "2", "3", "4", "5", "7", "8", "9", "10", "11", "12", "13"]
-inFileDir = "/home/fynu/swertz/scratch/CMSSW_7_6_3_patch2/src/cp3_llbb/HHTools/condor/skim_160527_0/condor/output/"
+# v1 training
+#nodes = ["SM", "box", "5", "8", "13"] # v1 nodes for separate training
+#nodes = ["2", "3", "4", "5", "7", "8", "9", "10", "11", "12", "13"] # v1 nodes for "all" training
+#inFileDir = "/home/fynu/swertz/scratch/CMSSW_7_6_3_patch2/src/cp3_llbb/HHTools/condor/skim_160527_0/condor/output/"
+
+# v2 training
+nodes = ["SM", "2", "5", "6", "12"] # v1 nodes for separate training
+#nodes = ["2", "3", "4", "5", "7", "8", "9", "10", "11", "12", "13"] # v1 nodes for "all" training
+inFileDir = "/home/fynu/swertz/scratch/CMSSW_7_6_3_patch2/src/cp3_llbb/HHTools/condor/skim_160610_0/condor/output/"
 
 # SAMPLES FOR THE TRAINING
 
@@ -61,6 +67,12 @@ DY5to50_HT400to600_db = get_sample(unicode(DY5to50_HT400to600))
 DY5to50_HT600toInf = "DYJetsToLL_M-5to50_HT-600toInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_extended_ext0_plus_ext1_v0.1.2+76X_HHAnalysis_2016-05-02.v0"
 DY5to50_HT600toInf_db = get_sample(unicode(DY5to50_HT600toInf))
 
+DYJetsToLL_M10to50 = "DYJetsToLL_M-10to50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_extended_ext0_plus_ext1_plus_ext3_v0.1.2+76X_HHAnalysis_2016-05-02.v0"
+DYJetsToLL_M10to50_db = get_sample(unicode(DYJetsToLL_M10to50))
+
+DYJetsToLL_M50 = "DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_extended_ext0_plus_ext1_plus_ext4_v0.1.2+76X_HHAnalysis_2016-05-02.v0"
+DYJetsToLL_M50_db = get_sample(unicode(DYJetsToLL_M50))
+
 ST_tw = "ST_tW_top_5f_inclusiveDecays_13TeV-powheg_Fall15MiniAODv2_v0.1.2+76X_HHAnalysis_2016-05-02.v0"
 ST_tw_db = get_sample(unicode(ST_tw))
 ST_tbarw = "ST_tW_antitop_5f_inclusiveDecays_13TeV-powheg_Fall15MiniAODv2_v0.1.2+76X_HHAnalysis_2016-05-02.v0"
@@ -71,45 +83,53 @@ bkgFiles = {
                     "files" : [inFileDir+ttSample+"_histos.root"],
                     "relativeWeight" : ttDbSample.source_dataset.xsection/ttDbSample.event_weight_sum
                 },
-        "DY50_incl" : { 
-                    "files" : [inFileDir+DY50_incl+"_histos.root"],
-                    "relativeWeight" : DY50_incl_db.source_dataset.xsection/DY50_incl_db.event_weight_sum
-                },
-        "DY50_HT100to200" : { 
-                    "files" : [inFileDir+DY50_HT100to200+"_histos.root"],
-                    "relativeWeight" : DY50_HT100to200_db.source_dataset.xsection/DY50_HT100to200_db.event_weight_sum
-                },
-        "DY50_HT200to400" : { 
-                    "files" : [inFileDir+DY50_HT200to400+"_histos.root"],
-                    "relativeWeight" : DY50_HT200to400_db.source_dataset.xsection/DY50_HT200to400_db.event_weight_sum
-                },
-        "DY50_HT400to600" : { 
-                    "files" : [inFileDir+DY50_HT400to600+"_histos.root"],
-                    "relativeWeight" : DY50_HT400to600_db.source_dataset.xsection/DY50_HT400to600_db.event_weight_sum
-                },
-        "DY50_HT600toInf" : { 
-                    "files" : [inFileDir+DY50_HT600toInf+"_histos.root"],
-                    "relativeWeight" : DY50_HT600toInf_db.source_dataset.xsection/DY50_HT600toInf_db.event_weight_sum
-                },
-        #"DY5to50_incl" : { 
-        #            "files" : [inFileDir+DY5to50_incl+"_histos.root"],
-        #            "relativeWeight" : DY5to50_incl_db.source_dataset.xsection/DY5to50_incl_db.event_weight_sum
+        #"DY50_incl" : { 
+        #            "files" : [inFileDir+DY50_incl+"_histos.root"],
+        #            "relativeWeight" : DY50_incl_db.source_dataset.xsection/DY50_incl_db.event_weight_sum
         #        },
-        "DY5to50_HT100to200" : { 
-                    "files" : [inFileDir+DY5to50_HT100to200+"_histos.root"],
-                    "relativeWeight" : DY5to50_HT100to200_db.source_dataset.xsection/DY5to50_HT100to200_db.event_weight_sum
+        #"DY50_HT100to200" : { 
+        #            "files" : [inFileDir+DY50_HT100to200+"_histos.root"],
+        #            "relativeWeight" : DY50_HT100to200_db.source_dataset.xsection/DY50_HT100to200_db.event_weight_sum
+        #        },
+        #"DY50_HT200to400" : { 
+        #            "files" : [inFileDir+DY50_HT200to400+"_histos.root"],
+        #            "relativeWeight" : DY50_HT200to400_db.source_dataset.xsection/DY50_HT200to400_db.event_weight_sum
+        #        },
+        #"DY50_HT400to600" : { 
+        #            "files" : [inFileDir+DY50_HT400to600+"_histos.root"],
+        #            "relativeWeight" : DY50_HT400to600_db.source_dataset.xsection/DY50_HT400to600_db.event_weight_sum
+        #        },
+        #"DY50_HT600toInf" : { 
+        #            "files" : [inFileDir+DY50_HT600toInf+"_histos.root"],
+        #            "relativeWeight" : DY50_HT600toInf_db.source_dataset.xsection/DY50_HT600toInf_db.event_weight_sum
+        #        },
+        ##"DY5to50_incl" : { 
+        ##            "files" : [inFileDir+DY5to50_incl+"_histos.root"],
+        ##            "relativeWeight" : DY5to50_incl_db.source_dataset.xsection/DY5to50_incl_db.event_weight_sum
+        ##        },
+        #"DY5to50_HT100to200" : { 
+        #            "files" : [inFileDir+DY5to50_HT100to200+"_histos.root"],
+        #            "relativeWeight" : DY5to50_HT100to200_db.source_dataset.xsection/DY5to50_HT100to200_db.event_weight_sum
+        #        },
+        #"DY5to50_HT200to400" : { 
+        #            "files" : [inFileDir+DY5to50_HT200to400+"_histos.root"],
+        #            "relativeWeight" : DY5to50_HT200to400_db.source_dataset.xsection/DY5to50_HT200to400_db.event_weight_sum
+        #        },
+        #"DY5to50_HT400to600" : { 
+        #            "files" : [inFileDir+DY5to50_HT400to600+"_histos.root"],
+        #            "relativeWeight" : DY5to50_HT400to600_db.source_dataset.xsection/DY5to50_HT400to600_db.event_weight_sum
+        #        },
+        #"DY5to50_HT600toInf" : { 
+        #            "files" : [inFileDir+DY5to50_HT600toInf+"_histos.root"],
+        #            "relativeWeight" : DY5to50_HT600toInf_db.source_dataset.xsection/DY5to50_HT600toInf_db.event_weight_sum
+        #        },
+        "DYJetsToLL_M-10to50": {
+                    "files": [inFileDir+DYJetsToLL_M10to50+"_histos.root"],
+                    "relativeWeight": DYJetsToLL_M10to50_db.source_dataset.xsection/DYJetsToLL_M10to50_db.event_weight_sum
                 },
-        "DY5to50_HT200to400" : { 
-                    "files" : [inFileDir+DY5to50_HT200to400+"_histos.root"],
-                    "relativeWeight" : DY5to50_HT200to400_db.source_dataset.xsection/DY5to50_HT200to400_db.event_weight_sum
-                },
-        "DY5to50_HT400to600" : { 
-                    "files" : [inFileDir+DY5to50_HT400to600+"_histos.root"],
-                    "relativeWeight" : DY5to50_HT400to600_db.source_dataset.xsection/DY5to50_HT400to600_db.event_weight_sum
-                },
-        "DY5to50_HT600toInf" : { 
-                    "files" : [inFileDir+DY5to50_HT600toInf+"_histos.root"],
-                    "relativeWeight" : DY5to50_HT600toInf_db.source_dataset.xsection/DY5to50_HT600toInf_db.event_weight_sum
+        "DYJetsToLL_M-50": {
+                    "files": [inFileDir+DYJetsToLL_M50+"_histos.root"],
+                    "relativeWeight": DYJetsToLL_M50_db.source_dataset.xsection/DYJetsToLL_M50_db.event_weight_sum
                 },
         "ST_tw" : { 
                     "files" : [inFileDir+ST_tw+"_histos.root"],
@@ -137,22 +157,40 @@ discriList = [
 spectatorList = []
 cut = "(91 - ll_M) > 15"
 MVAmethods = ["kBDT"]
-weightExpr = "event_weight * trigeff * jjbtag * llidiso * pu"
+weightExpr = "event_weight * trigeff * jjbtag * llidiso * pu * sample_weight"
 
 if __name__ == '__main__':
 
-    sigFiles = {}
     
     for node in nodes:
             
+        sigFiles = {}
+        
         sigFiles[node] = {
-                            "files" : [ inFileDir + "GluGluToHHTo2B2VTo2L2Nu_node_{}_13TeV-madgraph_v0.1.2+76X_HHAnalysis_2016-05-02.v0_histos.root".format(node) ],
+                            "files" : [ inFileDir + "GluGluToHHTo2B2VTo2L2Nu_node_{}_13TeV-madgraph_v0.1.3+76X_HHAnalysis_2016-06-03.v0_histos.root".format(node) ], # v3
+                            #"files" : [ inFileDir + "GluGluToHHTo2B2VTo2L2Nu_node_{}_13TeV-madgraph_v0.1.2+76X_HHAnalysis_2016-05-02.v0_histos.root".format(node) ], # v1
                             "relativeWeight" : 1.
                         }
             
-    label = label_template.replace("DATE", date).replace("NODE", "all").replace("SUFFIX", suffix)
+        label = label_template.replace("DATE", date).replace("NODE", str(node)).replace("SUFFIX", suffix)
         
-    print bkgFiles, sigFiles
+        print bkgFiles, sigFiles
         
-    trainMVA(bkgFiles, sigFiles, discriList, cut, weightExpr, MVAmethods, spectatorList, label)
+        trainMVA(bkgFiles, sigFiles, discriList, cut, weightExpr, MVAmethods, spectatorList, label)
+
+    #sigFiles = {}
+    #
+    #for node in nodes:
+    #        
+    #    sigFiles[node] = {
+    #                        "files" : [ inFileDir + "GluGluToHHTo2B2VTo2L2Nu_node_{}_13TeV-madgraph_v0.1.3+76X_HHAnalysis_2016-06-03.v0_histos.root".format(node) ], # v3
+    #                        #"files" : [ inFileDir + "GluGluToHHTo2B2VTo2L2Nu_node_{}_13TeV-madgraph_v0.1.2+76X_HHAnalysis_2016-05-02.v0_histos.root".format(node) ], # v1
+    #                        "relativeWeight" : 1.
+    #                    }
+    #        
+    #label = label_template.replace("DATE", date).replace("NODE", "all").replace("SUFFIX", suffix)
+    #    
+    #print bkgFiles, sigFiles
+    #    
+    #trainMVA(bkgFiles, sigFiles, discriList, cut, weightExpr, MVAmethods, spectatorList, label)
 

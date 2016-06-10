@@ -29,41 +29,41 @@ IDs = []
 IDsToSplitMore = []
 IDsToSplitLitleMore = []
 
-# Data
+## Data
 #IDs.extend([
 #    1642, # DoubleEG
 #    1662, # MuonEG
 #    1716, # DoubleMuon
 #    ])
+#
+## Main backgrounds:
+IDs.extend([
+    1658, # tW 
+    1666, # tW
+    1715, # sT t-chan
+    1718, # TT incl NLO
+    1733, # DY M10-50 NLO merged
+    1734, # DY M-50 NLO merged 
+    ])
 
-# Main backgrounds:
-#IDs.extend([
-#    #1658, # tW 
-#    #1666, # tW
-#    #1715, # sT t-chan
-#    1718, # TT incl NLO
-#    1733, # DY M10-50 NLO merged
-#    1734, # DY M-50 NLO merged 
-#    ])
-
-## DY LO
-#IDs.extend([
-#    # M-50 incl. merged
-#    1739,
-#    # M-50, binned HT > 100
-#    1731,
-#    1679,
-#    1736,
-#    1737,
-#    # M-5to50 incl.: forget it...
-#    #1717,
-#    # M-5to50, binned HT
-#    1738,
-#    1705,
-#    1680,
-#    1735,
-#    ])
-
+### DY LO
+IDs.extend([
+    # M-50 incl. merged
+    1739,
+    # M-50, binned HT > 100
+    1731,
+    1679,
+    1736,
+    1737,
+    # M-5to50 incl.: forget it...
+    1717,
+    # M-5to50, binned HT
+    1738,
+    1705,
+    1680,
+    1735,
+    ])
+#
 # Other backgrounds
 # VV
 #IDs.extend([
@@ -145,11 +145,21 @@ IDsToSplitLitleMore = []
 #IDs.extend([1617, 1625, 1630, 1631, 1638, 1640, 1647, 1652, 1654, 1660, 1665, 1668, 1669, 1674, 1676, 1678, 1685, 1686, 1689, 1695, 1699, 1700, 1704, 1706, 1708, 1728])
 
 # NonResonant
-IDs.extend([
-    #1651, # SM
-    1672, # box
-    ])
+#IDs.extend([
+#    #1651, # SM
+#    1672, # box
+#    ])
 #IDs.extend([1614, 1618, 1626, 1634, 1635, 1639, 1673, 1677, 1684, 1697, 1698, 1722])
+
+# NonResonant with GEN info
+IDs.extend([
+    1765, # SM
+    1760, # box
+    ])
+#IDs.extend([1768, 1767, 1748, 1763, 1753, 1757, 1764, 1756, 1759, 1751, 1755, 1762])
+
+# NonResonant merged
+IDs.append(1769)
 
 parser = argparse.ArgumentParser(description='Facility to submit histFactory jobs on condor.')
 parser.add_argument('-o', '--output', dest='output', default=str(datetime.date.today()), help='Name of the output directory.')
@@ -163,7 +173,7 @@ parser.add_argument('--tree', dest='treeFactory', action='store_true', default=F
 
 args = parser.parse_args()
 
-sample = get_sample(IDs[0])
+sample = get_sample(1769)
 files = ["/storage/data/cms/" + x.lfn for x  in sample.files]
 
 if args.test : 
@@ -176,7 +186,7 @@ if args.test :
 
 samples = []
 for ID in IDs:
-    filesperJob = 15
+    filesperJob = 7
     if ID in IDsToSplitMore :
         filesperJob = 5
     if ID in IDsToSplitLitleMore :
@@ -253,14 +263,13 @@ if args.filter :
                     jsonSample[sampleName]["sample_cut"] = "event_ht < 100"
 
                 # Handle the cluster v1tov3 reweighting
-                if "merged" in sampleName:
+                if "all_nodes" in sampleName:
                     for node in range(1, 13):
-                        node_str = str(node)
-                        print "Changing box to reweight to benchmark {}".format(node_str)
-                        newName = sampleName.replace("merged", node_str)
+                        node_str = "node_" + str(node)
+                        newName = sampleName.replace("all_nodes", node_str)
                         jsonSample[newName] = copy.deepcopy(jsonSample[sampleName])
                         jsonSample[newName]["sample-weight"] = "cluster_" + node_str
-                        jsonSample[newName]["output_name"] = jsonSample[sampleName]["output_name"].replace("box", node_str)
+                        jsonSample[newName]["output_name"] = jsonSample[sampleName]["output_name"].replace("all_nodes", node_str)
                     jsonSample.pop(sampleName)
 
         with open(jsonSampleFilePath, 'w+') as jsonSampleFile :
