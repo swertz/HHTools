@@ -5,6 +5,8 @@ import ROOT
 # From https://github.com/acarvalh/generateHH/blob/master/mapV1/Distros_5p_500000ev_12sam_13TeV_JHEP_500K.root
 v3_filename = "Distros_5p_500000ev_12sam_13TeV_JHEP_500K.root"
 
+#v3_filename = "GluGluToHHTo2B2VTo2L2Nu_node_{}_mhh_vs_cos_theta_star.root" #=> used for v1/v1 check
+
 # Output of getNonResonant_gen_mhh_vs_costhetastar.py
 v1_filename = "GluGluToHHTo2B2VTo2L2Nu_all_nodes_gen_mhh_vs_costhetastar.root"
 
@@ -37,6 +39,11 @@ v1_file = ROOT.TFile.Open(v1_filename)
 v1_map = v1_file.Get("mhh_vs_abs_cos_theta_star")
 v1_map_unfolded = v1_file.Get("mhh_vs_cos_theta_star")
 
+## => used for v1/v1 check:
+#for cluster in range(2, 14):
+    #v3_file = ROOT.TFile.Open(v3_filename.format(cluster))
+    #v3_map_unfolded = v3_file.Get("mhh_vs_cos_theta_star")
+    
 for cluster in range(0, 12):
     v3_map_unfolded = v3_file.Get("%d_bin1" % cluster)
 

@@ -16,7 +16,8 @@ legend:
 systematics:
   - pu
   - elidiso
-  - muidiso
+  - muiso
+  - muid
   - jjbtag
   - jec
   - jer 
