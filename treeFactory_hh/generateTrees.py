@@ -33,8 +33,8 @@ weights_llbb = []
 flavour = "All"
 categories_llbb = [flavour]
 stage_llbb = "no_cut"
-plots_llbb = ["mll", "mjj", "basic", "bdtinput", "ht", "other", "llidisoWeight", 'jjbtagWeight', 'trigeffWeight', 'puWeight', 'forSkimmer', 'csv']
-#plots_llbb += ["bdtoutput"]
+plots_llbb = ["mll", "mjj", "basic", "bdtinput", "ht", "other", "llidisoWeight", 'jjbtagWeight', 'trigeffWeight', 'puWeight', 'forSkimmer', 'csv', 'gen']
+plots_llbb += ["bdtoutput"]
 plots.extend(basePlotter.generatePlots(categories_llbb, stage_llbb, systematic = "nominal", weights = weights_llbb, requested_plots = plots_llbb))
 
 tree = {}

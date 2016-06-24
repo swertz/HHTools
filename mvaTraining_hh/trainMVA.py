@@ -28,8 +28,8 @@ label_template = "DATE_BDT_NODE_SUFFIX"
 #inFileDir = "/home/fynu/swertz/scratch/CMSSW_7_6_3_patch2/src/cp3_llbb/HHTools/condor/skim_160527_0/condor/output/"
 
 # v2 training
-nodes = ["SM", "2", "5", "6", "12"] # v1 nodes for separate training
-#nodes = ["2", "3", "4", "5", "7", "8", "9", "10", "11", "12", "13"] # v1 nodes for "all" training
+#nodes = ["SM", "2", "5", "6", "12"] # v1 nodes for separate training
+nodes = ["SM", "box", "1", "2", "3", "4", "5", "7", "8", "9", "10", "11", "12"] # v1 nodes for "all" training
 inFileDir = "/home/fynu/swertz/scratch/CMSSW_7_6_3_patch2/src/cp3_llbb/HHTools/condor/skim_160610_0/condor/output/"
 
 # SAMPLES FOR THE TRAINING
@@ -162,35 +162,35 @@ weightExpr = "event_weight * trigeff * jjbtag * llidiso * pu * sample_weight"
 if __name__ == '__main__':
 
     
-    for node in nodes:
-            
-        sigFiles = {}
-        
-        sigFiles[node] = {
-                            "files" : [ inFileDir + "GluGluToHHTo2B2VTo2L2Nu_node_{}_13TeV-madgraph_v0.1.3+76X_HHAnalysis_2016-06-03.v0_histos.root".format(node) ], # v3
-                            #"files" : [ inFileDir + "GluGluToHHTo2B2VTo2L2Nu_node_{}_13TeV-madgraph_v0.1.2+76X_HHAnalysis_2016-05-02.v0_histos.root".format(node) ], # v1
-                            "relativeWeight" : 1.
-                        }
-            
-        label = label_template.replace("DATE", date).replace("NODE", str(node)).replace("SUFFIX", suffix)
-        
-        print bkgFiles, sigFiles
-        
-        trainMVA(bkgFiles, sigFiles, discriList, cut, weightExpr, MVAmethods, spectatorList, label)
-
-    #sigFiles = {}
-    #
     #for node in nodes:
     #        
+    #    sigFiles = {}
+    #    
     #    sigFiles[node] = {
     #                        "files" : [ inFileDir + "GluGluToHHTo2B2VTo2L2Nu_node_{}_13TeV-madgraph_v0.1.3+76X_HHAnalysis_2016-06-03.v0_histos.root".format(node) ], # v3
     #                        #"files" : [ inFileDir + "GluGluToHHTo2B2VTo2L2Nu_node_{}_13TeV-madgraph_v0.1.2+76X_HHAnalysis_2016-05-02.v0_histos.root".format(node) ], # v1
     #                        "relativeWeight" : 1.
     #                    }
     #        
-    #label = label_template.replace("DATE", date).replace("NODE", "all").replace("SUFFIX", suffix)
+    #    label = label_template.replace("DATE", date).replace("NODE", str(node)).replace("SUFFIX", suffix)
     #    
-    #print bkgFiles, sigFiles
+    #    print bkgFiles, sigFiles
     #    
-    #trainMVA(bkgFiles, sigFiles, discriList, cut, weightExpr, MVAmethods, spectatorList, label)
+    #    trainMVA(bkgFiles, sigFiles, discriList, cut, weightExpr, MVAmethods, spectatorList, label)
+
+    sigFiles = {}
+    
+    for node in nodes:
+            
+        sigFiles[node] = {
+                            "files" : [ inFileDir + "GluGluToHHTo2B2VTo2L2Nu_node_{}_13TeV-madgraph_v0.1.3+76X_HHAnalysis_2016-06-03.v0_histos.root".format(node) ], # v3
+                            #"files" : [ inFileDir + "GluGluToHHTo2B2VTo2L2Nu_node_{}_13TeV-madgraph_v0.1.2+76X_HHAnalysis_2016-05-02.v0_histos.root".format(node) ], # v1
+                            "relativeWeight" : 1.
+                        }
+            
+    label = label_template.replace("DATE", date).replace("NODE", "all").replace("SUFFIX", suffix)
+        
+    print bkgFiles, sigFiles
+        
+    trainMVA(bkgFiles, sigFiles, discriList, cut, weightExpr, MVAmethods, spectatorList, label)
 
