@@ -187,7 +187,7 @@ if args.test:
 
 samples = []
 for ID in IDs + IDsToSplitMore:
-    filesperJob = 20
+    filesperJob = 15
     if ID in IDsToSplitMore:
         filesperJob = 1
     samples.append(
@@ -280,6 +280,7 @@ if args.filter:
 
         # Handle the cluster v1tov3 reweighting
         if "all_nodes" in sample["db_name"]:
+            ## For v1->v1 reweighting check:
             #for node in range(2, 14):
             #    node_str = "node_rwgt_" + str(node)
             for node in range(1, 13):

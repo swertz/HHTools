@@ -44,13 +44,16 @@ class BasePlotter:
         
         # The following will need to be modified each time the name of the BDT output changes
         bdtNameTemplate = "DATE_BDT_NODE_SUFFIX"
+        
         # v1 benchmark BDTs (w/ LO DY)
         #date = "2016_05_27"
         #nodes = ["SM", "box", "5", "8", "13", "all"]
+        
         # v3 benchmark BDTs (w/ NLO DY)
         date = "2016_06_10"
-        #nodes = ["SM", "2", "5", "6", "12", "all"]
-        nodes = ["SM", "2"] # Chosen BDTs
+        nodes = ["SM", "2", "5", "6", "12", "all"]
+        #nodes = ["SM", "2"] # Chosen BDTs
+        
         suffixes = ["VS_TT_DYHTonly_tW_8var"]
         BDToutputs = {}
         bdtNames = []
@@ -168,7 +171,7 @@ class BasePlotter:
 
         # Append the proper extension to the name plot if needed (scale name are down at the end of the code)
         self.systematicString = ""
-        if not systematic == "nominal" and not systematic == "scale":
+        if not systematic == "nominal" and not "scale" in systematic:
             self.systematicString = "__" + systematic
 
         available_weights = {'trigeff' : trigEff, 'jjbtag' : jjBtag_sf, 'llidiso' : llIdIso_sf, 'pu' : puWeight}
@@ -936,17 +939,23 @@ class BasePlotter:
             ])
 
         plotsToReturn = []
+        
         for plotFamily in requested_plots:
+            
             if "scale" in systematic:
+                
                 scaleIndices = ["0", "1", "2", "3", "4", "5"]
+                
                 for scaleIndice in scaleIndices:
+                    
                     scaleWeight = "event_scale_weights[%s]" % scaleIndice
+                    
                     for plot in getattr(self, plotFamily+"_plot"):
                         tempPlot = copy.deepcopy(plot)
                         # Two different ways to normalise the variations
                         if "Uncorr" not in systematic:
                             tempPlot["normalize-to"] = "scale_%s" % scaleIndice
-                        tempPlot["name"] += "__scale%s"%scaleIndice
+                        tempPlot["name"] += "__" + systematic + scaleIndice
                         if not "Weight" in plotFamily:
                             tempPlot["weight"] = "event_weight" + " * " + scaleWeight
                             for weight in weights:
@@ -954,7 +963,9 @@ class BasePlotter:
                         else:
                             print "No other weight than event_weight for ", plotFamily 
                         plotsToReturn.append(tempPlot)
+            
             elif "pdf" in systematic:
+                
                 for plot in getattr(self, plotFamily+"_plot"):
                     if not "Weight" in plotFamily:
                         plot["weight"] = "event_weight" + " * " + pdfWeight
@@ -964,7 +975,9 @@ class BasePlotter:
                     else:
                         print "No other weight than event_weight for ", plotFamily 
                     plotsToReturn.append(plot)
+            
             else:
+                
                 for plot in getattr(self, plotFamily+"_plot"):
                     if not "Weight" in plotFamily:
                         plot["weight"] = "event_weight"
