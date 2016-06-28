@@ -22,5 +22,5 @@ systematics:
   - jec
   - jer 
   - trigeff
-  - scale
+  - scaleUncorr
   - pdf

@@ -47,7 +47,8 @@ defaultStyle_events.update({
         'y-axis': 'Events',
         'y-axis-format': '%1% / %2$.2f',
         })
-print args
+
+nHistos = 0
 
 for key in keys:
     if key.GetName() not in alreadyIn and not "__" in key.GetName():
@@ -65,9 +66,10 @@ for key in keys:
         #if "highBDT" in key.GetName(): continue
         #if "highBDT" not in key.GetName(): continue
         #if "_vs_" not in key.GetName(): continue
+        #if "3x25" not in key.GetName(): continue
 
-        #if "ll_M" not in key.GetName() or "All" not in key.GetName(): continue
-        if "ll_M" in key.GetName() and "All" not in key.GetName(): continue
+        #if "ll_M" not in key.GetName() or "All" in key.GetName(): continue
+        #if "ll_M" in key.GetName() and "All" not in key.GetName(): continue
 
         ## Update all the plots with title, ...
 
@@ -246,19 +248,31 @@ for key in keys:
             plot['x-axis'] = "BDT output, m_{jj} bins"
             plot.update(defaultStyle_events)
             
-            if "3x25" in key.GetName():
+            if "3x25" in key.GetName() and "BDT_2" in key.GetName():
                 plot['vertical-lines'] = [ 
                         { "line-color": 1, "line-type": 2, "line-width": 2, "value": 0.6 }, 
-                        { "line-color": 1, "line-type": 2, "line-width": 2, "value": 1.8 }
+                        { "line-color": 1, "line-type": 2, "line-width": 2, "value": 1.7 }
                     ]
+                plot['y-axis-range'] = [0.01, 450]
+                if not args.unblinded and "blind" not in key.GetName():
+                    plot['blinded-range'] = [1.128, 1.7]
+        
+            if "3x25" in key.GetName() and "BDT_SM" in key.GetName():
+                plot['vertical-lines'] = [ 
+                        { "line-color": 1, "line-type": 2, "line-width": 2, "value": 0.5 }, 
+                        { "line-color": 1, "line-type": 2, "line-width": 2, "value": 1.5 }
+                    ]
+                plot['y-axis-range'] = [0.01, 400]
+                if not args.unblinded and "blind" not in key.GetName():
+                    plot['blinded-range'] = [1, 1.5]
+
+            if "3x25" in key.GetName():
                 plot['labels'] += [
                         { "size": 18, "position": [ 0.23, 0.65 ], "text": "m_{jj} < 75 GeV" },
-                        { "size": 18, "position": [ 0.475, 0.735 ], "text": "m_{jj} #in [75, 140[ GeV" },
-                        { "size": 18, "position": [ 0.75, 0.8 ], "text": "m_{jj} #geq 140 GeV" },
+                        { "size": 18, "position": [ 0.475, 0.735 ], "text": "75 GeV #leq m_{jj} < 140 GeV" },
+                        { "size": 18, "position": [ 0.75, 0.82 ], "text": "m_{jj} #geq 140 GeV" },
                     ]
-                if not args.unblinded and "blind" not in key.GetName():
-                    plot['blinded-range'] = [1.177, 1.8]
-        
+
         # Default:
         
         else:
@@ -313,5 +327,11 @@ for key in keys:
                 }]
             plot['legend-position'] = [0.22, 0.61, 0.62, 0.89]
 
+        # Finally, save what we have
+        plots[key.GetName()] = plot
+        nHistos += 1
+
 with open("allPlots.yml", "w") as f:
     yaml.dump(plots, f)
+
+print "Saved configuration for {} plots in {}".format(nHistos, "allPlots.yml")
