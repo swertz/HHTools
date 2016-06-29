@@ -8,7 +8,7 @@ R.gROOT.SetBatch()
 # Tool to produce ROC curves for all the benchmarks used in the training, and for each BDT
 # Usage : python ... outRocPlotDir
 
-inFileDir = "/home/fynu/swertz/scratch/CMSSW_7_6_3_patch2/src/cp3_llbb/HHTools/condor/160611_all_0/condor/output/"
+inFileDir = "/home/fynu/swertz/scratch/CMSSW_7_6_3_patch2/src/cp3_llbb/HHTools/condor/160622_allGood_scaleNoNorm_0/condor/output/"
 
 outFileDir = "rocCurve_" + sys.argv[1]
 if not os.path.isdir(outFileDir):
@@ -49,7 +49,9 @@ for node in nodes_sig:
     bkgEffVsCut = {}
     sigEffVsCut = {}
     Rocs = []
+    merit = []
     leg = R.TLegend(0.51,0.19,0.943,0.49)
+    leg2 = R.TLegend(0.21,0.59,0.643,0.89)
     
     for mva in nodes_mva:
         
@@ -66,6 +68,11 @@ for node in nodes_sig:
         roc = drawROCfromEffVsCutCurves(sigEffVsCut[var], bkgEffVsCut[var])
         Rocs.append(roc)
         leg.AddEntry(roc, "BDT training: {}".format(mva), "L")
+
+        sigTH1[var].Scale(1000)
+        merit.append(drawFigMeritVsCutCurve(bkgTH1[var], sigTH1[var]))
+        leg2.AddEntry(merit[-1], "BDT training: {}".format(mva), "L")
     
-    drawTGraph(Rocs, "Signal_{}".format(node), "Background Efficiency", "Signal Efficiency", leg, "Signal: {}".format(node), "", ["pdf", "png", "root"], outFileDir)
+    drawTGraph(Rocs, "Signal_{}".format(node), "Background Efficiency", "Signal Efficiency", leg, "Signal: {}".format(node), "", ["pdf", "png", "root"], outFileDir, range=[[-0.05, 1.05], [-0.05, 1.05]], log_range=[[0.001, 1], [0.5, 1]])
+    drawTGraph(merit, "Merit_signal_{}".format(node), "BDT output", "2 x (sqrt(S + B) - sqrt(B))", leg2, "Signal: {} (1 pb)".format(node), "", ["pdf", "png", "root"], outFileDir)
 
