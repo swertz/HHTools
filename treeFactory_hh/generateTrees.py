@@ -18,7 +18,7 @@ includes.append( os.path.join(scriptDir, "..", "common", "readMVA.h") )
 includes.append( os.path.join(scriptDir, "..", "common", "reweight_v1tov3.h") )
 
 code_before_loop += """
-getBenchmarkReweighter("/home/fynu/sbrochet/scratch/Framework/CMSSW_8_0_6/src/cp3_llbb/HHTools/scripts/", 0, 11);
+getBenchmarkReweighter("/home/fynu/sbrochet/scratch/Framework/CMSSW_7_6_5/src/cp3_llbb/HHTools/scripts/", 0, 11);
 """
 
 sample_weights = {}
