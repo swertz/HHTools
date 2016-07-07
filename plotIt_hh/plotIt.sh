@@ -12,4 +12,4 @@ plotDir=plots_all_${plotDate}${suffix}
 
 mkdir ${plotDir}
 
-../../plotIt/plotIt -o ${plotDir} hh_plotter_all.yml -v -y
+../../plotIt/plotIt -o ${plotDir} hh_plotter_all.yml -y

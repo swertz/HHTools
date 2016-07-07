@@ -12,8 +12,8 @@ parser.add_argument('-d', '--directory', dest='directory', default="76_mjjStudy"
 parser.add_argument('--blinded', dest='unblinded', help='If you want to produce blinded plots', action="store_false")
 args = parser.parse_args()
 
-baseDir = "/home/fynu/swertz/scratch/CMSSW_7_6_3_patch2/src/cp3_llbb/HHTools/condor/"
-fileName = baseDir + args.directory + "/condor/output/GluGluToHHTo2B2VTo2L2Nu_node_SM_13TeV-madgraph_v0.1.3+76X_HHAnalysis_2016-06-03.v0_histos.root"
+baseDir = "/home/fynu/sbrochet/scratch/Framework/CMSSW_7_6_5/src/cp3_llbb/HHTools/histFactory_hh/"
+fileName = baseDir + args.directory + "/condor/output/GluGluToHHTo2B2VTo2L2Nu_node_SM_13TeV-madgraph_v0.1.4+76X_HHAnalysis_2016-06-03.v0_histos.root"
 
 skim = False
 
