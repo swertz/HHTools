@@ -17,7 +17,7 @@ sys.path.append('/nfs/soft/python/python-2.7.5-sl6_amd64_gcc44/lib/python2.7/sit
 
 CMSSW_BASE = os.environ['CMSSW_BASE']
 SCRAM_ARCH = os.environ['SCRAM_ARCH']
-sys.path.append(os.path.join(CMSSW_BASE,'bin', SCRAM_ARCH))
+sys.path.append(os.path.join(CMSSW_BASE, 'bin', SCRAM_ARCH))
 from SAMADhi import Dataset, Sample, DbStore
 
 def get_sample(iSample):
@@ -37,30 +37,30 @@ IDs.extend([
 
 # Main backgrounds:
 IDs.extend([
-    1658, # tW 
-    1666, # tW
-    1715, # sT t-chan
-    1718, # TT incl NLO
-    1733, # DY M10-50 NLO merged
-    1734, # DY M-50 NLO merged 
+    1817, # tW top
+    1846, # tW atop
+    1894, # sT t-chan
+    1909, # TT incl NLO
+    1915, # DY M10-50 NLO merged
+    1918, # DY M-50 NLO merged 
     ])
 
 # DY LO
 IDs.extend([
     # M-50 incl. merged
-    1739,
+    1920,
     # M-50, binned HT > 100
-    1731,
-    1679,
-    1736,
-    1737,
+    1884, # 100-200 non-merged
+    1848, # 200-400 non-merged
+    1917, # 400-600 merged
+    1919, # 600-Inf merged
     # M-5to50 incl.: forget it...
-    1717,
+    1878,
     # M-5to50, binned HT
-    1738,
-    1705,
-    1680,
-    1735,
+    1916, # 100-200 merged
+    1815, # 200-400 non-merged
+    1824, # 400-600 non-merged
+    1914, # 600-Inf merged
     ])
 #
 # Other backgrounds
@@ -68,98 +68,97 @@ IDs.extend([
 IDs.extend([
     #1624, # VV(2L2Nu)
     
-    1691, # WW(LNuQQ)
-    1703, # WW(2L2Nu)
+    1897, # WW(LNuQQ)
+    1892, # WW(2L2Nu)
     
-    1615, # WZ(3LNu)
-    1701, # WZ(L3Nu)
-    1721, # WZ(LNu2Q)
-    1725, # WZ(2L2Q)
+    1899, # WZ(3LNu)
+    1838, # WZ(L3Nu)
+    1908, # WZ(LNu2Q)
+    1902, # WZ(2L2Q)
     
-    1723, # ZZ(4L)
-    1727, # ZZ(2L2Nu)
-    1729, # ZZ(2L2Q)
+    1834, # ZZ(4L)
+    1893, # ZZ(2L2Nu)
+    1896, # ZZ(2L2Q)
     
-    1633, # WZZ
+    1872, # WZZ
     ])
 
 # Higgs
 IDs.extend([
     # ggH ==> no H(ZZ)?
-    1650, # H(WW(2L2Nu))
-    1656, # H(BB)
+    1844, # H(WW(2L2Nu))
+    1849, # H(BB)
 
     # ZH
-    1616, # ggZ(LL)H(WW(2L2Nu))
-    1653, # ZH(WW)
-    1628, # ggZ(LL)H(BB)
-    1644, # Z(LL)H(BB)
-    1657, # ggZ(NuNu)H(BB)
+    1847, # ggZ(LL)H(WW(2L2Nu))
+    1821, # ZH(WW)
+    1866, # ggZ(LL)H(BB)
+    1828, # Z(LL)H(BB)
+    1883, # ggZ(NuNu)H(BB)
     
     # VBF
-    1629, # VBFH(BB)
-    1690, # VBFH(WW(2L2Nu))
+    1833, # VBFH(BB)
+    1901, # VBFH(WW(2L2Nu))
 
     # WH
-    1643, # W+(LNu)H(BB)
-    1692, # W-(LNu)H(BB)
-    1659, # W+H(WW)
-    1664, # W-H(WW)
+    1875, # W+(LNu)H(BB)
+    1854, # W-(LNu)H(BB)
+    1862, # W+H(WW)
+    1858, # W-H(WW)
 
     # bbH
-    1687, # bbH(BB) ybyt
-    1641, # bbH(BB) yb2
+    1869, # bbH(BB) ybyt
+    1874, # bbH(BB) yb2
+    1841, # bbH(WW) ybyt
+    1819, # bbH(WW) yb2
     ])
 
 # Top
 IDs.extend([
-    1688, # sT s-channel
-    1622, # TTW(LNu)
-    1675, # TTW(QQ)
-    1693, # TTZ(2L2Nu)
-    1702, # TTZ(QQ),
-    1694, # ttH(bb)
-    1710, # ttH(nonbb)
+    1837, # sT s-channel
+    1818, # TTW(LNu)
+    1831, # TTW(QQ)
+    1863, # TTZ(2L2Nu)
+    1880, # TTZ(QQ),
+    1839, # ttH(bb)
+    1906, # ttH(nonbb)
     #1711, # TT(2L2Nu)
     ])
 
+# # TT aMC@NLO
+# IDs.append(1929)
+
 # Wjets
 IDs.extend([
-    1648, # JetsLNu
-    1780, 1781, 1782, 1783, 1784, 1785, 1786, # HT binned
+    1876, # JetsLNu
+
+    # HT binned
+    1904, # 200-400
+    1825, # 800-1200
+    1907, # 1200 - 2500
+    1898, # 2500 - Inf 
     ])
 
-## QCD ==> 30to50 missing
-#IDs.extend([
-#    1661, # Pt-15to20EMEnriched
-#    1671, # Pt-20to30EMEnriched
-#    1681, # Pt-50to80EMEnriched
-#    1637, # Pt-80to120EMEnriched
-#    1632, # Pt-120to170EMEnriched
-#    1670, # Pt-170to300EMEnriched
-#    1645, # Pt-300toInfEMEnriched
-#    #1719, # Pt-20toInfMuEnriched
-#    ])
-
-# Resonant
-#IDs.extend([1617, 1625, 1630, 1631, 1638, 1640, 1647, 1652, 1654, 1660, 1665, 1668, 1669, 1674, 1676, 1678, 1685, 1686, 1689, 1695, 1699, 1700, 1704, 1706, 1708, 1728])
-
-# NonResonant
-#IDs.extend([
-#    #1651, # SM
-#    1672, # box
-#    ])
-#IDs.extend([1614, 1618, 1626, 1634, 1635, 1639, 1673, 1677, 1684, 1697, 1698, 1722])
+# QCD ==> 30to50 missing
+# IDs.extend([
+   # 1661, # Pt-15to20EMEnriched
+   # 1671, # Pt-20to30EMEnriched
+   # 1681, # Pt-50to80EMEnriched
+   # 1637, # Pt-80to120EMEnriched
+   # 1632, # Pt-120to170EMEnriched
+   # 1670, # Pt-170to300EMEnriched
+   # 1645, # Pt-300toInfEMEnriched
+   # #1719, # Pt-20toInfMuEnriched
+   # ])
 
 # NonResonant with GEN info
-IDs.extend([
-    1765, # SM
-    1760, # box
+IDsToSplitMore.extend([
+    1927, # SM
+    1928, # box
     ])
-#IDs.extend([1792, 1767, 1748, 1763, 1753, 1757, 1764, 1756, 1759, 1751, 1755, 1762])
 
 # NonResonant merged
-IDs.append(1769)
+IDsToSplitMore.append(1903)
 
 parser = argparse.ArgumentParser(description='Facility to submit histFactory jobs on condor.')
 parser.add_argument('-o', '--output', dest='output', default=str(datetime.date.today()), help='Name of the output directory.')
@@ -174,7 +173,7 @@ parser.add_argument('--tree', dest='treeFactory', action='store_true', default=F
 args = parser.parse_args()
 
 # get one of the new samples with gen info to read Tree structure
-sample = get_sample(1769)
+sample = get_sample(1903)
 files = ["/storage/data/cms/" + x.lfn for x  in sample.files]
 
 if args.test: 
@@ -189,7 +188,7 @@ samples = []
 for ID in IDs + IDsToSplitMore:
     filesperJob = 15
     if ID in IDsToSplitMore:
-        filesperJob = 1
+        filesperJob = 3
     samples.append(
         {
             "ID": ID,
@@ -230,11 +229,13 @@ mySub = condorSubmitter(samples, "%s/build/" % args.output + executable, "DUMMY"
 ## Create test_condor directory and subdirs
 mySub.setupCondorDirs()
 
+splitTT = False
+
 ## Modify the input samples to add sample cuts and stuff
 if args.filter: 
     for sample in mySub.sampleCfg[:]:
         # TTbar final state splitting
-        if 'TT_TuneCUETP8M1_13TeV-powheg-pythia8_Fall15MiniAODv2' in sample["db_name"]:
+        if splitTT and 'TT_TuneCUETP8M1_13TeV-powheg-pythia8_Fall15MiniAODv2' in sample["db_name"]:
 
             # Fully leptonic
             tt_fl_sample = copy.deepcopy(sample)
@@ -284,6 +285,7 @@ if args.filter:
             #for node in range(2, 14):
             #    node_str = "node_rwgt_" + str(node)
             for node in range(1, 13):
+
                 newSample = copy.deepcopy(sample)
                 newJson = copy.deepcopy(sample["json_skeleton"][sample["db_name"]])
                 
