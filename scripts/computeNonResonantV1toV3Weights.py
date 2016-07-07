@@ -2,8 +2,9 @@
 
 import ROOT
 
-# From https://github.com/acarvalh/generateHH/blob/master/mapV1/Distros_5p_500000ev_12sam_13TeV_JHEP_500K.root
-v3_filename = "Distros_5p_500000ev_12sam_13TeV_JHEP_500K.root"
+# From https://github.com/ResonantHbbHgg/bbggTools/blob/xanda/scripts/ReweightTrees/Distros_benchmarks_5p_500000ev_12sam_13TeV_JHEPv3.root
+# Updated on 4th July, 2016 after Xanda mail 'correction weights HH'
+v3_filename = "Distros_benchmarks_5p_500000ev_12sam_13TeV_JHEPv3.root"
 
 #v3_filename = "GluGluToHHTo2B2VTo2L2Nu_node_{}_mhh_vs_cos_theta_star.root" #=> used for v1/v1 check
 
