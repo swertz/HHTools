@@ -38,7 +38,7 @@ class BasePlotter:
     def generatePlots(self, categories = ["All"], stage = "cleaning_cut", requested_plots = [], weights = ['trigeff', 'jjbtag', 'llidiso', 'pu'], extraCut = "", systematic = "nominal", extraString = "", fit2DtemplatesBinning = None):
 
         # MVA evaluation : ugly but necessary part
-        baseStringForMVA_part1 = 'evaluateMVA("/home/fynu/swertz/scratch/CMSSW_7_6_3_patch2/src/cp3_llbb/HHTools/mvaTraining_hh/weights/BDTNAME_kBDT.weights.xml", '
+        baseStringForMVA_part1 = 'evaluateMVA("/home/fynu/sbrochet/scratch/Framework/CMSSW_7_6_5/src/cp3_llbb/HHTools//mvaTraining_hh/weights/BDTNAME_kBDT.weights.xml", '
         baseStringForMVA_part2 = '{{"jj_pt", %s}, {"ll_pt", %s}, {"ll_M", %s}, {"ll_DR_l_l", %s}, {"jj_DR_j_j", %s}, {"llmetjj_DPhi_ll_jj", %s}, {"llmetjj_minDR_l_j", %s}, {"llmetjj_MTformula", %s}})' % ( self.jj_str + ".Pt()", self.ll_str + ".Pt()", self.ll_str + ".M()", self.baseObject + ".DR_l_l", self.baseObject + ".DR_j_j", self.baseObject + ".minDR_l_j", self.baseObject + ".DPhi_ll_jj", self.baseObject + ".MT_formula")
         stringForMVA = baseStringForMVA_part1 + baseStringForMVA_part2
         
@@ -50,8 +50,8 @@ class BasePlotter:
         #nodes = ["SM", "box", "5", "8", "13", "all"]
         
         # v3 benchmark BDTs (w/ NLO DY)
-        date = "2016_06_10"
-        nodes = ["SM", "2", "5", "6", "12", "all"]
+        date = "2016_07_05"
+        nodes = ["SM", "2", "5", "6", "12"]
         #nodes = ["SM", "2"] # Chosen BDTs
         
         suffixes = ["VS_TT_DYHTonly_tW_8var"]
@@ -195,6 +195,8 @@ class BasePlotter:
         self.flavour_plot = []
 
         self.llidisoWeight_plot = []
+        self.mumuidisoWeight_plot = []
+        self.elelidisoWeight_plot = []
         self.jjbtagWeight_plot = []
         self.trigeffWeight_plot = []
         self.puWeight_plot = []
@@ -277,6 +279,12 @@ class BasePlotter:
             self.llidisoWeight_plot.append(
                         {'name': 'llidiso_%s_%s_%s%s'%(self.llFlav, self.suffix, self.extraString,  self.systematicString), 'variable': available_weights["llidiso"],
                         'plot_cut': self.totalCut, 'binning': '(50, 0.7, 1.3)', 'weight': 'event_weight'})
+            self.llidisoWeight_plot.append(
+                        {'name': 'mumuidiso_%s_%s_%s%s'%(self.llFlav, self.suffix, self.extraString,  self.systematicString), 'variable': available_weights["llidiso"],
+                        'plot_cut': self.joinCuts(self.totalCut, "%s.isMuMu" % self.baseObject), 'binning': '(50, 0.7, 1.3)', 'weight': 'event_weight'})
+            self.llidisoWeight_plot.append(
+                        {'name': 'elelidiso_%s_%s_%s%s'%(self.llFlav, self.suffix, self.extraString,  self.systematicString), 'variable': available_weights["llidiso"],
+                        'plot_cut': self.joinCuts(self.totalCut, "%s.isElEl" % self.baseObject), 'binning': '(50, 0.7, 1.3)', 'weight': 'event_weight'})
             self.trigeffWeight_plot.append(
                         {'name': 'trigeff_%s_%s_%s%s'%(self.llFlav, self.suffix, self.extraString,  self.systematicString), 'variable': available_weights["trigeff"],
                         'plot_cut': self.totalCut, 'binning': '(50, 0, 1.2)', 'weight': 'event_weight'})
