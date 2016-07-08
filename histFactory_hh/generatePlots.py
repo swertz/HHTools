@@ -39,7 +39,7 @@ includes.append( os.path.join(scriptDir, "..", "common", "readMVA.h") )
 includes.append( os.path.join(scriptDir, "..", "common", "reweight_v1tov3.h") )
 
 code_before_loop += """
-getBenchmarkReweighter("/home/fynu/sbrochet/scratch/Framework/CMSSW_8_0_6/src/cp3_llbb/HHTools/scripts/", 0, 11);
+getBenchmarkReweighter("/home/fynu/sbrochet/scratch/Framework/CMSSW_7_6_5/src/cp3_llbb/HHTools/scripts/", 0, 11);
 """
 ## For v1->v1 checks:
 #code_before_loop += """
@@ -78,26 +78,26 @@ chosen2Dbinnings = {
             "mjjBinning": "3, { 0, 75, 140, 13000 }",
             "bdtNbins": 25
         },
-        "25x25": {
-            "mjjBinning": getBinningStrWithMax(25, 0, 600, 13000), 
-            "bdtNbins": 25
-        },
-        "20x20": {
-            "mjjBinning": getBinningStrWithMax(20, 0, 600, 13000), 
-            "bdtNbins": 20
-        },
-        "10x10": {
-            "mjjBinning": getBinningStrWithMax(10, 0, 600, 13000), 
-            "bdtNbins": 10
-        },
-        "10x25": {
-            "mjjBinning": getBinningStrWithMax(10, 0, 600, 13000), 
-            "bdtNbins": 25
-        },
-        "5x25": {
-            "mjjBinning": getBinningStrWithMax(5, 0, 600, 13000), 
-            "bdtNbins": 25
-        },
+        # "25x25": {
+        #     "mjjBinning": getBinningStrWithMax(25, 0, 600, 13000), 
+        #     "bdtNbins": 25
+        # },
+        # "20x20": {
+        #     "mjjBinning": getBinningStrWithMax(20, 0, 600, 13000), 
+        #     "bdtNbins": 20
+        # },
+        # "10x10": {
+        #     "mjjBinning": getBinningStrWithMax(10, 0, 600, 13000), 
+        #     "bdtNbins": 10
+        # },
+        # "10x25": {
+        #     "mjjBinning": getBinningStrWithMax(10, 0, 600, 13000), 
+        #     "bdtNbins": 25
+        # },
+        # "5x25": {
+        #     "mjjBinning": getBinningStrWithMax(5, 0, 600, 13000), 
+        #     "bdtNbins": 25
+        # },
     }
 
 for systematicType in systematics.keys():
@@ -112,7 +112,7 @@ for systematicType in systematics.keys():
         basePlotter_lljj = BasePlotter(baseObjectName = "hh_llmetjj_HWWleptons_nobtag_csv", btagWP_str = 'nobtag', objects = objects)
         
         #plots.extend(basePlotter_lljj.generatePlots(categories_lljj, stage_lljj, systematic = systematic, weights = weights_lljj, requested_plots = plots_lljj))
-        #plots.extend(basePlotter_lljj.generatePlots(["MuMu", "ElEl", "MuEl"], stage_lljj, systematic = systematic, weights = weights_lljj, requested_plots = ["mll"]))
+        plots.extend(basePlotter_lljj.generatePlots(["All", "MuMu", "ElEl", "MuEl"], stage_lljj, systematic = systematic, weights = weights_lljj, requested_plots = ["mll"]))
         
         
         ## llbb 
@@ -120,11 +120,14 @@ for systematicType in systematics.keys():
        
         ## No mll cut
         #plots.extend(basePlotter_llbb.generatePlots(categories_llbb, stage_llbb, systematic = systematic, weights = weights_llbb, requested_plots = plots_llbb))
-        #plots.extend(basePlotter_llbb.generatePlots(["MuMu", "ElEl", "MuEl"], stage_llbb, systematic = systematic, weights = weights_llbb, requested_plots = ["mll"]))
+        plots.extend(basePlotter_llbb.generatePlots(["All", "MuMu", "ElEl", "MuEl"], stage_llbb, systematic = systematic, weights = weights_llbb, requested_plots = ["mll"]))
         
         ## With mll cut
-        #plots.extend(basePlotter_llbb.generatePlots(categories_llbb, "mll_cut", systematic = systematic, weights = weights_llbb, requested_plots = plots_llbb))
-        #plots.extend(basePlotter_llbb.generatePlots(categories_llbb, "mll_cut", systematic = systematic, weights = weights_llbb, requested_plots = ["bdtoutput", "mjj", "mjj_vs_bdt"], fit2DtemplatesBinning = chosen2Dbinnings))
+        plots.extend(basePlotter_llbb.generatePlots(categories_llbb, "mll_cut", systematic = systematic, weights = weights_llbb, requested_plots = plots_llbb))
+        plots.extend(basePlotter_llbb.generatePlots(categories_llbb, "mll_cut", systematic = systematic, weights = weights_llbb, requested_plots = ["bdtoutput", "mjj", "mjj_vs_bdt"], fit2DtemplatesBinning = chosen2Dbinnings))
+
+        # if systematic == 'nominal':
+            # plots.extend(basePlotter_llbb.generatePlots(categories_llbb, "mll_cut", systematic = systematic, weights = weights_llbb, requested_plots = ["llidisoWeight"], fit2DtemplatesBinning = chosen2Dbinnings))
         
         ## With mll cut + actually cut into mjj sidebands
         #plots.extend(basePlotter_llbb.generatePlots(categories_llbb, "mjj_blind", systematic = systematic, weights = weights_llbb, requested_plots = plots_llbb))
