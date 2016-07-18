@@ -13,7 +13,7 @@ root: '/home/fynu/sbrochet/scratch/Framework/CMSSW_7_6_5/src/cp3_llbb/HHTools/hi
 #root: '/home/fynu/swertz/scratch/CMSSW_7_6_3_patch2/src/cp3_llbb/HHTools/condor/160624_new2Dbinnings_0/condor/output/'
 
 luminosity: 2300  # according to brilcalc 
-luminosity-error: 0.027
+luminosity-error: 0.
 blinded-range-fill-color: "16" #"#29556270"
 blinded-range-fill-style: 3004
 

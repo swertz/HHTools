@@ -11,7 +11,7 @@ groups:
   include: ['groups.yml']
 
 legend:
-  include: ['legendPosition.yml']
+  include: ['legendPosition_shapes_postfit.yml']
 
 systematics:
   - postfit
