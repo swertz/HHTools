@@ -1,0 +1,6 @@
+position: [0.62, 0.61, 0.95, 0.89]
+entries:
+  -
+    label: 'Signal (5 pb)'
+    type: signal
+    order: 1000  # Always on top
