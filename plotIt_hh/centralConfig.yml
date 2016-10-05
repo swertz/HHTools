@@ -9,8 +9,9 @@ extra-label: "Preliminary"
 #root: '/home/fynu/swertz/scratch/CMSSW_7_6_3_patch2/src/cp3_llbb/HHTools/condor/160614_highBDT_2D_0/condor/output/'
 #root: '/home/fynu/swertz/scratch/CMSSW_7_6_3_patch2/src/cp3_llbb/HHTools/condor/160615_allGood_0/condor/output/'
 #root: '/home/fynu/sbrochet/scratch/Framework/CMSSW_7_6_5/src/cp3_llbb/HHTools/histFactory_hh/160701_all_newjer_0/condor/output/'
-root: '/home/fynu/sbrochet/scratch/Framework/CMSSW_7_6_5/src/cp3_llbb/HHTools/histFactory_hh/160706_all_newjer_newtraining_fixedcluster7_0//condor/output/'
+#root: '/home/fynu/sbrochet/scratch/Framework/CMSSW_7_6_5/src/cp3_llbb/HHTools/histFactory_hh/160706_all_newjer_newtraining_fixedcluster7_0//condor/output/'
 #root: '/home/fynu/swertz/scratch/CMSSW_7_6_3_patch2/src/cp3_llbb/HHTools/condor/160624_new2Dbinnings_0/condor/output/'
+root: '/home/fynu/swertz/scratch/CMSSW_7_6_3_patch2/src/cp3_llbb/HHTools/condor/160714_rebinned_0/condor/output/'
 
 luminosity: 2300  # according to brilcalc 
 luminosity-error: 0.027

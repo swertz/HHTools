@@ -50,24 +50,55 @@ class BenchmarkReweighter {
 
         BenchmarkReweighter() = delete;
 
-        BenchmarkReweighter(std::string baseDirPath, uint32_t nStart, uint32_t nStop) {
-            for (uint32_t bm = nStart; bm <= nStop; bm++) {
-                std::string fileName = baseDirPath + "cluster_" + std::to_string(bm) + "_v1_to_v3_weights.root";
-                TFile *file = TFile::Open(fileName.c_str());
+        BenchmarkReweighter(std::string baseDirPath, uint32_t nStart, uint32_t nStop, bool manyFiles, std::string nameTemplate, std::string templateIdx) {
+            if (manyFiles) {
+                
+                for (uint32_t bm = nStart; bm <= nStop; bm++) {
+                    std::string thisFileName = nameTemplate;
+                    std::size_t pos = thisFileName.find(templateIdx);
+                    thisFileName.replace(pos, templateIdx.length(), std::to_string(bm));
+                    std::string path = baseDirPath + "/" + thisFileName;
+                    TFile *file = TFile::Open(path.c_str());
+                    if (!file || !file->IsOpen() ){
+                        std::cout << "Warning: could not open file " << path << std::endl;
+                        continue;
+                    }
+                    
+                    TH2 *th2 = static_cast<TH2*>(file->Get("weights_unfolded"));
+                    if (!th2 || !th2->InheritsFrom("TH2") ) {
+                        std::cout << "Warning: could not find TH2 \"weights\" in file " << path << std::endl;
+                        continue;
+                    }
+                    th2->SetDirectory(0);
+                    m_weights[bm] = th2;
+
+                    std::cout << "Added weights histogram for benchmark nr. " << bm << std::endl;
+                }
+            
+            } else {
+                
+                TFile *file = TFile::Open(baseDirPath.c_str());
                 if (!file || !file->IsOpen() ){
-                    std::cerr << "Error: could not open file " << fileName << std::endl;
+                    std::cerr << "Error: could not open file " << baseDirPath << std::endl;
                     exit(1);
                 }
                 
-                TH2 *th2 = static_cast<TH2*>(file->Get("weights_unfolded"));
-                if (!th2 || !th2->InheritsFrom("TH2") ) {
-                    std::cerr << "Error: could not find TH2 \"weights\" in file " << fileName << std::endl;
-                    exit(1);
-                }
-                th2->SetDirectory(0);
-                m_weights[bm] = th2;
+                for (uint32_t bm = nStart; bm <= nStop; bm++) {
+                    std::string thisName = nameTemplate;
+                    std::size_t pos = thisName.find(templateIdx);
+                    thisName.replace(pos, templateIdx.length(), std::to_string(bm));
+                    TH2 *th2 = static_cast<TH2*>(file->Get(thisName.c_str()));
+                    if (!th2 || !th2->InheritsFrom("TH2") ) {
+                        std::cout << "Warning: could not find TH2 \"weights\" in file " << baseDirPath << std::endl;
+                        continue;
+                    }
+                    th2->SetDirectory(0);
+                    m_weights[bm] = th2;
 
-                std::cout << "Added weights histogram for benchmark nr. " << bm << std::endl;
+                    std::cout << "Added weights histogram for benchmark nr. " << bm << std::endl;
+                }
+
+                file->Close();
             }
         }
         
@@ -80,7 +111,7 @@ class BenchmarkReweighter {
         std::map<uint32_t, TH2*> m_weights;
 };
 
-static BenchmarkReweighter& getBenchmarkReweighter(std::string baseDirPath = "", uint32_t nStart = 0, uint32_t nStop = 0) {
-    static shared_ptr<BenchmarkReweighter> m_reweighter = std::make_shared<BenchmarkReweighter>(baseDirPath, nStart, nStop);
+static BenchmarkReweighter& getBenchmarkReweighter(std::string baseDirPath = "", uint32_t nStart = 0, uint32_t nStop = 0, bool manyFiles = true, std::string nameTemplate = "", std::string templateIdx = "") {
+    static shared_ptr<BenchmarkReweighter> m_reweighter = std::make_shared<BenchmarkReweighter>(baseDirPath, nStart, nStop, manyFiles, nameTemplate, templateIdx);
     return *m_reweighter; 
 }
