@@ -188,7 +188,7 @@ samples = []
 for ID in IDs + IDsToSplitMore:
     filesperJob = 15
     if ID in IDsToSplitMore:
-        filesperJob = 3
+        filesperJob = 100
     samples.append(
         {
             "ID": ID,
@@ -279,19 +279,35 @@ if args.filter:
         if 'WJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8' in sample["db_name"]:
             sample["json_skeleton"][sample["db_name"]]["sample_cut"] = "event_ht < 100"
 
-        # Handle the cluster v1tov3 reweighting
+        # Handle the cluster reweighting
         if "all_nodes" in sample["db_name"]:
             ## For v1->v1 reweighting check:
             #for node in range(2, 14):
             #    node_str = "node_rwgt_" + str(node)
-            for node in range(1, 13):
+            #for node in range(1, 13):
+
+            #    newSample = copy.deepcopy(sample)
+            #    newJson = copy.deepcopy(sample["json_skeleton"][sample["db_name"]])
+            #    
+            #    node_str = "node_" + str(node)
+            #    newSample["db_name"] = sample["db_name"].replace("all_nodes", node_str)
+            #    newJson["sample-weight"] = "cluster_" + node_str
+            #    
+            #    newSample["json_skeleton"][newSample["db_name"]] = newJson
+            #    newSample["json_skeleton"].pop(sample["db_name"])
+            #    mySub.sampleCfg.append(newSample)
+            
+            # 1507 points
+            for node in range(0, 1507):
+                # Skip dummy Xanda
+                if node in [324, 910, 985, 990]: continue
 
                 newSample = copy.deepcopy(sample)
                 newJson = copy.deepcopy(sample["json_skeleton"][sample["db_name"]])
                 
-                node_str = "node_" + str(node)
+                node_str = "point_" + str(node)
                 newSample["db_name"] = sample["db_name"].replace("all_nodes", node_str)
-                newJson["sample-weight"] = "cluster_" + node_str
+                newJson["sample-weight"] = node_str
                 
                 newSample["json_skeleton"][newSample["db_name"]] = newJson
                 newSample["json_skeleton"].pop(sample["db_name"])

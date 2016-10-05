@@ -35,23 +35,34 @@ code_before_loop = ""
 # Needed to evaluate MVA outputs
 includes.append( os.path.join(scriptDir, "..", "common", "readMVA.h") )
 
-# For cluster reweighting
+###### Reweighting #########
+sample_weights = {}
+
 includes.append( os.path.join(scriptDir, "..", "common", "reweight_v1tov3.h") )
 
+## For v1->v3 reweighting
+#code_before_loop += """
+#getBenchmarkReweighter("/home/fynu/sbrochet/scratch/Framework/CMSSW_7_6_5/src/cp3_llbb/HHTools/scripts/", 0, 11, true, "cluster_NUM_v1_to_v3_weights.root", "NUM");
+#"""
+#for node in range(1, 13):
+#    sample_weights[ "cluster_node_" + str(node) ] = "getBenchmarkReweighter().getWeight({}-1, hh_gen_mHH, hh_gen_costhetastar)".format(node)
+
+## For v1->1507 reweighting
 code_before_loop += """
-getBenchmarkReweighter("/home/fynu/sbrochet/scratch/Framework/CMSSW_7_6_5/src/cp3_llbb/HHTools/scripts/", 0, 11);
+getBenchmarkReweighter("/home/fynu/swertz/scratch/CMSSW_7_6_3_patch2/src/cp3_llbb/HHTools/scripts/weights_v1_1507_points.root", 0, 1506, false, "point_NUM_weights_unfolded", "NUM");
 """
+for node in range(0, 1507):
+    if node in [324, 910, 985, 990]: continue # Skip dummy Xanda
+    sample_weights[ "point_" + str(node) ] = "getBenchmarkReweighter().getWeight({}, hh_gen_mHH, hh_gen_costhetastar)".format(node)
+
 ## For v1->v1 checks:
 #code_before_loop += """
-#getBenchmarkReweighter("/home/fynu/swertz/scratch/CMSSW_7_6_3_patch2/src/cp3_llbb/HHTools/scripts/", 2, 13);
+#getBenchmarkReweighter("/home/fynu/swertz/scratch/CMSSW_7_6_3_patch2/src/cp3_llbb/HHTools/scripts/", 2, 13, true, "cluster_NUM_v1_to_v3_weights.root", "NUM");
 #"""
-
-sample_weights = {}
-for node in range(1, 13):
-    sample_weights[ "cluster_node_" + str(node) ] = "getBenchmarkReweighter().getWeight({}-1, hh_gen_mHH, hh_gen_costhetastar)".format(node)
-## For v1->v1 checks:
 #for node in range(2, 14):
 #    sample_weights[ "cluster_node_rwgt_" + str(node) ] = "getBenchmarkReweighter().getWeight({}, hh_gen_mHH, hh_gen_costhetastar)".format(node)
+
+###########################"
 
 # Plot configuration
 
@@ -111,7 +122,7 @@ for systematicType in systematics.keys():
         ## lljj 
         basePlotter_lljj = BasePlotter(baseObjectName = "hh_llmetjj_HWWleptons_nobtag_csv", btagWP_str = 'nobtag', objects = objects)
         
-        #plots.extend(basePlotter_lljj.generatePlots(categories_lljj, stage_lljj, systematic = systematic, weights = weights_lljj, requested_plots = plots_lljj))
+        plots.extend(basePlotter_lljj.generatePlots(categories_lljj, stage_lljj, systematic = systematic, weights = weights_lljj, requested_plots = plots_lljj))
         plots.extend(basePlotter_lljj.generatePlots(["All", "MuMu", "ElEl", "MuEl"], stage_lljj, systematic = systematic, weights = weights_lljj, requested_plots = ["mll"]))
         
         
@@ -123,7 +134,7 @@ for systematicType in systematics.keys():
         plots.extend(basePlotter_llbb.generatePlots(["All", "MuMu", "ElEl", "MuEl"], stage_llbb, systematic = systematic, weights = weights_llbb, requested_plots = ["mll"]))
         
         ## With mll cut
-        plots.extend(basePlotter_llbb.generatePlots(categories_llbb, "mll_cut", systematic = systematic, weights = weights_llbb, requested_plots = plots_llbb))
+        #plots.extend(basePlotter_llbb.generatePlots(categories_llbb, "mll_cut", systematic = systematic, weights = weights_llbb, requested_plots = plots_llbb))
         plots.extend(basePlotter_llbb.generatePlots(categories_llbb, "mll_cut", systematic = systematic, weights = weights_llbb, requested_plots = ["bdtoutput", "mjj", "mjj_vs_bdt"], fit2DtemplatesBinning = chosen2Dbinnings))
 
         # if systematic == 'nominal':
