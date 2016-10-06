@@ -3,7 +3,6 @@
 # usage dans histfactory_hh : python launchHistFactory.py outputName [submit]
 
 import sys, os, json
-sys.path.append("../../CommonTools/histFactory/")
 import copy
 import datetime
 
@@ -242,7 +241,7 @@ samples = []
 for ID in IDs + IDsToSplitMore:
     filesperJob = 15
     if ID in IDsToSplitMore:
-        filesperJob = 100
+        filesperJob = 1
     samples.append(
         {
             "ID": ID,
@@ -271,10 +270,9 @@ if args.treeFactory:
 
 if not args.skip :
     if args.test : 
-        os.system(os.path.join("../../", "CommonTools", toolDir, "build", toolScript) + " %s %s %s"%(rootFileName, args.plotter, args.output))
+        os.system(os.path.join("../../", "CommonTools", "Factories", "build", toolScript) + " %s %s %s"%(rootFileName, args.plotter, args.output))
     else : 
-        os.system(os.path.join("../../", "CommonTools", toolDir, "build", toolScript) + " %s %s %s"%(skeleton_file, args.plotter, args.output))
-
+        os.system(os.path.join("../../", "CommonTools", "Factories", "build", toolScript) + " %s %s %s"%(files[0], args.plotter, args.output))
 
 ## Create Condor submitter to handle job creating
 mySub = condorSubmitter(samples, "%s/build/" % args.output + executable, "DUMMY", args.output+"/", rescale = True)
@@ -284,6 +282,9 @@ mySub.setupCondorDirs()
 
 splitTT = False
 splitDY = False
+
+operators_MV = ["OtG", "Otphi", "O6", "OH"]
+rwgt_base = [ "SM", "box" ] + range(2, 13)
 
 ## Modify the input samples to add sample cuts and stuff
 if args.filter: 
@@ -368,41 +369,70 @@ if args.filter:
         if 'WJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8' in sample["db_name"]:
             sample["json_skeleton"][sample["db_name"]]["sample_cut"] = "event_ht < 100"
 
-        # Handle the cluster reweighting
-        if "all_nodes" in sample["db_name"]:
-            ## For v1->v1 reweighting check:
-            #for node in range(2, 14):
-            #    node_str = "node_rwgt_" + str(node)
-            #for node in range(1, 13):
+        ## Cluster to 1507 points reweighting (template-based)
+        #if "all_nodes" in sample["db_name"]:
+        #    ## For v1->v1 reweighting check:
+        #    #for node in range(2, 14):
+        #    #    node_str = "node_rwgt_" + str(node)
+        #    #for node in range(1, 13):
 
-            #    newSample = copy.deepcopy(sample)
-            #    newJson = copy.deepcopy(sample["json_skeleton"][sample["db_name"]])
-            #    
-            #    node_str = "node_" + str(node)
-            #    newSample["db_name"] = sample["db_name"].replace("all_nodes", node_str)
-            #    newJson["sample-weight"] = "cluster_" + node_str
-            #    
-            #    newSample["json_skeleton"][newSample["db_name"]] = newJson
-            #    newSample["json_skeleton"].pop(sample["db_name"])
-            #    mySub.sampleCfg.append(newSample)
-            
-            # 1507 points
-            for node in range(0, 1507):
-                # Skip dummy Xanda
-                if node in [324, 910, 985, 990]: continue
+        #    #    newSample = copy.deepcopy(sample)
+        #    #    newJson = copy.deepcopy(sample["json_skeleton"][sample["db_name"]])
+        #    #    
+        #    #    node_str = "node_" + str(node)
+        #    #    newSample["db_name"] = sample["db_name"].replace("all_nodes", node_str)
+        #    #    newJson["sample-weight"] = "cluster_" + node_str
+        #    #    
+        #    #    newSample["json_skeleton"][newSample["db_name"]] = newJson
+        #    #    newSample["json_skeleton"].pop(sample["db_name"])
+        #    #    mySub.sampleCfg.append(newSample)
+        #    
+        #    # 1507 points
+        #    for node in range(0, 1507):
+        #        # Skip dummy Xanda
+        #        if node in [324, 910, 985, 990]: continue
 
-                newSample = copy.deepcopy(sample)
-                newJson = copy.deepcopy(sample["json_skeleton"][sample["db_name"]])
-                
-                node_str = "point_" + str(node)
-                newSample["db_name"] = sample["db_name"].replace("all_nodes", node_str)
-                newJson["sample-weight"] = node_str
-                
-                newSample["json_skeleton"][newSample["db_name"]] = newJson
-                newSample["json_skeleton"].pop(sample["db_name"])
-                mySub.sampleCfg.append(newSample)
+        #        newSample = copy.deepcopy(sample)
+        #        newJson = copy.deepcopy(sample["json_skeleton"][sample["db_name"]])
+        #        
+        #        node_str = "point_" + str(node)
+        #        newSample["db_name"] = sample["db_name"].replace("all_nodes", node_str)
+        #        newJson["sample-weight"] = node_str
+        #        
+        #        newSample["json_skeleton"][newSample["db_name"]] = newJson
+        #        newSample["json_skeleton"].pop(sample["db_name"])
+        #        mySub.sampleCfg.append(newSample)
 
-            mySub.sampleCfg.remove(sample)
+        #    mySub.sampleCfg.remove(sample)
+
+        ## Cluster to MV reweighting (ME-based)
+        #if "node" in sample["db_name"]:
+        #    for base, base_name in enumerate(rwgt_base):
+        #        for i, op1 in enumerate(operators_MV):
+        #            newSample = copy.deepcopy(sample)
+        #            newJson = copy.deepcopy(sample["json_skeleton"][sample["db_name"]])
+        #            
+        #            newSample["db_name"] = sample["db_name"].replace("node_" + base_name, "SM_" + op1)
+        #            newJson["sample-weight"] = "base_" + base_name + "_SM_" + op1
+        #            
+        #            newSample["json_skeleton"][newSample["db_name"]] = newJson
+        #            newSample["json_skeleton"].pop(sample["db_name"])
+        #            
+        #            mySub.sampleCfg.append(newSample)
+        #
+        #            for j, op2 in enumerate(operators_MV):
+        #                if i < j: continue
+        #            
+        #                newSample = copy.deepcopy(sample)
+        #                newJson = copy.deepcopy(sample["json_skeleton"][sample["db_name"]])
+        #                
+        #                newSample["db_name"] = sample["db_name"].replace("node_" + base_name, op1 + "_" + op2)
+        #                newJson["sample-weight"] = "base_" + base_name + "_" + op1 + "_" + op2
+        #                
+        #                newSample["json_skeleton"][newSample["db_name"]] = newJson
+        #                newSample["json_skeleton"].pop(sample["db_name"])
+        #                
+        #                mySub.sampleCfg.append(newSample)
 
 ## Write command and data files in the condor directory
 mySub.createCondorFiles()

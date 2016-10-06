@@ -764,6 +764,12 @@ class BasePlotter:
                     'plot_cut': self.totalCut,
                     'binning': '(50, -1, 1)'
                 },
+                {
+                    'name': 'gen_sample_weight',
+                    'variable': '__sample_weight',
+                    'plot_cut': self.totalCut,
+                    'binning': '(200, -10, 10)'
+                },
             ])
             self.evt_plot.extend([ # broken if we do not use maps
                 {
@@ -1020,12 +1026,14 @@ class BasePlotter:
             else:
                 
                 for plot in getattr(self, plotFamily+"_plot"):
-                    if not "Weight" in plotFamily:
+                    if not "Weight" in plotFamily and "sample_weight" not in plot["name"]:
                         plot["weight"] = "event_weight"
                         plot["normalize-to"] = normalization
                         for weight in weights:
                             plot["weight"] += " * " + available_weights[weight]
                     else:
+                        # Divide by sample_weight since we cannot avoid it in histFactory
+                        plot["weight"] = "event_weight/__sample_weight"
                         print "No other weight than event_weight for ", plotFamily 
                     plotsToReturn.append(plot)
 
