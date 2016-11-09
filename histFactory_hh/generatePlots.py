@@ -28,17 +28,20 @@ def getBinningStrWithMax(nBins, start, end, max):
     return m_string
 
 
-includes = []
+include_directories = []
+headers = []
 plots = []
 code_before_loop = ""
 
+include_directories.append(os.path.join(scriptDir, "..", "common"))
+
 # Needed to evaluate MVA outputs
-includes.append( os.path.join(scriptDir, "..", "common", "readMVA.h") )
+headers.append("readMVA.h")
 
 ###### Reweighting #########
 sample_weights = {}
 
-includes.append( os.path.join(scriptDir, "..", "common", "reweight_v1tov3.h") )
+headers.append("reweight_v1tov3.h")
 
 ## For v1->v3 reweighting
 #code_before_loop += """
