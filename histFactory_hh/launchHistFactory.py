@@ -20,127 +20,150 @@ SCRAM_ARCH = os.environ['SCRAM_ARCH']
 sys.path.append(os.path.join(CMSSW_BASE, 'bin', SCRAM_ARCH))
 from SAMADhi import Dataset, Sample, DbStore
 
+def build_sample_name(name, tag):
+    return "{}*{}".format(name, tag)
+
+# Connect to the database
+dbstore = DbStore()
+
+def get_sample_id_from_name(name):
+    results = dbstore.find(Sample, Sample.name.like(unicode(name.replace('*', '%'))))
+
+    if results.count() == 0:
+        return None
+
+    if results.count() > 1:
+        raise Exception("More than one sample found in the database matching %r. This is not supported." % name)
+
+    sample = results.one()
+    return sample.sample_id
+
 def get_sample(iSample):
-    dbstore = DbStore()
     resultset = dbstore.find(Sample, Sample.sample_id == iSample)
     return resultset.one()
 
-IDs = []
-IDsToSplitMore = []
+# Warning: put most recent tags first!
+analysis_tags = [
+        'v0.1.4+76X_HHAnalysis_2016-06-03.v0',
+        'v0.1.2+76X_HHAnalysis_2016-05-02.v0'
+        ]
+
+Samples = []
+SamplesToSplitMore = []
 
 # Data
-IDs.extend([
-    1642, # DoubleEG
-    1662, # MuonEG
-    1716, # DoubleMuon
+Samples.extend([
+    'DoubleEG', # DoubleEG
+    'MuonEG', # MuonEG
+    'DoubleMuon', # DoubleMuon
     ])
 
 # Main backgrounds:
-IDs.extend([
-    1817, # tW top
-    1846, # tW atop
-    1894, # sT t-chan
-    1909, # TT incl NLO
-    1915, # DY M10-50 NLO merged
-    1918, # DY M-50 NLO merged 
+Samples.extend([
+    'ST_tW_top_5f_inclusiveDecays_13TeV-powheg', # tW top
+    'ST_tW_antitop_5f_inclusiveDecays_13TeV-powheg', # tW atop
+    'ST_t-channel_4f_leptonDecays_13TeV-amcatnlo', # sT t-chan
+    'TT_TuneCUETP8M1_13TeV-powheg-pythia8', # TT incl NLO
+    'DYJetsToLL_M-10to50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_extended', # DY M10-50 NLO merged
+    'DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_extended', # DY M-50 NLO merged 
     ])
 
 # DY LO
-IDs.extend([
+Samples.extend([
     # M-50 incl. merged
-    1920,
+    'DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_extended',
     # M-50, binned HT > 100
-    1884, # 100-200 non-merged
-    1848, # 200-400 non-merged
-    1917, # 400-600 merged
-    1919, # 600-Inf merged
+    'DYJetsToLL_M-50_HT-100to200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8', # 100-200 non-merged
+    'DYJetsToLL_M-50_HT-200to400_TuneCUETP8M1_13TeV-madgraphMLM-pythia8', # 200-400 non-merged
+    'DYJetsToLL_M-50_HT-400to600_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_extended', # 400-600 merged
+    'DYJetsToLL_M-50_HT-600toInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_extended', # 600-Inf merged
     # M-5to50 incl.: forget it...
-    1878,
+    'DYJetsToLL_M-5to50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8',
     # M-5to50, binned HT
-    1916, # 100-200 merged
-    1815, # 200-400 non-merged
-    1824, # 400-600 non-merged
-    1914, # 600-Inf merged
+    'DYJetsToLL_M-5to50_HT-100to200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_extended', # 100-200 merged
+    'DYJetsToLL_M-5to50_HT-200to400_TuneCUETP8M1_13TeV-madgraphMLM-pythia8', # 200-400 non-merged
+    'DYJetsToLL_M-5to50_HT-400to600_TuneCUETP8M1_13TeV-madgraphMLM-pythia8', # 400-600 non-merged
+    'DYJetsToLL_M-5to50_HT-600toInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_extended', # 600-Inf merged
     ])
 #
 # Other backgrounds
 # VV
-IDs.extend([
-    #1624, # VV(2L2Nu)
+Samples.extend([
+    #'VVTo2L2Nu_13TeV_amcatnloFXFX_madspin_pythia8', # VV(2L2Nu)
     
-    1897, # WW(LNuQQ)
-    1892, # WW(2L2Nu)
+    'WWToLNuQQ_13TeV-powheg', # WW(LNuQQ)
+    'WWTo2L2Nu_13TeV-powheg', # WW(2L2Nu)
     
-    1899, # WZ(3LNu)
-    1838, # WZ(L3Nu)
-    1908, # WZ(LNu2Q)
-    1902, # WZ(2L2Q)
+    'WZTo3LNu_TuneCUETP8M1_13TeV-powheg-pythia8', # WZ(3LNu)
+    'WZTo1L3Nu_13TeV_amcatnloFXFX_madspin_pythia8', # WZ(L3Nu)
+    'WZTo1L1Nu2Q_13TeV_amcatnloFXFX_madspin_pythia8', # WZ(LNu2Q)
+    'WZTo2L2Q_13TeV_amcatnloFXFX_madspin_pythia8', # WZ(2L2Q)
     
-    1834, # ZZ(4L)
-    1893, # ZZ(2L2Nu)
-    1896, # ZZ(2L2Q)
+    'ZZTo4L_13TeV_powheg_pythia8', # ZZ(4L)
+    'ZZTo2L2Nu_13TeV_powheg_pythia8', # ZZ(2L2Nu)
+    'ZZTo2L2Q_13TeV_amcatnloFXFX_madspin_pythia8', # ZZ(2L2Q)
     
-    1872, # WZZ
+    'WZZ_TuneCUETP8M1_13TeV-amcatnlo-pythia8', # WZZ
     ])
 
 # Higgs
-IDs.extend([
+Samples.extend([
     # ggH ==> no H(ZZ)?
-    1844, # H(WW(2L2Nu))
-    1849, # H(BB)
+    'GluGluHToWWTo2L2Nu_M125_13TeV_powheg_JHUgen_pythia8', # H(WW(2L2Nu))
+    'GluGluHToBB_M125_13TeV_powheg_pythia8', # H(BB)
 
     # ZH
-    1847, # ggZ(LL)H(WW(2L2Nu))
-    1821, # ZH(WW)
-    1866, # ggZ(LL)H(BB)
-    1828, # Z(LL)H(BB)
-    1883, # ggZ(NuNu)H(BB)
+    'GluGluZH_HToWWTo2L2Nu_ZTo2L_M125_13TeV_powheg_pythia8', # ggZ(LL)H(WW(2L2Nu))
+    'HZJ_HToWW_M125_13TeV_powheg_pythia8', # ZH(WW)
+    'ggZH_HToBB_ZToLL_M125_13TeV_powheg_pythia8', # ggZ(LL)H(BB)
+    'ZH_HToBB_ZToLL_M125_13TeV_powheg_pythia8', # Z(LL)H(BB)
+    'ggZH_HToBB_ZToNuNu_M125_13TeV_powheg_pythia8', # ggZ(NuNu)H(BB)
     
     # VBF
-    1833, # VBFH(BB)
-    1901, # VBFH(WW(2L2Nu))
+    'VBFHToBB_M-125_13TeV_powheg_pythia8', # VBFH(BB)
+    'VBFHToWWTo2L2Nu_M125_13TeV_powheg_JHUgen_pythia8', # VBFH(WW(2L2Nu))
 
     # WH
-    1875, # W+(LNu)H(BB)
-    1854, # W-(LNu)H(BB)
-    1862, # W+H(WW)
-    1858, # W-H(WW)
+    'WplusH_HToBB_WToLNu_M125_13TeV_powheg_pythia8', # W+(LNu)H(BB)
+    'WminusH_HToBB_WToLNu_M125_13TeV_powheg_pythia8', # W-(LNu)H(BB)
+    'HWplusJ_HToWW_M125_13TeV_powheg_pythia8', # W+H(WW)
+    'HWminusJ_HToWW_M125_13TeV_powheg_pythia8', # W-H(WW)
 
     # bbH
-    1869, # bbH(BB) ybyt
-    1874, # bbH(BB) yb2
-    1841, # bbH(WW) ybyt
-    1819, # bbH(WW) yb2
+    'bbHToBB_M-125_4FS_ybyt_13TeV_amcatnlo', # bbH(BB) ybyt
+    'bbHToBB_M-125_4FS_yb2_13TeV_amcatnlo', # bbH(BB) yb2
+    'bbHToWWTo2L2Nu_M-125_4FS_ybyt_13TeV_amcatnlo', # bbH(WW) ybyt
+    'bbHToWWTo2L2Nu_M-125_4FS_yb2_13TeV_amcatnlo', # bbH(WW) yb2
     ])
 
 # Top
-IDs.extend([
-    1837, # sT s-channel
-    1818, # TTW(LNu)
-    1831, # TTW(QQ)
-    1863, # TTZ(2L2Nu)
-    1880, # TTZ(QQ),
-    1839, # ttH(bb)
-    1906, # ttH(nonbb)
-    #1711, # TT(2L2Nu)
+Samples.extend([
+    'ST_s-channel_4f_leptonDecays_13TeV-amcatnlo', # sT s-channel
+    'TTWJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-madspin-pythia8', # TTW(LNu)
+    'TTWJetsToQQ_TuneCUETP8M1_13TeV-amcatnloFXFX-madspin-pythia8', # TTW(QQ)
+    'TTZToLLNuNu_M-10_TuneCUETP8M1_13TeV-amcatnlo-pythia8', # TTZ(2L2Nu)
+    'TTZToQQ_TuneCUETP8M1_13TeV-amcatnlo-pythia8', # TTZ(QQ),
+    'ttHTobb_M125_13TeV_powheg_pythia8', # ttH(bb)
+    'ttHToNonbb_M125_13TeV_powheg_pythia8', # ttH(nonbb)
+    # 'TTTo2L2Nu_13TeV-powheg', # TT(2L2Nu)
     ])
 
 # # TT aMC@NLO
-# IDs.append(1929)
+# Samples.append('TTJets_TuneCUETP8M1_amcatnloFXFX')
 
 # Wjets
-IDs.extend([
-    1876, # JetsLNu
+Samples.extend([
+    'WJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8', # JetsLNu
 
     # HT binned
-    1904, # 200-400
-    1825, # 800-1200
-    1907, # 1200 - 2500
-    1898, # 2500 - Inf 
+    'WJetsToLNu_HT-200To400_TuneCUETP8M1_13TeV-madgraphMLM-pythia8', # 200-400
+    'WJetsToLNu_HT-800To1200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8', # 800-1200
+    'WJetsToLNu_HT-1200To2500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8', # 1200 - 2500
+    'WJetsToLNu_HT-2500ToInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8', # 2500 - Inf 
     ])
 
 # QCD ==> 30to50 missing
-# IDs.extend([
+# Samples.extend([
    # 1661, # Pt-15to20EMEnriched
    # 1671, # Pt-20to30EMEnriched
    # 1681, # Pt-50to80EMEnriched
@@ -152,13 +175,13 @@ IDs.extend([
    # ])
 
 # NonResonant with GEN info
-IDsToSplitMore.extend([
-    1927, # SM
-    1928, # box
+SamplesToSplitMore.extend([
+    'GluGluToHHTo2B2VTo2L2Nu_node_SM_13TeV-madgraph', # SM
+    'GluGluToHHTo2B2VTo2L2Nu_node_box_13TeV-madgraph', # box
     ])
 
 # NonResonant merged
-IDsToSplitMore.append(1903)
+SamplesToSplitMore.append('GluGluToHHTo2B2VTo2L2Nu_all_nodes_13TeV-madgraph')
 
 parser = argparse.ArgumentParser(description='Facility to submit histFactory jobs on condor.')
 parser.add_argument('-o', '--output', dest='output', default=str(datetime.date.today()), help='Name of the output directory.')
@@ -172,9 +195,34 @@ parser.add_argument('--tree', dest='treeFactory', action='store_true', default=F
 
 args = parser.parse_args()
 
-# get one of the new samples with gen info to read Tree structure
-sample = get_sample(1903)
-files = ["/storage/data/cms/" + x.lfn for x  in sample.files]
+# Convert samples into ids
+def convert_to_ids(samples):
+    ids = []
+    for sample in samples:
+        found = False
+        for tag in analysis_tags:
+            id = get_sample_id_from_name(build_sample_name(sample, tag))
+            if id:
+                found = True
+                ids.append(id)
+                break
+
+        if not found:
+            raise Exception("No sample found in the database for %r" % sample)
+
+    return ids
+
+IDs = convert_to_ids(Samples)
+IDsToSplitMore = convert_to_ids(SamplesToSplitMore)
+
+# Find first MC sample and use one file as skeleton
+for id in IDs:
+    sample = get_sample(id)
+    if sample.source_dataset.datatype != "mc":
+        continue
+
+    skeleton_file = "/storage/data/cms/" + sample.files.any().lfn
+    break
 
 if args.test: 
     jsonName = "jsonTest.json"
@@ -220,7 +268,7 @@ if not args.skip :
     if args.test : 
         os.system(os.path.join("../../", "CommonTools", toolDir, "build", toolScript) + " %s %s %s"%(rootFileName, args.plotter, args.output))
     else : 
-        os.system(os.path.join("../../", "CommonTools", toolDir, "build", toolScript) + " %s %s %s"%(files[0], args.plotter, args.output))
+        os.system(os.path.join("../../", "CommonTools", toolDir, "build", toolScript) + " %s %s %s"%(skeleton_file, args.plotter, args.output))
 
 
 ## Create Condor submitter to handle job creating
