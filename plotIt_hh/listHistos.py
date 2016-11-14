@@ -1,26 +1,46 @@
 #! /usr/bin/env python
 
+import os
 import yaml
+import glob
 
 #usage: python listHisto.py [yields]
-from ROOT import * 
+from ROOT import TFile
 import argparse
 
 parser = argparse.ArgumentParser(description='Facility to produce the yml with plots information.')
 parser.add_argument('--yields', help='If you just want to produce the yields and systematics.', action="store_true")
-parser.add_argument('-d', '--directory', dest='directory', default="76_mjjStudy", help='Directory of the input rootfiles.')
+parser.add_argument('-d', '--directory', dest='directory', required=True, help='Directory of the input rootfiles.')
 parser.add_argument('--blinded', dest='unblinded', help='If you want to produce blinded plots', action="store_false")
 args = parser.parse_args()
 
-baseDir = "/home/fynu/swertz/scratch/CMSSW_7_6_3_patch2/src/cp3_llbb/HHTools/condor/"
-#baseDir = "/home/fynu/sbrochet/scratch/Framework/CMSSW_7_6_5/src/cp3_llbb/HHTools/histFactory_hh/"
-fileName = baseDir + args.directory + "/condor/output/GluGluToHHTo2B2VTo2L2Nu_node_SM_13TeV-madgraph_v0.1.4+76X_HHAnalysis_2016-06-03.v0_histos.root"
+if not os.path.exists(args.directory):
+    parser.error("%r does not exists" % args.directory)
+
+rootDir = args.directory
+condorDir = os.path.join(rootDir, "condor/output")
+
+# Find a ROOT file in condor output directory
+root_files = glob.glob(os.path.join(condorDir, "*.root"))
+if len(root_files) == 0:
+    raise Exception("No ROOT files found in %r" % condorDir)
+
+fileName = root_files[0]
+
+print("Listing histograms found in %r" % fileName)
 
 skim = False
 
-file = TFile(fileName) 
+file = TFile.Open(fileName) 
 keys = file.GetListOfKeys() 
 alreadyIn = []
+
+# Create 'centralConfig.yml'
+with open('centralConfig.yml.tpl') as tpl_handle:
+    tpl = tpl_handle.read()
+    tpl = tpl.format(root=condorDir)
+    with open('centralConfig.yml', 'w') as f:
+        f.write(tpl)
 
 # Dictionary containing all the plots
 plots = {}
@@ -53,6 +73,10 @@ nHistos = 0
 
 for key in keys:
     if key.GetName() not in alreadyIn and not "__" in key.GetName():
+
+        # Keep only histograms
+        if not key.ReadObj().InheritsFrom("TH1"):
+            continue
 
         ## Some manual choices which plots to skip...
         
