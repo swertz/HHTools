@@ -96,7 +96,10 @@ for key in keys:
         #if "ll_M" not in key.GetName() or "All" in key.GetName(): continue
         #if "ll_M" in key.GetName() and "All" not in key.GetName(): continue
 
-        if "BDT" not in key.GetName(): continue
+        # if "BDT" not in key.GetName(): continue
+
+        if "MuMu" not in key.GetName():
+            continue
 
         ## Update all the plots with title, ...
 
