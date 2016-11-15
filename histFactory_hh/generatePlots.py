@@ -51,12 +51,12 @@ headers.append("reweight_v1tov3.h")
 #    sample_weights[ "cluster_node_" + str(node) ] = "getBenchmarkReweighter().getWeight({}-1, hh_gen_mHH, hh_gen_costhetastar)".format(node)
 
 ## For v1->1507 reweighting
-code_before_loop += """
-getBenchmarkReweighter("/home/fynu/swertz/scratch/CMSSW_7_6_3_patch2/src/cp3_llbb/HHTools/scripts/weights_v1_1507_points.root", 0, 1506, false, "point_NUM_weights_unfolded", "NUM");
-"""
-for node in range(0, 1507):
-    if node in [324, 910, 985, 990]: continue # Skip dummy Xanda
-    sample_weights[ "point_" + str(node) ] = "getBenchmarkReweighter().getWeight({}, hh_gen_mHH, hh_gen_costhetastar)".format(node)
+# code_before_loop += """
+# getBenchmarkReweighter("/home/fynu/swertz/scratch/CMSSW_7_6_3_patch2/src/cp3_llbb/HHTools/scripts/weights_v1_1507_points.root", 0, 1506, false, "point_NUM_weights_unfolded", "NUM");
+# """
+# for node in range(0, 1507):
+    # if node in [324, 910, 985, 990]: continue # Skip dummy Xanda
+    # sample_weights[ "point_" + str(node) ] = "getBenchmarkReweighter().getWeight({}, hh_gen_mHH, hh_gen_costhetastar)".format(node)
 
 ## For v1->v1 checks:
 #code_before_loop += """
@@ -71,19 +71,23 @@ for node in range(0, 1507):
 
 # lljj 
 weights_lljj = ['trigeff', 'llidiso', 'pu']
-categories_lljj = ["All"] 
+# categories_lljj = ["All", "MuMu", "ElEl", "MuEl"] 
+categories_lljj = ["MuMu"] 
 stage_lljj = "no_cut"
 plots_lljj = ["mll", "mjj", "basic", "csv", "bdtinput", "gen"]
 
+# Weights
+plots_lljj += ["llidisoWeight", "trigeffWeight", "puWeight"]
+
 #llbb
-weights_llbb = ['trigeff', 'llidiso', 'pu', 'jjbtag']
-categories_llbb = ["All"]
+weights_llbb = ['trigeff', 'llidiso', 'pu', 'jjbtag_heavy', 'jjbtag_light']
+categories_llbb = ["MuMu"]
 stage_llbb = "no_cut"
-plots_llbb = plots_lljj
+plots_llbb = plots_lljj + ["jjbtagWeight"]
 #plots_llbb = ["bdtinput", "mjj"]
 
-#systematics = {"modifObjects" : ["nominal"]}
-systematics = {"modifObjects" : ["nominal", "jecup", "jecdown", "jerup", "jerdown"], "SF" : ["elidisoup", "elidisodown", "muidup", "muiddown", "muisoup", "muisodown", "jjbtagup", "jjbtagdown", "puup", "pudown", "trigeffup", "trigeffdown", "pdfup", "pdfdown", "scale", "scaleUncorr"]}
+systematics = {"modifObjects" : ["nominal"]}
+# systematics = {"modifObjects" : ["nominal", "jecup", "jecdown", "jerup", "jerdown"], "SF" : ["elidisoup", "elidisodown", "muidup", "muiddown", "muisoup", "muisodown", "jjbtagup", "jjbtagdown", "puup", "pudown", "trigeffup", "trigeffdown", "pdfup", "pdfdown", "scale", "scaleUncorr"]}
 #systematics = {"modifObjects" : ["nominal"], "SF" : ["scale"]}
 
 # Define binning of 2D templates for fitting
@@ -126,22 +130,22 @@ for systematicType in systematics.keys():
         basePlotter_lljj = BasePlotter(baseObjectName = "hh_llmetjj_HWWleptons_nobtag_csv", btagWP_str = 'nobtag', objects = objects)
         
         plots.extend(basePlotter_lljj.generatePlots(categories_lljj, stage_lljj, systematic = systematic, weights = weights_lljj, requested_plots = plots_lljj))
-        plots.extend(basePlotter_lljj.generatePlots(["All", "MuMu", "ElEl", "MuEl"], stage_lljj, systematic = systematic, weights = weights_lljj, requested_plots = ["mll"]))
+        # plots.extend(basePlotter_lljj.generatePlots(["All", "MuMu", "ElEl", "MuEl"], stage_lljj, systematic = systematic, weights = weights_lljj, requested_plots = ["mll"]))
         
         
         ## llbb 
         basePlotter_llbb = BasePlotter(baseObjectName = "hh_llmetjj_HWWleptons_btagM_csv", btagWP_str = 'medium', objects = objects)
        
         ## No mll cut
-        #plots.extend(basePlotter_llbb.generatePlots(categories_llbb, stage_llbb, systematic = systematic, weights = weights_llbb, requested_plots = plots_llbb))
-        plots.extend(basePlotter_llbb.generatePlots(["All", "MuMu", "ElEl", "MuEl"], stage_llbb, systematic = systematic, weights = weights_llbb, requested_plots = ["mll"]))
+        plots.extend(basePlotter_llbb.generatePlots(categories_llbb, stage_llbb, systematic = systematic, weights = weights_llbb, requested_plots = plots_llbb))
+        # plots.extend(basePlotter_llbb.generatePlots(["All", "MuMu", "ElEl", "MuEl"], stage_llbb, systematic = systematic, weights = weights_llbb, requested_plots = ["mll"]))
         
         ## With mll cut
-        #plots.extend(basePlotter_llbb.generatePlots(categories_llbb, "mll_cut", systematic = systematic, weights = weights_llbb, requested_plots = plots_llbb))
-        plots.extend(basePlotter_llbb.generatePlots(categories_llbb, "mll_cut", systematic = systematic, weights = weights_llbb, requested_plots = ["bdtoutput", "mjj", "mjj_vs_bdt"], fit2DtemplatesBinning = chosen2Dbinnings))
+        plots.extend(basePlotter_llbb.generatePlots(categories_llbb, "mll_cut", systematic = systematic, weights = weights_llbb, requested_plots = plots_llbb))
+        # plots.extend(basePlotter_llbb.generatePlots(categories_llbb, "mll_cut", systematic = systematic, weights = weights_llbb, requested_plots = ["bdtoutput", "mjj", "mjj_vs_bdt"], fit2DtemplatesBinning = chosen2Dbinnings))
 
         # if systematic == 'nominal':
-            # plots.extend(basePlotter_llbb.generatePlots(categories_llbb, "mll_cut", systematic = systematic, weights = weights_llbb, requested_plots = ["llidisoWeight"], fit2DtemplatesBinning = chosen2Dbinnings))
+            # plots.extend(basePlotter_llbb.generatePlots(categories_llbb, "mll_cut", systematic = systematic, weights = weights_llbb, requested_plots = ["llidisoWeight", ], fit2DtemplatesBinning = chosen2Dbinnings))
         
         ## With mll cut + actually cut into mjj sidebands
         #plots.extend(basePlotter_llbb.generatePlots(categories_llbb, "mjj_blind", systematic = systematic, weights = weights_llbb, requested_plots = plots_llbb))

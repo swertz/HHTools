@@ -26,17 +26,22 @@ def build_sample_name(name, tag):
 # Connect to the database
 dbstore = DbStore()
 
-def get_sample_id_from_name(name):
+def get_sample_ids_from_name(name):
     results = dbstore.find(Sample, Sample.name.like(unicode(name.replace('*', '%'))))
 
     if results.count() == 0:
         return None
 
     if results.count() > 1:
-        raise Exception("More than one sample found in the database matching %r. This is not supported." % name)
+        print("Note: more than one sample found in the database matching %r. This is maybe not what you expected:" % name)
+        for sample in results:
+            print("    %s" % sample.name)
 
-    sample = results.one()
-    return sample.sample_id
+    ids = []
+    for sample in results:
+        ids.append(sample.sample_id)
+
+    return ids
 
 def get_sample(iSample):
     resultset = dbstore.find(Sample, Sample.sample_id == iSample)
@@ -201,10 +206,10 @@ def convert_to_ids(samples):
     for sample in samples:
         found = False
         for tag in analysis_tags:
-            id = get_sample_id_from_name(build_sample_name(sample, tag))
-            if id:
+            ids_ = get_sample_ids_from_name(build_sample_name(sample, tag))
+            if ids_:
                 found = True
-                ids.append(id)
+                ids.extend(ids_)
                 break
 
         if not found:
@@ -222,6 +227,7 @@ for id in IDs:
         continue
 
     skeleton_file = "/storage/data/cms/" + sample.files.any().lfn
+    print("Using %r as skeleton" % skeleton_file)
     break
 
 if args.test: 

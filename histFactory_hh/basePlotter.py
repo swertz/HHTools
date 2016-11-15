@@ -81,9 +81,9 @@ class BasePlotter:
 
         # Categories (lepton flavours)
         self.dict_cat_cut =  {
-            "ElEl": "({0}.isElEl && (hh_elel_fire_trigger_Ele17_Ele12_cut || runOnMC) && (runOnElEl || runOnMC) && {1}.M() > 12)".format(self.baseObject, self.ll_str),
-            "MuMu": "({0}.isMuMu && (hh_mumu_fire_trigger_Mu17_Mu8_cut || hh_mumu_fire_trigger_Mu17_TkMu8_cut || runOnMC) && (runOnMuMu || runOnMC) && {1}.M() > 12)".format(self.baseObject, self.ll_str),
-            "MuEl": "((({0}.isElMu && (hh_elmu_fire_trigger_Mu8_Ele17_cut || runOnMC)) || ({0}.isMuEl && (hh_muel_fire_trigger_Mu17_Ele12_cut || runOnMC))) && (runOnElMu || runOnMC) && {1}.M() > 12)".format(self.baseObject, self.ll_str)
+            "ElEl": "({0}.isElEl && (runOnMC || hh_elel_fire_trigger_cut) && (runOnElEl || runOnMC) && {1}.M() > 12)".format(self.baseObject, self.ll_str),
+            "MuMu": "({0}.isMuMu && (runOnMC || hh_mumu_fire_trigger_cut) && (runOnMuMu || runOnMC) && {1}.M() > 12)".format(self.baseObject, self.ll_str),
+            "MuEl": "(({0}.isElMu || {0}.isMuEl) && (runOnMC || hh_elmu_fire_trigger_cut || hh_muel_fire_trigger_cut) && (runOnElMu || runOnMC) && {1}.M() > 12)".format(self.baseObject, self.ll_str)
                         }   
         cut_for_All_channel = "(" + self.dict_cat_cut["ElEl"] + "||" + self.dict_cat_cut["MuMu"] + "||" +self.dict_cat_cut["MuEl"] + ")"
         cut_for_SF_channel = "(" + self.dict_cat_cut["ElEl"] + "||" + self.dict_cat_cut["MuMu"] + ")"
@@ -97,7 +97,7 @@ class BasePlotter:
         # Lepton ID and Iso Scale Factors
         llIdIso_sfIdx = "[0]"
         llIdIso_strCommon = "NOMINAL"
-        llIdIso_sf = "(common::combineScaleFactors<2>({{{{{{({0}.isEl) ? electron_sf_id_tight[{1}][0] : muon_sf_id_hww[{1}][0]*muon_sf_iso_tight_id_hww[{1}][0], ({0}.isEl) ? electron_sf_id_tight[{1}]{2} : muon_sf_id_hww[{1}]{2}*muon_sf_iso_tight_id_hww[{1}]{2}}}, {{ ({3}.isEl) ? electron_sf_id_tight[{4}][0] : muon_sf_id_hww[{4}][0]*muon_sf_iso_tight_id_hww[{4}][0], ({3}.isEl) ? electron_sf_id_tight[{4}]{2} : muon_sf_id_hww[{4}]{2}*muon_sf_iso_tight_id_hww[{4}]{2} }}}}}}, common::Variation::{5}) )".format(self.lep1_str, self.lep1_fwkIdx, llIdIso_sfIdx, self.lep2_str, self.lep2_fwkIdx, llIdIso_strCommon)
+        llIdIso_sf = "(common::combineScaleFactors<2>({{{{{{({0}.isEl) ? electron_sf_hww_wp[{1}][0] : muon_sf_id_tight_hww[{1}][0]*muon_sf_iso_tight_hww[{1}][0], ({0}.isEl) ? electron_sf_hww_wp[{1}]{2} : muon_sf_id_tight_hww[{1}]{2}*muon_sf_iso_tight_hww[{1}]{2}}}, {{ ({3}.isEl) ? electron_sf_hww_wp[{4}][0] : muon_sf_id_tight_hww[{4}][0]*muon_sf_iso_tight_hww[{4}][0], ({3}.isEl) ? electron_sf_hww_wp[{4}]{2} : muon_sf_id_tight_hww[{4}]{2}*muon_sf_iso_tight_hww[{4}]{2} }}}}}}, common::Variation::{5}) )".format(self.lep1_str, self.lep1_fwkIdx, llIdIso_sfIdx, self.lep2_str, self.lep2_fwkIdx, llIdIso_strCommon)
         # electrons
         if systematic == "elidisoup":
             llIdIso_sfIdx = "[2]" 
@@ -106,7 +106,7 @@ class BasePlotter:
             llIdIso_sfIdx = "[1]"
             llIdIso_strCommon = "DOWN"
         if systematic == "elidisoup" or systematic == "elidisodown":
-            llIdIso_sf = "(common::combineScaleFactors<2>({{{{{{({0}.isEl) ? electron_sf_id_tight[{1}][0] :muon_sf_id_hww[{1}][0]*muon_sf_iso_tight_id_hww[{1}][0], ({0}.isEl) ? electron_sf_id_tight[{1}]{2} : 0 }}, {{ ({3}.isEl) ? electron_sf_id_tight[{4}][0] :muon_sf_id_hww[{4}][0]*muon_sf_iso_tight_id_hww[{4}][0], ({3}.isEl) ? electron_sf_id_tight[{4}]{2} : 0 }}}}}}, common::Variation::{5}) )".format(self.lep1_str, self.lep1_fwkIdx, llIdIso_sfIdx, self.lep2_str, self.lep2_fwkIdx, llIdIso_strCommon)
+            llIdIso_sf = "(common::combineScaleFactors<2>({{{{{{({0}.isEl) ? electron_sf_hww_wp[{1}][0] :muon_sf_id_tight_hww[{1}][0]*muon_sf_iso_tight_hww[{1}][0], ({0}.isEl) ? electron_sf_hww_wp[{1}]{2} : 0 }}, {{ ({3}.isEl) ? electron_sf_hww_wp[{4}][0] :muon_sf_id_tight_hww[{4}][0]*muon_sf_iso_tight_hww[{4}][0], ({3}.isEl) ? electron_sf_hww_wp[{4}]{2} : 0 }}}}}}, common::Variation::{5}) )".format(self.lep1_str, self.lep1_fwkIdx, llIdIso_sfIdx, self.lep2_str, self.lep2_fwkIdx, llIdIso_strCommon)
 
         # muons
         if systematic == "muidup":
@@ -117,7 +117,7 @@ class BasePlotter:
             llIdIso_strCommon="DOWN"
         if systematic == "muidup" or systematic == "muiddown":
             # if we compute muon id error, the muon iso SF should not be inside the combineScaleFactors (above, for electron id error, it can be inside because it won't be use together with the error
-            llIdIso_sf = "((({0}.isEl) ? 1 : muon_sf_iso_tight_id_hww[{1}][0]) * (({3}.isEl) ? 1 : muon_sf_iso_tight_id_hww[{4}][0]) * (common::combineScaleFactors<2>({{{{{{({0}.isEl) ? electron_sf_id_tight[{1}][0] :muon_sf_id_hww[{1}][0], ({0}.isEl) ? 0. :muon_sf_id_hww[{1}]{2}}}, {{ ({3}.isEl) ? electron_sf_id_tight[{4}][0] :muon_sf_id_hww[{4}][0], ({3}.isEl) ? 0. :muon_sf_id_hww[{4}]{2} }}}}}}, common::Variation::{5}) ))".format(self.lep1_str, self.lep1_fwkIdx, llIdIso_sfIdx, self.lep2_str, self.lep2_fwkIdx, llIdIso_strCommon)
+            llIdIso_sf = "((({0}.isEl) ? 1 : muon_sf_iso_tight_hww[{1}][0]) * (({3}.isEl) ? 1 : muon_sf_iso_tight_hww[{4}][0]) * (common::combineScaleFactors<2>({{{{{{({0}.isEl) ? electron_sf_hww_wp[{1}][0] :muon_sf_id_tight_hww[{1}][0], ({0}.isEl) ? 0. :muon_sf_id_tight_hww[{1}]{2}}}, {{ ({3}.isEl) ? electron_sf_hww_wp[{4}][0] :muon_sf_id_tight_hww[{4}][0], ({3}.isEl) ? 0. :muon_sf_id_tight_hww[{4}]{2} }}}}}}, common::Variation::{5}) ))".format(self.lep1_str, self.lep1_fwkIdx, llIdIso_sfIdx, self.lep2_str, self.lep2_fwkIdx, llIdIso_strCommon)
         if systematic == "muisoup":
             llIdIso_sfIdx = "[2]" 
             llIdIso_strCommon="UP"
@@ -125,7 +125,7 @@ class BasePlotter:
             llIdIso_sfIdx = "[1]"
             llIdIso_strCommon="DOWN"
         if systematic == "muisoup" or systematic == "muisodown":
-            llIdIso_sf = "((({0}.isEl) ? 1 : muon_sf_id_hww[{1}][0]) * (({3}.isEl) ? 1 : muon_sf_id_hww[{4}][0]) * (common::combineScaleFactors<2>({{{{{{({0}.isEl) ? electron_sf_id_tight[{1}][0] :muon_sf_iso_tight_id_hww[{1}][0], ({0}.isEl) ? 0. :muon_sf_iso_tight_id_hww[{1}]{2}}}, {{ ({3}.isEl) ? electron_sf_id_tight[{4}][0] :muon_sf_iso_tight_id_hww[{4}][0], ({3}.isEl) ? 0. :muon_sf_iso_tight_id_hww[{4}]{2} }}}}}}, common::Variation::{5}) ))".format(self.lep1_str, self.lep1_fwkIdx, llIdIso_sfIdx, self.lep2_str, self.lep2_fwkIdx, llIdIso_strCommon)
+            llIdIso_sf = "((({0}.isEl) ? 1 : muon_sf_id_tight_hww[{1}][0]) * (({3}.isEl) ? 1 : muon_sf_id_tight_hww[{4}][0]) * (common::combineScaleFactors<2>({{{{{{({0}.isEl) ? electron_sf_hww_wp[{1}][0] :muon_sf_iso_tight_hww[{1}][0], ({0}.isEl) ? 0. :muon_sf_iso_tight_hww[{1}]{2}}}, {{ ({3}.isEl) ? electron_sf_hww_wp[{4}][0] :muon_sf_iso_tight_hww[{4}][0], ({3}.isEl) ? 0. :muon_sf_iso_tight_hww[{4}]{2} }}}}}}, common::Variation::{5}) ))".format(self.lep1_str, self.lep1_fwkIdx, llIdIso_sfIdx, self.lep2_str, self.lep2_fwkIdx, llIdIso_strCommon)
 
         # BTAG SF
         jjBtag_sfIdx = "[0]"
@@ -138,9 +138,13 @@ class BasePlotter:
             jjBtag_strCommon="DOWN"
         # propagate jecup etc to the framework objects
         sys_fwk = ""
+
         if "jec" in systematic or "jer" in systematic:
             sys_fwk = "_" + systematic
-        jjBtag_sf = "(common::combineScaleFactors<2>({{{{{{ jet{0}_sf_csvv2_{1}[{2}][0] , jet{0}_sf_csvv2_{1}[{2}]{3} }}, {{ jet{0}_sf_csvv2_{1}[{4}][0] , jet{0}_sf_csvv2_{1}[{4}]{3} }}}}}}, {{{{1, 0}}, {{0, 1}}}}, common::Variation::{5}) )".format(sys_fwk, self.btagWP_str, self.jet1_fwkIdx, jjBtag_sfIdx, self.jet2_fwkIdx, jjBtag_strCommon)
+
+        jjBtag_heavyjet_sf = "(common::combineScaleFactors<2>({{{{{{ jet{0}_sf_csvv2_heavyjet_{1}[{2}][0] , jet{0}_sf_csvv2_heavyjet_{1}[{2}]{3} }}, {{ jet{0}_sf_csvv2_heavyjet_{1}[{4}][0] , jet{0}_sf_csvv2_heavyjet_{1}[{4}]{3} }}}}}}, common::Variation::{5}) )".format(sys_fwk, self.btagWP_str, self.jet1_fwkIdx, jjBtag_sfIdx, self.jet2_fwkIdx, jjBtag_strCommon)
+
+        jjBtag_lightjet_sf = "(common::combineScaleFactors<2>({{{{{{ jet{0}_sf_csvv2_lightjet_{1}[{2}][0] , jet{0}_sf_csvv2_lightjet_{1}[{2}]{3} }}, {{ jet{0}_sf_csvv2_lightjet_{1}[{4}][0] , jet{0}_sf_csvv2_lightjet_{1}[{4}]{3} }}}}}}, common::Variation::{5}) )".format(sys_fwk, self.btagWP_str, self.jet1_fwkIdx, jjBtag_sfIdx, self.jet2_fwkIdx, jjBtag_strCommon)
 
         # PU WEIGHT
         puWeight = "event_pu_weight"
@@ -174,7 +178,7 @@ class BasePlotter:
         if not systematic == "nominal" and not "scale" in systematic:
             self.systematicString = "__" + systematic
 
-        available_weights = {'trigeff' : trigEff, 'jjbtag' : jjBtag_sf, 'llidiso' : llIdIso_sf, 'pu' : puWeight}
+        available_weights = {'trigeff' : trigEff, 'jjbtag_heavy' : jjBtag_heavyjet_sf, 'jjbtag_light': jjBtag_lightjet_sf, 'llidiso' : llIdIso_sf, 'pu' : puWeight}
 
         #########
         # PLOTS #
@@ -274,7 +278,10 @@ class BasePlotter:
 
             # Weight Plots
             self.jjbtagWeight_plot.append(
-                        {'name': 'jjbtag_%s_%s_%s%s'%(self.llFlav, self.suffix, self.extraString,  self.systematicString), 'variable': available_weights["jjbtag"],
+                        {'name': 'jjbtag_heavy_%s_%s_%s%s'%(self.llFlav, self.suffix, self.extraString,  self.systematicString), 'variable': available_weights["jjbtag_heavy"],
+                        'plot_cut': self.totalCut, 'binning':'(100, 0, 1.5)', 'weight': 'event_weight'})
+            self.jjbtagWeight_plot.append(
+                        {'name': 'jjbtag_light_%s_%s_%s%s'%(self.llFlav, self.suffix, self.extraString,  self.systematicString), 'variable': available_weights["jjbtag_light"],
                         'plot_cut': self.totalCut, 'binning':'(100, 0, 1.5)', 'weight': 'event_weight'})
             self.llidisoWeight_plot.append(
                         {'name': 'llidiso_%s_%s_%s%s'%(self.llFlav, self.suffix, self.extraString,  self.systematicString), 'variable': available_weights["llidiso"],
@@ -446,6 +453,12 @@ class BasePlotter:
                 {
                         'name': 'llmetjj_MTformula_%s_%s_%s%s'%(self.llFlav, self.suffix, self.extraString, self.systematicString),
                         'variable': self.baseObject+".MT_formula", # std::sqrt(2 * ll[ill].p4.Pt() * met[imet].p4.Pt() * (1-std::cos(dphi)));
+                        'plot_cut': self.totalCut,
+                        'binning': '(50, 0, 500)'
+                },
+                {
+                        'name': 'llmetjj_MT2_%s_%s_%s%s'%(self.llFlav, self.suffix, self.extraString, self.systematicString),
+                        'variable': self.baseObject+".MT2",
                         'plot_cut': self.totalCut,
                         'binning': '(50, 0, 500)'
                 },
@@ -898,7 +911,7 @@ class BasePlotter:
                 },
                 {
                     'name': 'total_weight_%s_%s_%s%s'%(self.llFlav, self.suffix, self.extraString, self.systematicString),
-                    'variable': "event_weight * (%s) * (%s) * (%s) * (%s)"%(available_weights["jjbtag"], available_weights["llidiso"], available_weights["pu"], available_weights["trigeff"]),
+                    'variable': "event_weight * (%s) * (%s) * (%s) * (%s) * (%s)"%(available_weights["jjbtag_heavy"], available_weights["jjbtag_light"], available_weights["llidiso"], available_weights["pu"], available_weights["trigeff"]),
                     'plot_cut': self.totalCut,
                     'binning': '(5, -2, 2)'
                 },
