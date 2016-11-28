@@ -1,0 +1,21 @@
+# NLO
+- file: 'DYJetsToLL_M-*_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_*_histos.root'
+  type: mc
+  stack-index: 1
+  group: no_btag
+
+- file: 'DYJetsToLL_M-*_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_*_histos.root'
+  type: mc
+  stack-index: 3
+  group: with_btag
+  rename:
+    - from: "nobtag"
+      to: "btagM"
+
+- file: 'DYJetsToLL_M-*_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_*_histos.root'
+  type: mc
+  stack-index: 4
+  group: no_btag_with_eff
+  rename:
+    - from: "mll_cut"
+      to: "mll_cut_with_btag_eff"

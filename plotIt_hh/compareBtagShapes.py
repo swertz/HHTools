@@ -45,7 +45,7 @@ with open('centralConfig.yml.tpl') as tpl_handle:
 # Dictionary containing all the plots
 plots = {}
 
-logY = 'both'
+logY = False
 if args.yields:
     logY = False
 defaultStyle = {
@@ -98,10 +98,19 @@ for key in keys:
 
         # if "BDT" not in key.GetName(): continue
 
-        if "All" not in key.GetName():
+        if not 'All' in key.GetName():
             continue
 
-        if 'with_btag' in key.GetName() or 'high_mll' in key.GetName():
+        if not 'nobtag' in key.GetName():
+            continue
+
+        if not 'mll_cut' in key.GetName():
+            continue
+
+        # if 'inverted_mll_cut' in key.GetName():
+            # continue
+
+        if 'with_btag_eff' in key.GetName():
             continue
 
         ## Update all the plots with title, ...
@@ -109,6 +118,11 @@ for key in keys:
         alreadyIn.append(key.GetName())
         plot = {
                 'x-axis': key.GetName(),
+                'normalized': True,
+                'rename': [
+                    {'from': '(.*)(_log.)?\.(.*)', 'to': '\\1_DY_btag_comparison\\2.\\3'},
+                    {'from': '_nobtag', 'to': ''}
+                    ]
                 }
         plot['labels'] = []
 
@@ -125,10 +139,10 @@ for key in keys:
             plot['x-axis'] = "Sub-leading jet p_{T} (GeV)"
             plot.update(defaultStyle_events_per_gev)
         elif "lep1_eta" in key.GetName():
-            plot['x-axis'] = "Leading jet #eta"
+            plot['x-axis'] = "Leading lepton #eta"
             plot.update(defaultStyle_events)
         elif "lep2_eta" in key.GetName():
-            plot['x-axis'] = "Sub-leading jet #eta"
+            plot['x-axis'] = "Sub-leading lepton #eta"
             plot.update(defaultStyle_events)
         elif "jet1_eta" in key.GetName():
             plot['x-axis'] = "Leading jet #eta"

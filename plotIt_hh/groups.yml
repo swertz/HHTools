@@ -29,3 +29,87 @@
   legend: 'VV'
   legend-order: 3
     
+'low_mll':
+  legend: 'm_{ll} < 76'
+  line-width: 2.7
+  line-type: 1
+  fill-type: 0
+  line-color: '#00A0B0'
+  legend-style: l
+
+'high_mll':
+  legend: 'm_{ll} > 106'
+  line-width: 2.7
+  line-type: 1
+  fill-type: 0
+  legend-style: l
+
+'inverted_mll':
+  legend: 'm_{ll} #geq 76'
+  line-width: 2.7
+  line-type: 1
+  fill-type: 0
+  line-color: '#BF0A2B'
+  legend-style: l
+
+'inverted_mll_reweighted':
+  legend: 'm_{ll} #geq 76 reweighted'
+  line-width: 2.7
+  line-type: 1
+  fill-type: 0
+  line-color: '#4C1B1B'
+  legend-style: l
+
+'no_btag':
+  legend: 'No btag'
+  legend-order: 2
+  line-width: 2.7
+  line-type: 1
+  fill-type: 0
+  line-color: '#00A0B0'
+  legend-style: l
+
+'with_btag':
+  legend: '#geq 2 btag'
+  legend-order: 2
+  line-width: 2.7
+  line-type: 1
+  fill-type: 0
+  line-color: '#BF0A2B'
+  legend-style: l
+
+'no_btag_with_eff':
+  legend: 'No btag with b-tag eff'
+  legend-order: 1
+  line-width: 2.7
+  line-type: 1
+  fill-type: 0
+  line-color: '#4C1B1B'
+  legend-style: l
+
+'real_b':
+  legend: 'Z + bb / cc / bc'
+  legend-order: 2
+  line-width: 2.7
+  line-type: 1
+  fill-type: 0
+  line-color: '#00A0B0'
+  legend-style: l
+
+'bx':
+  legend: 'Z + bx / cx'
+  legend-order: 2
+  line-width: 2.7
+  line-type: 1
+  fill-type: 0
+  line-color: '#BF0A2B'
+  legend-style: l
+
+'light':
+  legend: 'Z + ll'
+  legend-order: 1
+  line-width: 2.7
+  line-type: 1
+  fill-type: 0
+  line-color: '#4C1B1B'
+  legend-style: l
