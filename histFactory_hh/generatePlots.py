@@ -43,6 +43,9 @@ sample_weights = {}
 
 headers.append("reweight_v1tov3.h")
 
+headers.append("dy_reweighting.h")
+headers.append("btag_efficiency.h")
+
 ## For v1->v3 reweighting
 #code_before_loop += """
 #getBenchmarkReweighter("/home/fynu/sbrochet/scratch/Framework/CMSSW_7_6_5/src/cp3_llbb/HHTools/scripts/", 0, 11, true, "cluster_NUM_v1_to_v3_weights.root", "NUM");
@@ -67,23 +70,28 @@ headers.append("reweight_v1tov3.h")
 
 ###########################"
 
+# Utility to retrieve b-tagging efficiency
+code_before_loop += """
+BTagEfficiency btagEff("/home/fynu/sbrochet/scratch/Framework/CMSSW_8_0_20_patch1/src/cp3_llbb/HHTools/scripts/btaggingEfficiencyOnCondor/condor/output/btagging_efficiency.root");
+"""
+
 # Plot configuration
 
 # lljj 
 weights_lljj = ['trigeff', 'llidiso', 'pu']
 # categories_lljj = ["All", "MuMu", "ElEl", "MuEl"] 
-categories_lljj = ["MuMu"] 
+categories_lljj = ["All"] 
 stage_lljj = "no_cut"
-plots_lljj = ["mll", "mjj", "basic", "csv", "bdtinput", "gen"]
+plots_lljj = ["mll", "mjj", "basic", "csv", "bdtinput"]
 
 # Weights
-plots_lljj += ["llidisoWeight", "trigeffWeight", "puWeight"]
+# plots_lljj += ["llidisoWeight", "trigeffWeight", "puWeight"]
 
 #llbb
 weights_llbb = ['trigeff', 'llidiso', 'pu', 'jjbtag_heavy', 'jjbtag_light']
-categories_llbb = ["MuMu"]
+categories_llbb = ["All"]
 stage_llbb = "no_cut"
-plots_llbb = plots_lljj + ["jjbtagWeight"]
+plots_llbb = plots_lljj # + ["jjbtagWeight"]
 #plots_llbb = ["bdtinput", "mjj"]
 
 systematics = {"modifObjects" : ["nominal"]}
@@ -130,19 +138,22 @@ for systematicType in systematics.keys():
         basePlotter_lljj = BasePlotter(baseObjectName = "hh_llmetjj_HWWleptons_nobtag_csv", btagWP_str = 'nobtag', objects = objects)
         
         plots.extend(basePlotter_lljj.generatePlots(categories_lljj, stage_lljj, systematic = systematic, weights = weights_lljj, requested_plots = plots_lljj))
-        # plots.extend(basePlotter_lljj.generatePlots(["All", "MuMu", "ElEl", "MuEl"], stage_lljj, systematic = systematic, weights = weights_lljj, requested_plots = ["mll"]))
-        
+        plots.extend(basePlotter_lljj.generatePlots(categories_lljj, "mll_cut", systematic = systematic, weights = weights_lljj, requested_plots = plots_lljj))
+        plots.extend(basePlotter_lljj.generatePlots(categories_lljj, "inverted_mll_cut", systematic = systematic, weights = weights_lljj, requested_plots = plots_lljj))
+
+        # mll < 76 + b-tagging effiency applied
+        plots.extend(basePlotter_lljj.generatePlots(categories_lljj, "mll_cut", systematic = systematic, weights = weights_lljj + ['nobtag_to_btagM'], requested_plots = plots_lljj + ['twoBEff'], extraString='_with_btag_eff'))
+        # mll > 76 + btagging efficiency applied
+        plots.extend(basePlotter_lljj.generatePlots(categories_lljj, "inverted_mll_cut", systematic = systematic, weights = weights_lljj + ['nobtag_to_btagM'], requested_plots = plots_lljj + ['twoBEff'], extraString='_with_btag_eff'))
         
         ## llbb 
         basePlotter_llbb = BasePlotter(baseObjectName = "hh_llmetjj_HWWleptons_btagM_csv", btagWP_str = 'medium', objects = objects)
        
-        ## No mll cut
         plots.extend(basePlotter_llbb.generatePlots(categories_llbb, stage_llbb, systematic = systematic, weights = weights_llbb, requested_plots = plots_llbb))
-        # plots.extend(basePlotter_llbb.generatePlots(["All", "MuMu", "ElEl", "MuEl"], stage_llbb, systematic = systematic, weights = weights_llbb, requested_plots = ["mll"]))
-        
-        ## With mll cut
         plots.extend(basePlotter_llbb.generatePlots(categories_llbb, "mll_cut", systematic = systematic, weights = weights_llbb, requested_plots = plots_llbb))
-        # plots.extend(basePlotter_llbb.generatePlots(categories_llbb, "mll_cut", systematic = systematic, weights = weights_llbb, requested_plots = ["bdtoutput", "mjj", "mjj_vs_bdt"], fit2DtemplatesBinning = chosen2Dbinnings))
+        plots.extend(basePlotter_llbb.generatePlots(categories_llbb, "inverted_mll_cut", systematic = systematic, weights = weights_llbb, requested_plots = plots_llbb))
+
+        # plots.extend(basePlotter_llbb.generatePlots(categories_llbb, "mll_cut", systematic = systematic, weights = weights_llbb + ['nobtag_to_btagM'], requested_plots = plots_llbb + ['twoBEff'], extraString='_with_btag_eff'))
 
         # if systematic == 'nominal':
             # plots.extend(basePlotter_llbb.generatePlots(categories_llbb, "mll_cut", systematic = systematic, weights = weights_llbb, requested_plots = ["llidisoWeight", ], fit2DtemplatesBinning = chosen2Dbinnings))
