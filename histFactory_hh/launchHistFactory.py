@@ -283,6 +283,7 @@ mySub = condorSubmitter(samples, "%s/build/" % args.output + executable, "DUMMY"
 mySub.setupCondorDirs()
 
 splitTT = False
+splitDY = False
 
 ## Modify the input samples to add sample cuts and stuff
 if args.filter: 
@@ -324,6 +325,41 @@ if args.filter:
             mySub.sampleCfg.append(tt_fh_sample)
 
             mySub.sampleCfg.remove(sample)
+
+        if splitDY and 'DYJetsToLL_' in sample["db_name"]:
+
+            # Z + jj' ; j = b/c, j' = b/c
+            dy_bb_sample = copy.deepcopy(sample)
+            newJson = copy.deepcopy(sample["json_skeleton"][sample["db_name"]])
+
+            dy_bb_sample["db_name"] = sample["db_name"].replace("DYJetsToLL", "DYBBOrCCOrBCToLL")
+            newJson["sample_cut"] = "(hh_llmetjj_HWWleptons_nobtag_csv.gen_bb || hh_llmetjj_HWWleptons_nobtag_csv.gen_cc || hh_llmetjj_HWWleptons_nobtag_csv.gen_bc)"
+
+            dy_bb_sample["json_skeleton"][dy_bb_sample["db_name"]] = newJson
+            dy_bb_sample["json_skeleton"].pop(sample["db_name"])
+            mySub.sampleCfg.append(dy_bb_sample)
+
+            # Z + jj' ; j = b/c, j' = l
+            dy_bx_sample = copy.deepcopy(sample)
+            newJson = copy.deepcopy(sample["json_skeleton"][sample["db_name"]])
+
+            dy_bx_sample["db_name"] = sample["db_name"].replace("DYJetsToLL", "DYBXOrCXToLL")
+            newJson["sample_cut"] = "(hh_llmetjj_HWWleptons_nobtag_csv.gen_bl || hh_llmetjj_HWWleptons_nobtag_csv.gen_cl)"
+
+            dy_bx_sample["json_skeleton"][dy_bx_sample["db_name"]] = newJson
+            dy_bx_sample["json_skeleton"].pop(sample["db_name"])
+            mySub.sampleCfg.append(dy_bx_sample)
+
+            # Z + jj' ; j = l, j' = l
+            dy_xx_sample = copy.deepcopy(sample)
+            newJson = copy.deepcopy(sample["json_skeleton"][sample["db_name"]])
+
+            dy_xx_sample["db_name"] = sample["db_name"].replace("DYJetsToLL", "DYXXToLL")
+            newJson["sample_cut"] = "(hh_llmetjj_HWWleptons_nobtag_csv.gen_ll)"
+
+            dy_xx_sample["json_skeleton"][dy_xx_sample["db_name"]] = newJson
+            dy_xx_sample["json_skeleton"].pop(sample["db_name"])
+            mySub.sampleCfg.append(dy_xx_sample)
 
         # Merging with HT binned sample: add cut on inclusive one
         if 'DYJetsToLL_M-5to50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8' in sample["db_name"] or 'DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8' in sample["db_name"]: 
