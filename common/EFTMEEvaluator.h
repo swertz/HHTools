@@ -17,10 +17,10 @@
 class EFTMEEvaluatorBase {
     public:
         virtual ~EFTMEEvaluatorBase() {}
-        virtual double operator()(const std::map<std::string, double>& params, int pid_1, int pid_2, std::pair< std::vector<double>, std::vector<double> >& initial, std::vector< std::pair<int, std::vector<double> > >& final) = 0;
-        virtual double operator()(int op_1, int op_2, int pid_1, int pid_2, std::pair< std::vector<double>, std::vector<double> >& initial, std::vector< std::pair<int, std::vector<double> > >& final, bool reweight_to_sm = false) = 0;
+        virtual double operator()(const std::map<std::string, double>& params, int pid_1, int pid_2, std::pair< std::vector<double>, std::vector<double> >& initial, std::vector< std::pair<int, std::vector<double> > >& final, double alpha_s=0) = 0;
+        virtual double operator()(int op_1, int op_2, int pid_1, int pid_2, std::pair< std::vector<double>, std::vector<double> >& initial, std::vector< std::pair<int, std::vector<double> > >& final, double alpha_s=0, bool reweight_to_sm = false) = 0;
         virtual void computeTerms(int pid_1, int pid_2, std::pair< std::vector<double>, std::vector<double> >& initial, std::vector< std::pair<int, std::vector<double> > >& final, std::vector<double>& weights, double alpha_s=0) = 0;
-        virtual void printWeights(int pid_1, int pid_2, std::pair< std::vector<double>, std::vector<double> >& initial, std::vector< std::pair<int, std::vector<double> > >& final) = 0;
+        virtual void printWeights(int pid_1, int pid_2, std::pair< std::vector<double>, std::vector<double> >& initial, std::vector< std::pair<int, std::vector<double> > >& final, double alpha_s=0) = 0;
 };
 
 template<typename Process>
@@ -52,9 +52,14 @@ class EFTMEEvaluator: public EFTMEEvaluatorBase {
          * - initial: 4-vectors of the initial state
          * - final: PDG IDs and 4-vectors of the final state
          */
-        double operator()(const std::map<std::string, double>& params, int pid_1, int pid_2, std::pair< std::vector<double>, std::vector<double> >& initial, std::vector< std::pair<int, std::vector<double> > >& final) override {
+        double operator()(const std::map<std::string, double>& params, int pid_1, int pid_2, std::pair< std::vector<double>, std::vector<double> >& initial, std::vector< std::pair<int, std::vector<double> > >& final, double alpha_s=0) override {
             
             auto selected_initial_state = std::make_pair(pid_1, pid_2);
+
+            // Set correct value of alpha_strong
+            if (alpha_s > 0) {
+                me_params->setParameter("aS", alpha_s);
+            }
 
             // Get parameters before the call and update with what is asked
             reset_params();
@@ -94,7 +99,7 @@ class EFTMEEvaluator: public EFTMEEvaluatorBase {
          *  - twice for operator squared terms
          *  - 5 times for crossed operator interferences
          */
-        double operator()(int op_1, int op_2, int pid_1, int pid_2, std::pair< std::vector<double>, std::vector<double> >& initial, std::vector< std::pair<int, std::vector<double> > >& final, bool reweight_to_sm = false) override {
+        double operator()(int op_1, int op_2, int pid_1, int pid_2, std::pair< std::vector<double>, std::vector<double> >& initial, std::vector< std::pair<int, std::vector<double> > >& final, double alpha_s=0, bool reweight_to_sm=false) override {
             
             if (op_1 >= (int) op_params.size() || op_2 >= (int) op_params.size()) {
                 std::cout << "Warning: invalid operator IDs " << op_1 << ", " << op_2 << std::endl;
@@ -102,6 +107,11 @@ class EFTMEEvaluator: public EFTMEEvaluatorBase {
             }
 
             auto selected_initial_state = std::make_pair(pid_1, pid_2);
+
+            // Set correct value of alpha_strong
+            if (alpha_s > 0) {
+                me_params->setParameter("aS", alpha_s);
+            }
 
             reset_params();
             double sm_result = me_p1->compute(initial, final)[selected_initial_state];
@@ -186,7 +196,7 @@ class EFTMEEvaluator: public EFTMEEvaluatorBase {
          *                                        .    .    .    ...  2n+2
          * The matrix element is called in total 1 + n(3+n)/2 times
          */
-        void computeTerms(int pid_1, int pid_2, std::pair< std::vector<double>, std::vector<double> >& initial, std::vector< std::pair<int, std::vector<double> > >& final, std::vector<double> & weights, double alpha_s) override {
+        void computeTerms(int pid_1, int pid_2, std::pair< std::vector<double>, std::vector<double> >& initial, std::vector< std::pair<int, std::vector<double> > >& final, std::vector<double> & weights, double alpha_s=0) override {
             std::size_t n = op_params.size();
 
             if (weights.size() != 1 + n * (3 + n) / 2) {
@@ -196,7 +206,7 @@ class EFTMEEvaluator: public EFTMEEvaluatorBase {
             
             // Set correct value of alpha_strong
             if (alpha_s > 0) {
-                me_params->setParameter("as", alpha_s);
+                me_params->setParameter("aS", alpha_s);
             }
 
             auto selected_initial_state = std::make_pair(pid_1, pid_2);
@@ -266,8 +276,13 @@ class EFTMEEvaluator: public EFTMEEvaluatorBase {
          * - initial: 4-vectors of the initial state
          * - final: PDG IDs and 4-vectors of the final state
          */
-        void printWeights(int pid_1, int pid_2, std::pair< std::vector<double>, std::vector<double> >& initial, std::vector< std::pair<int, std::vector<double> > >& final) override {
+        void printWeights(int pid_1, int pid_2, std::pair< std::vector<double>, std::vector<double> >& initial, std::vector< std::pair<int, std::vector<double> > >& final, double alpha_s=0) override {
             auto selected_initial_state = std::make_pair(pid_1, pid_2);
+
+            // Set correct value of alpha_strong
+            if (alpha_s > 0) {
+                me_params->setParameter("aS", alpha_s);
+            }
 
             double sm_result = operator()(-1, -1, pid_1, pid_2, initial, final);
             

@@ -87,7 +87,7 @@ ParametersWrapper::ParametersWrapper(const std::string& param_card) {
     m_card_parameters["mdl_c6"] = params_r_.MDL_C6;
     m_card_parameters["mdl_ch"] = params_r_.MDL_CH;
     m_card_parameters["mdl_lambda"] = params_r_.MDL_LAMBDA;
-    m_card_parameters["as"] = params_r_.AS;
+    m_card_parameters["aS"] = params_r_.AS;
 }
 
 void ParametersWrapper::cacheParameters() {
@@ -98,7 +98,7 @@ void ParametersWrapper::cacheParameters() {
     params_r_.MDL_C6 = m_card_parameters["mdl_c6"];
     params_r_.MDL_CH = m_card_parameters["mdl_ch"];
     params_r_.MDL_LAMBDA = m_card_parameters["mdl_lambda"];
-    params_r_.AS = m_card_parameters["as"];
+    params_r_.AS = m_card_parameters["aS"];
 }
 
 void ParametersWrapper::cacheCouplings() {
