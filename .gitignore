@@ -6,3 +6,4 @@
 *.pyc
 [0-9][0-9]*
 plots_all*/
+condor/

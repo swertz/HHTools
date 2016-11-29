@@ -102,10 +102,10 @@ headers.append("readMVA.h")
 #rwgt_base = [ "SM", "box" ] + range(2, 13)
 #for base, base_name in enumerate(rwgt_base):
 #    for i, op1 in enumerate(operators_MV):
-#        sample_weights["base_" + base_name + "_SM_" + op1] = "getHHEFTReweighter().getMVTermME(hh_gen_H1, hh_gen_H2, -1, {})/getHHEFTReweighter().getBenchmarkME(hh_gen_H1, hh_gen_H2, {})".format(i, base)
+#        sample_weights["base_" + base_name + "_SM_" + op1] = "getHHEFTReweighter().getMVTermME(hh_gen_H1, hh_gen_H2, -1, {}, event_alpha_QCD)/getHHEFTReweighter().getBenchmarkME(hh_gen_H1, hh_gen_H2, {}, event_alpha_QCD)".format(i, base)
 #        for j, op2 in enumerate(operators_MV):
 #            if i < j: continue
-#            sample_weights["base_" + base_name + "_" + op1 + "_" + op2] = "getHHEFTReweighter().getMVTermME(hh_gen_H1, hh_gen_H2, {}, {})/getHHEFTReweighter().getBenchmarkME(hh_gen_H1, hh_gen_H2, {})".format(i, j, base)
+#            sample_weights["base_" + base_name + "_" + op1 + "_" + op2] = "getHHEFTReweighter().getMVTermME(hh_gen_H1, hh_gen_H2, {}, {}, event_alpha_QCD)/getHHEFTReweighter().getBenchmarkME(hh_gen_H1, hh_gen_H2, {}, event_alpha_QCD)".format(i, j, base)
 
 ###########################"
 

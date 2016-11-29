@@ -166,7 +166,7 @@ class HHEFTReweighter {
         ////////////////////  CLUSTERING MODEL ////////////////////////////
         ///////////////////////////////////////////////////////////////////
 
-        double getBenchmarkME(const LorentzVector& h1, const LorentzVector& h2, const int bm) {
+        double getBenchmarkME(const LorentzVector& h1, const LorentzVector& h2, const int bm, double alpha_s=0) {
             // enforce the on-shell mass
             auto shell_h1 = put_on_shell(h1, 125);
             auto shell_h2 = put_on_shell(h2, 125);
@@ -174,10 +174,10 @@ class HHEFTReweighter {
             std::pair< std::vector<double>, std::vector<double> > initials = getInitialsFromHiggses(shell_h1, shell_h2);
             std::vector< std::pair<int, std::vector<double>> > finals = { { 25, LORENTZ_TO_ARRAY(shell_h1) }, { 25, LORENTZ_TO_ARRAY(shell_h2) } };
 
-            return (*m_evaluator_AC)(benchmark_couplings.at(bm), 21, 21, initials, finals);
+            return (*m_evaluator_AC)(benchmark_couplings.at(bm), 21, 21, initials, finals, alpha_s);
         }
 
-        double getACParamsME(const LorentzVector& h1, const LorentzVector& h2, const std::map<std::string, double>& params) {
+        double getACParamsME(const LorentzVector& h1, const LorentzVector& h2, const std::map<std::string, double>& params, double alpha_s=0) {
             // enforce the on-shell mass
             auto shell_h1 = put_on_shell(h1, 125);
             auto shell_h2 = put_on_shell(h2, 125);
@@ -185,7 +185,7 @@ class HHEFTReweighter {
             std::pair< std::vector<double>, std::vector<double> > initials = getInitialsFromHiggses(shell_h1, shell_h2);
             std::vector< std::pair<int, std::vector<double>> > finals = { { 25, LORENTZ_TO_ARRAY(shell_h1) }, { 25, LORENTZ_TO_ARRAY(shell_h2) } };
 
-            return (*m_evaluator_AC)(params, 21, 21, initials, finals);
+            return (*m_evaluator_AC)(params, 21, 21, initials, finals, alpha_s);
         }
 
         double computeXS5(int benchmark) {
@@ -220,7 +220,7 @@ class HHEFTReweighter {
         ////////////////  MALTONI ET AL. MODEL ////////////////////////////
         ///////////////////////////////////////////////////////////////////
 
-        double getMVParamsME(const LorentzVector& h1, const LorentzVector& h2, const std::map<std::string, double>& params) {
+        double getMVParamsME(const LorentzVector& h1, const LorentzVector& h2, const std::map<std::string, double>& params, double alpha_s=0) {
             // MadLoop complains if Higgses are not precisely on shell
             auto shell_h1 = put_on_shell(h1, 125);
             auto shell_h2 = put_on_shell(h2, 125);
@@ -228,17 +228,17 @@ class HHEFTReweighter {
             std::pair< std::vector<double>, std::vector<double> > initials = getInitialsFromHiggses(shell_h1, shell_h2);
             std::vector< std::pair<int, std::vector<double>> > finals = { { 25, LORENTZ_TO_ARRAY(shell_h1) }, { 25, LORENTZ_TO_ARRAY(shell_h2) } };
 
-            return (*m_evaluator_MV_noTree)(params, 21, 21, initials, finals);
+            return (*m_evaluator_MV_noTree)(params, 21, 21, initials, finals, alpha_s);
         }
 
-        double getMVTermME(const LorentzVector& h1, const LorentzVector& h2, int op_1, int op_2) {
+        double getMVTermME(const LorentzVector& h1, const LorentzVector& h2, int op_1, int op_2, double alpha_s=0) {
             auto shell_h1 = put_on_shell(h1, 125);
             auto shell_h2 = put_on_shell(h2, 125);
 
             std::pair< std::vector<double>, std::vector<double> > initials = getInitialsFromHiggses(shell_h1, shell_h2);
             std::vector< std::pair<int, std::vector<double>> > finals = { { 25, LORENTZ_TO_ARRAY(shell_h1) }, { 25, LORENTZ_TO_ARRAY(shell_h2) } };
 
-            return (*m_evaluator_MV_noTree)(op_1, op_2, 21, 21, initials, finals);
+            return (*m_evaluator_MV_noTree)(op_1, op_2, 21, 21, initials, finals, alpha_s);
         }
         
         // All terms not involving OphiG
