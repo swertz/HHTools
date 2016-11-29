@@ -176,9 +176,8 @@ class BasePlotter:
             trigEff = "({0}.trigger_efficiency_upVariated)".format(self.baseObject)
         if systematic == "trigeffdown":
             trigEff = "({0}.trigger_efficiency_downVariated)".format(self.baseObject)
-        # Include dZ filter efficiency for ee and mumu
+        # Include dZ filter efficiency for ee (not for mumu since we no longer use the DZ version of the trigger)
         trigEff += "*(({0}.isElEl && runOnMC) ? 0.995 : 1)".format(self.baseObject)
-        trigEff += "*(({0}.isMuMu && runOnMC) ? 0.95 : 1)".format(self.baseObject)
 
         # Append the proper extension to the name plot if needed (scale name are down at the end of the code)
         self.systematicString = ""
