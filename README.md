@@ -5,7 +5,7 @@ Toolbox for resonant HH analysis
 This repository consists of scripts interfacing the CommonTools and PlotIt facilities. It does not require any compilation, just run the following before launching anything :
 ```
 cms_env
-cmenv
+cmsenv
 ```
 with, in the .bashrc,
 
