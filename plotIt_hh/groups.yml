@@ -62,7 +62,7 @@
 
 'no_btag':
   legend: 'No btag'
-  legend-order: 2
+  legend-order: 4
   line-width: 2.7
   line-type: 1
   fill-type: 0
@@ -71,7 +71,7 @@
 
 'with_btag':
   legend: '#geq 2 btag'
-  legend-order: 2
+  legend-order: 3
   line-width: 2.7
   line-type: 1
   fill-type: 0
@@ -80,11 +80,21 @@
 
 'no_btag_with_eff':
   legend: 'No btag with b-tag eff'
+  legend-order: 2
+  line-width: 2.7
+  line-type: 1
+  fill-type: 0
+  #line-color: '#4C1B1B'
+  line-color: '#BF0A2B'
+  legend-style: l
+
+'no_btag_with_reweighting':
+  legend: 'No btag with reweighting'
   legend-order: 1
   line-width: 2.7
   line-type: 1
   fill-type: 0
-  line-color: '#4C1B1B'
+  line-color: '#7D8A2E'
   legend-style: l
 
 'real_b':

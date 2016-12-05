@@ -14,6 +14,8 @@ parser.add_argument('input', type=str, metavar='FILE', help='Input ROOT file con
 
 options = parser.parse_args()
 
+ROOT.TH1.SetDefaultSumw2(True)
+
 f = ROOT.TFile.Open(options.input, "update")
 
 h_njets_b = f.Get("njets_b")

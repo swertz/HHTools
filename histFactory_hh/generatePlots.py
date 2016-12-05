@@ -7,7 +7,6 @@ sys.path.append(scriptDir)
 from basePlotter import *
 from HHAnalysis import HH
 
-
 def getBinningStrWithMax(nBins, start, end, max):
     """Return string defining a binning in histFactory, with 'nBins' bins between
     'start' and 'end', but with the upper edge replaced by 'max'."""
@@ -39,6 +38,7 @@ include_directories.append(os.path.join(scriptDir, "..", "common"))
 
 headers.append("dy_reweighting.h")
 headers.append("btag_efficiency.h")
+headers.append("flavor_weighted_btag_efficiency.h")
 
 # Needed to evaluate MVA outputs
 headers.append("readMVA.h")
@@ -107,11 +107,21 @@ headers.append("readMVA.h")
 #            if i < j: continue
 #            sample_weights["base_" + base_name + "_" + op1 + "_" + op2] = "getHHEFTReweighter().getMVTermME(hh_gen_H1, hh_gen_H2, {}, {}, event_alpha_QCD)/getHHEFTReweighter().getBenchmarkME(hh_gen_H1, hh_gen_H2, {}, event_alpha_QCD)".format(i, j, base)
 
+# Compute HT
+code_in_loop = r"""
+    double HT = 0;
+    for (size_t i = 0; i < hh_jets.size(); i++)
+        HT += hh_jets[i].p4.Pt();
+    for (size_t i = 0; i < hh_leptons.size(); i++)
+        HT += hh_leptons[i].p4.Pt();
+"""
+
 ###########################"
 
 # Utility to retrieve b-tagging efficiency
 code_before_loop += """
 BTagEfficiency btagEff("/home/fynu/sbrochet/scratch/Framework/CMSSW_8_0_20_patch1/src/cp3_llbb/HHTools/scripts/btaggingEfficiencyOnCondor/condor/output/btagging_efficiency.root");
+FWBTagEfficiency fwBtagEff("/home/fynu/sbrochet/scratch/Framework/CMSSW_8_0_20_patch1/src/cp3_llbb/HHTools/scripts/btaggingEfficiencyOnCondor/condor/output/btagging_efficiency.root", "/home/fynu/sbrochet/scratch/Framework/CMSSW_8_0_20_patch1/src/cp3_llbb/HHTools/scripts/dyFlavorFractionsOnCondor/condor/output/dy_flavor_fraction.root");
 """
 
 # Plot configuration
@@ -121,7 +131,7 @@ weights_lljj = ['trigeff', 'llidiso', 'pu']
 # categories_lljj = ["All", "MuMu", "ElEl", "MuEl"] 
 categories_lljj = ["All"] 
 stage_lljj = "no_cut"
-plots_lljj = ["mll", "mjj", "basic", "csv", "bdtinput"]
+plots_lljj = ["mll", "mjj", "basic", "csv", "bdtinput", "evt"]
 
 # Weights
 # plots_lljj += ["llidisoWeight", "trigeffWeight", "puWeight"]
@@ -154,16 +164,21 @@ for systematicType in systematics.keys():
             objects = "nominal" #ensure that we use normal hh_objects for systematics not modifying obect such as scale factors 
 
         ## lljj 
-        #basePlotter_lljj = BasePlotter(baseObjectName = "hh_llmetjj_HWWleptons_nobtag_csv", btagWP_str = 'nobtag', objects = objects)
+        basePlotter_lljj = BasePlotter(baseObjectName = "hh_llmetjj_HWWleptons_nobtag_csv", btagWP_str = 'nobtag', objects = objects)
         
         plots.extend(basePlotter_lljj.generatePlots(categories_lljj, stage_lljj, systematic = systematic, weights = weights_lljj, requested_plots = plots_lljj))
         plots.extend(basePlotter_lljj.generatePlots(categories_lljj, "mll_cut", systematic = systematic, weights = weights_lljj, requested_plots = plots_lljj))
         plots.extend(basePlotter_lljj.generatePlots(categories_lljj, "inverted_mll_cut", systematic = systematic, weights = weights_lljj, requested_plots = plots_lljj))
 
+        # mll < 76 + no btag -> btag% reweighting applied
+        plots.extend(basePlotter_lljj.generatePlots(categories_lljj, "mll_cut", systematic = systematic, weights = weights_lljj + ['nobtag_to_btagM'], requested_plots = plots_lljj + ['nobtagToBTagMWeight'], extraString='_with_nobtag_to_btagM_reweighting'))
+        # mll > 76 + no btag -> btag% reweighting applied
+        plots.extend(basePlotter_lljj.generatePlots(categories_lljj, "inverted_mll_cut", systematic = systematic, weights = weights_lljj + ['nobtag_to_btagM'], requested_plots = plots_lljj + ['nobtagToBTagMWeight'], extraString='_with_nobtag_to_btagM_reweighting'))
+
         # mll < 76 + b-tagging effiency applied
-        plots.extend(basePlotter_lljj.generatePlots(categories_lljj, "mll_cut", systematic = systematic, weights = weights_lljj + ['nobtag_to_btagM'], requested_plots = plots_lljj + ['twoBEff'], extraString='_with_btag_eff'))
+        plots.extend(basePlotter_lljj.generatePlots(categories_lljj, "mll_cut", systematic = systematic, weights = weights_lljj + ['twoB_eff'], requested_plots = plots_lljj, extraString='_with_btag_eff'))
         # mll > 76 + btagging efficiency applied
-        plots.extend(basePlotter_lljj.generatePlots(categories_lljj, "inverted_mll_cut", systematic = systematic, weights = weights_lljj + ['nobtag_to_btagM'], requested_plots = plots_lljj + ['twoBEff'], extraString='_with_btag_eff'))
+        plots.extend(basePlotter_lljj.generatePlots(categories_lljj, "inverted_mll_cut", systematic = systematic, weights = weights_lljj + ['twoB_eff'], requested_plots = plots_lljj, extraString='_with_btag_eff'))
         
         ## llbb 
         basePlotter_llbb = BasePlotter(baseObjectName = "hh_llmetjj_HWWleptons_btagM_csv", btagWP_str = 'medium', objects = objects)

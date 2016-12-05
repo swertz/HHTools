@@ -185,11 +185,14 @@ class BasePlotter:
             self.systematicString = "__" + systematic
 
         dy_high_to_low_mll_weight = "dyReweighter.getWeight(%s, %s)" % (self.lep1_str + ".p4", self.lep2_str + ".p4")
-        nobtag_to_btagM_weight = "btagEff.get(%s) * btagEff.get(%s)" % (self.jet1_str + ".p4", self.jet2_str + ".p4")
+        nobtag_to_btagM_weight = "fwBtagEff.get(%s, %s, hh_jets.size())" % (self.jet1_str + ".p4", self.jet2_str + ".p4")
+        twoB_eff_weight = "btagEff.get(%s, %s) * btagEff.get(%s, %s)" % (self.jet1_str + ".p4", "jet_hadronFlavor[%s.idx]" % self.jet1_str, self.jet2_str + ".p4", "jet_hadronFlavor[%s.idx]" % self.jet2_str)
 
         available_weights = {'trigeff' : trigEff, 'jjbtag_heavy' : jjBtag_heavyjet_sf, 'jjbtag_light': jjBtag_lightjet_sf, 'llidiso' : llIdIso_sf, 'pu' : puWeight,
                 'dy_high_to_low_mll': dy_high_to_low_mll_weight,
-                'nobtag_to_btagM': nobtag_to_btagM_weight}
+                'nobtag_to_btagM': nobtag_to_btagM_weight,
+                'twoB_eff': twoB_eff_weight
+                }
 
         #########
         # PLOTS #
@@ -313,9 +316,9 @@ class BasePlotter:
             self.dyWeight_plot = [
                         {'name': 'dy_reweighting_%s_%s_%s%s'%(self.llFlav, self.suffix, self.extraString,  self.systematicString), 'variable': available_weights["dy_high_to_low_mll"],
                         'plot_cut': self.totalCut, 'binning': '(100, 0, 4)', 'weight': 'event_weight'}]
-            self.twoBEff_plot = [
-                        {'name': 'two_b_efficiency_%s_%s_%s%s'%(self.llFlav, self.suffix, self.extraString,  self.systematicString), 'variable': available_weights["nobtag_to_btagM"],
-                        'plot_cut': self.totalCut, 'binning': '(100, 0, 4)', 'weight': 'event_weight'}]
+            self.nobtagToBTagMWeight_plot = [
+                        {'name': 'nobtag_to_btagM_weight_%s_%s_%s%s'%(self.llFlav, self.suffix, self.extraString,  self.systematicString), 'variable': available_weights["nobtag_to_btagM"],
+                        'plot_cut': self.totalCut, 'binning': '(50, 0, 0.05)', 'weight': 'event_weight'}]
 
             self.scaleWeight_plot.extend([
                         {'name': 'scale0_%s_%s_%s%s'%(self.llFlav, self.suffix, self.extraString,  self.systematicString), 'variable': "std::abs(event_scale_weights[0])",
@@ -355,19 +358,37 @@ class BasePlotter:
                         'name': 'jet1_pt_%s_%s_%s%s'%(self.llFlav, self.suffix, self.extraString, self.systematicString),
                         'variable': self.jet1_str+".p4.Pt()",
                         'plot_cut': self.totalCut,
-                        'binning': '(50, 20, 400)'
+                        'binning': '(55, 20, 405)'
+                },
+                {
+                        'name': 'jet1_pt_same_binning_as_flav_frac_%s_%s_%s%s'%(self.llFlav, self.suffix, self.extraString, self.systematicString),
+                        'variable': self.jet1_str+".p4.Pt()",
+                        'plot_cut': self.totalCut,
+                        'binning': '(10, {20, 27, 34, 41, 48, 55, 75, 100, 150, 200, 300})'
                 },
                 {
                         'name': 'jet2_pt_%s_%s_%s%s'%(self.llFlav, self.suffix, self.extraString, self.systematicString),
                         'variable': self.jet2_str+".p4.Pt()",
                         'plot_cut': self.totalCut,
-                        'binning': '(50, 20, 300)'
+                        'binning': '(28, 20, 216)'
+                },
+                {
+                        'name': 'jet2_pt_same_binning_as_flav_frac_%s_%s_%s%s'%(self.llFlav, self.suffix, self.extraString, self.systematicString),
+                        'variable': self.jet2_str+".p4.Pt()",
+                        'plot_cut': self.totalCut,
+                        'binning': '(9, {20, 27, 34, 41, 48, 55, 75, 100, 150, 200})'
                 },
                 {
                         'name': 'met_pt_%s_%s_%s%s'%(self.llFlav, self.suffix, self.extraString, self.systematicString),
                         'variable': "met_p4.Pt()",
                         'plot_cut': self.totalCut,
                         'binning': '(50, 0, 450)'
+                },
+                {
+                        'name': 'ht_%s_%s_%s%s'%(self.llFlav, self.suffix, self.extraString, self.systematicString),
+                        'variable': "HT",
+                        'plot_cut': self.totalCut,
+                        'binning': '(50, 0, 1200)'
                 }
             ])
             self.csv_plot.extend([
