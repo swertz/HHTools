@@ -4,6 +4,8 @@ import argparse
 import os
 import sys
 
+import numpy as np
+
 CMSSW_BASE = os.environ['CMSSW_BASE']
 SCRAM_ARCH = os.environ['SCRAM_ARCH']
 sys.path.append(os.path.join(CMSSW_BASE, 'bin', SCRAM_ARCH))
@@ -55,20 +57,28 @@ else:
 
 output = "btagging_efficiency.root"
 
-h_njets_b = ROOT.TH2F("njets_b", "njets_b", 100, 20, 300, 100, -3, 3)
-h_njets_b_btagged = ROOT.TH2F("njets_b_btagged", "njets_b_btagged", 100, 20, 300, 100, -3, 3)
+pt_binning = np.asarray([20, 30, 40, 50, 75, 100, 150, 200, 300, 400, 500, 4000], dtype='float')
+n_pt_bins = len(pt_binning) - 1
 
-h_njets_c = ROOT.TH2F("njets_c", "njets_c", 100, 20, 300, 100, -3, 3)
-h_njets_c_btagged = ROOT.TH2F("njets_c_btagged", "njets_c_btagged", 100, 20, 300, 100, -3, 3)
+eta_binning = np.linspace(0, 2.4, 11)
+n_eta_bins = len(eta_binning) - 1
 
-h_njets_light = ROOT.TH2F("njets_light", "njets_light", 100, 20, 300, 100, -3, 3)
-h_njets_light_mistagged = ROOT.TH2F("njets_light_mistagged", "njets_light_mistagged", 100, 20, 300, 100, -3, 3)
+btagging_eff_on_b = ROOT.TEfficiency("btagging_eff_on_b", "btagging_eff_on_b", n_pt_bins, pt_binning, n_eta_bins, eta_binning)
+# btagging_eff_on_b.SetStatisticOption(ROOT.TEfficiency.kMidP)
+
+btagging_eff_on_c = ROOT.TEfficiency("btagging_eff_on_c", "btagging_eff_on_c", n_pt_bins, pt_binning, n_eta_bins, eta_binning)
+# btagging_eff_on_c.SetStatisticOption(ROOT.TEfficiency.kMidP)
+
+mistagging_eff_on_light = ROOT.TEfficiency("mistagging_eff_on_light", "mistagging_eff_on_light", n_pt_bins, pt_binning, n_eta_bins, eta_binning)
+# mistagging_eff_on_light.SetStatisticOption(ROOT.TEfficiency.kMidP)
 
 btag_cut = 0.800
 
 chain = ROOT.TChain('t')
 for f in files:
     chain.Add(f)
+
+ROOT.TH1.SetDefaultSumw2(True)
 
 chain.SetBranchStatus("*", 0)
 
@@ -93,51 +103,32 @@ for i in range(0, entries):
 
     for j in range(0, njets):
         pt = chain.jet_p4[j].Pt()
-        eta = chain.jet_p4[j].Eta()
+        eta = abs(chain.jet_p4[j].Eta())
 
         if pt < 20:
+            continue
+
+        if eta > 2.4:
             continue
         
         flavor = ord(chain.jet_hadronFlavor[j])
 
-        if flavor == 5:
-            h_njets_b.Fill(pt, eta)
-            if chain.jet_pfCombinedInclusiveSecondaryVertexV2BJetTags[j] > btag_cut:
-                h_njets_b_btagged.Fill(pt, eta)
-        elif flavor == 4:
-            h_njets_c.Fill(pt, eta)
-            if chain.jet_pfCombinedInclusiveSecondaryVertexV2BJetTags[j] > btag_cut:
-                h_njets_c_btagged.Fill(pt, eta)
-        else:
-            h_njets_light.Fill(pt, eta)
-            if chain.jet_pfCombinedInclusiveSecondaryVertexV2BJetTags[j] > btag_cut:
-                h_njets_light_mistagged.Fill(pt, eta)
+        object = None
 
+        if flavor == 5:
+            object = btagging_eff_on_b
+        elif flavor == 4:
+            object = btagging_eff_on_c
+        else:
+            object = mistagging_eff_on_light
+
+        object.Fill(chain.jet_pfCombinedInclusiveSecondaryVertexV2BJetTags[j] > btag_cut, pt, eta)
 
 print("Done")
 output = ROOT.TFile.Open(output, "recreate")
 
-h_njets_b.Write()
-h_njets_b_btagged.Write()
-
-h_njets_c.Write()
-h_njets_c_btagged.Write()
-
-h_njets_light.Write()
-h_njets_light_mistagged.Write()
-
-if not options.json:
-    btagging_eff_on_b = h_njets_b_btagged.Clone("btagging_eff_on_b")
-    btagging_eff_on_b.Divide(h_njets_b)
-
-    btagging_eff_on_c = h_njets_c_btagged.Clone("btagging_eff_on_c")
-    btagging_eff_on_c.Divide(h_njets_c)
-
-    mistagging_eff_on_light = h_njets_light_mistagged.Clone("mistagging_eff_on_light")
-    mistagging_eff_on_light.Divide(h_njets_light)
-
-    btagging_eff_on_b.Write()
-    btagging_eff_on_c.Write()
-    mistagging_eff_on_light.Write()
+btagging_eff_on_b.Write()
+btagging_eff_on_c.Write()
+mistagging_eff_on_light.Write()
 
 output.Close()
