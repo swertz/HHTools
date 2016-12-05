@@ -113,6 +113,9 @@ for key in keys:
         if 'with_btag_eff' in key.GetName():
             continue
 
+        if 'with_nobtag_to_btagM' in key.GetName():
+            continue
+
         ## Update all the plots with title, ...
 
         alreadyIn.append(key.GetName())
