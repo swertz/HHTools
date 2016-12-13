@@ -285,6 +285,13 @@ for key in keys:
             plot.update(defaultStyle_events)
             if not args.unblinded and "blind" not in key.GetName():
                 plot['blinded-range'] = [0, 0.6]
+
+        elif "NN_" in key.GetName():
+            plot['x-axis'] = "NN output"
+            plot.update(defaultStyle_events)
+            if "mll_cut" in key.GetName():
+                if not args.unblinded and "blind" not in key.GetName():
+                    plot['blinded-range'] = [0.7, 1]
         
         elif "MVA_" in key.GetName() and "_vs_" in key.GetName():
             plot['x-axis'] = "BDT output, m_{jj} bins"

@@ -1,5 +1,42 @@
 import copy, sys
 
+def default_code_before_loop():
+    return r"""
+        // Stuff for DY reweighting
+        BTagEfficiency btagEff("/home/fynu/sbrochet/scratch/Framework/CMSSW_8_0_24_patch1_HH_Analysis/src/cp3_llbb/HHTools/scripts/btaggingEfficiencyOnCondor/condor/output/btagging_efficiency.root");
+
+        FWBTagEfficiency fwBtagEff("/home/fynu/sbrochet/scratch/Framework/CMSSW_8_0_24_patch1_HH_Analysis/src/cp3_llbb/HHTools/scripts/btaggingEfficiencyOnCondor/condor/output/btagging_efficiency.root", "/home/fynu/sbrochet/scratch/Framework/CMSSW_8_0_24_patch1_HH_Analysis/src/cp3_llbb/HHTools/scripts/dyFlavorFractionsOnCondor/condor/output/dy_flavor_fraction.root");
+
+        bool isDY = m_dataset.name.find("DYJetsToLL") != std::string::npos;
+
+        // Keras NN evaluation
+        KerasModelEvaluator resonant_nn("/home/fynu/sbrochet/scratch/Framework/CMSSW_8_0_24_patch1_HH_Analysis/src/cp3_llbb/HHTools/mvaTraining/trained_models/hh_resonant_trained_model_400_650_900_with_mass_in_input.h5");
+        KerasModelEvaluatorCache<size_t, KerasModelEvaluator> resonant_nn_evaluator(resonant_nn);
+"""
+
+def default_code_in_loop():
+    return r"""
+        double HT = 0;
+        for (size_t i = 0; i < hh_jets.size(); i++)
+            HT += hh_jets[i].p4.Pt();
+        for (size_t i = 0; i < hh_leptons.size(); i++)
+            HT += hh_leptons[i].p4.Pt();
+
+        resonant_nn_evaluator.clear();
+"""
+
+def default_code_after_loop():
+    return ""
+
+def default_headers():
+    return [
+            "dy_reweighting.h",
+            "btag_efficiency.h",
+            "flavor_weighted_btag_efficiency.h",
+            "KerasModelEvaluator.h",
+            "readMVA.h"
+            ]
+
 class BasePlotter:
     def __init__(self, baseObjectName = "hh_llmetjj_allTight_btagM_csv", btagWP_str = 'medium', objects = "nominal", WP = ["T", "T", "T", "T", "L", "L", "M", "M", "csv"]):
         # systematic should be jecup, jecdown, jerup or jerdown. The one for lepton, btag, etc, have to be treated with the "weight" parameter in generatePlots.py (so far)
@@ -34,13 +71,60 @@ class BasePlotter:
         # Ensure we have one candidate, works also for jecup etc
         self.sanityCheck = "Length$(%s)>0"%baseObjectName
 
+        # Categories (lepton flavours)
+        self.dict_cat_cut =  {
+            "ElEl": "({0}.isElEl && (runOnMC || hh_elel_fire_trigger_cut) && (runOnElEl || runOnMC) && {1}.M() > 12)".format(self.baseObject, self.ll_str),
+            "MuMu": "({0}.isMuMu && (runOnMC || hh_mumu_fire_trigger_cut) && (runOnMuMu || runOnMC) && {1}.M() > 12)".format(self.baseObject, self.ll_str),
+            "MuEl": "(({0}.isElMu || {0}.isMuEl) && (runOnMC || hh_elmu_fire_trigger_cut || hh_muel_fire_trigger_cut) && (runOnElMu || runOnMC) && {1}.M() > 12)".format(self.baseObject, self.ll_str)
+                        }
+        cut_for_All_channel = "(" + self.dict_cat_cut["ElEl"] + "||" + self.dict_cat_cut["MuMu"] + "||" +self.dict_cat_cut["MuEl"] + ")"
+        cut_for_SF_channel = "(" + self.dict_cat_cut["ElEl"] + "||" + self.dict_cat_cut["MuMu"] + ")"
+        self.dict_cat_cut["SF"] = cut_for_SF_channel
+        self.dict_cat_cut["All"] = cut_for_All_channel
+
+        self.code_before_loop = ""
+        self.code_in_loop = ""
+        self.code_after_loop = ""
+
+    def get_code_in_loop(self):
+        return self.code_in_loop
+
+    def get_code_before_loop(self):
+        return self.code_before_loop
+
+    def get_code_after_loop(self):
+        return self.code_after_loop
     
     def generatePlots(self, categories = ["All"], stage = "cleaning_cut", requested_plots = [], weights = ['trigeff', 'jjbtag', 'llidiso', 'pu'], extraCut = "", systematic = "nominal", extraString = "", fit2DtemplatesBinning = None):
+
+        # Protect against the fact that data do not have jecup collections, in the nominal case we still have to check that data have one candidate 
+        sanityCheck = self.sanityCheck
+        if systematic != "nominal":
+            sanityCheck = self.joinCuts("!event_is_data", self.sanityCheck)
+
+        # Possible stages (selection)
+        # FIXME: Move to constructor
+        mll_cut = "((91 - {0}.M()) > 15)".format(self.ll_str)
+        inverted_mll_cut = "((91 - {0}.M()) <= 15)".format(self.ll_str)
+        high_mll_cut = "(({0}.M() - 91) > 15)".format(self.ll_str)
+
+        mjj_blind = "({0}.M() < 75 || {0}.M() > 140)".format(self.jj_str)
+
+        dict_stage_cut = {
+               "no_cut": "", 
+               "mll_cut": mll_cut,
+               "inverted_mll_cut": inverted_mll_cut,
+               "high_mll_cut": high_mll_cut,
+               "mjj_blind": self.joinCuts(mjj_blind, mll_cut),
+               }
 
         # MVA evaluation : ugly but necessary part
         baseStringForMVA_part1 = 'evaluateMVA("/home/fynu/sbrochet/scratch/Framework/CMSSW_7_6_5/src/cp3_llbb/HHTools//mvaTraining_hh/weights/BDTNAME_kBDT.weights.xml", '
         baseStringForMVA_part2 = '{{"jj_pt", %s}, {"ll_pt", %s}, {"ll_M", %s}, {"ll_DR_l_l", %s}, {"jj_DR_j_j", %s}, {"llmetjj_DPhi_ll_jj", %s}, {"llmetjj_minDR_l_j", %s}, {"llmetjj_MTformula", %s}})' % ( self.jj_str + ".Pt()", self.ll_str + ".Pt()", self.ll_str + ".M()", self.baseObject + ".DR_l_l", self.baseObject + ".DR_j_j", self.baseObject + ".minDR_l_j", self.baseObject + ".DPhi_ll_jj", self.baseObject + ".MT_formula")
         stringForMVA = baseStringForMVA_part1 + baseStringForMVA_part2
+
+        # Keras neural network
+        keras_resonant_input_variables = '{%s, %s, %s, %s, %s, %s, %s, %s, %%d}' % (self.jj_str + ".Pt()", self.ll_str + ".Pt()", self.ll_str + ".M()", self.baseObject + ".DR_l_l", self.baseObject + ".DR_j_j", self.baseObject + ".DPhi_ll_jj", self.baseObject + ".minDR_l_j", self.baseObject + ".MT_formula")
         
         # The following will need to be modified each time the name of the BDT output changes
         bdtNameTemplate = "DATE_BDT_NODE_SUFFIX"
@@ -64,20 +148,8 @@ class BasePlotter:
                 bdtNames.append(bdtName)
                 BDToutputsVariable[bdtName] = baseStringForMVA_part1.replace("BDTNAME", bdtName) + baseStringForMVA_part2
 
-        # Possible stages (selection)
-        mll_cut = "((91 - {0}.M()) > 15)".format(self.ll_str)
-        inverted_mll_cut = "((91 - {0}.M()) <= 15)".format(self.ll_str)
-        high_mll_cut = "(({0}.M() - 91) > 15)".format(self.ll_str)
-
-        mjj_blind = "({0}.M() < 75 || {0}.M() > 140)".format(self.jj_str)
-
-        dict_stage_cut = {
-               "no_cut": "", 
-               "mll_cut": mll_cut,
-               "inverted_mll_cut": inverted_mll_cut,
-               "high_mll_cut": high_mll_cut,
-               "mjj_blind": self.joinCuts(mjj_blind, mll_cut),
-               }
+        # Keras resonant NN
+        keras_resonant_signal_masses = [400, 650, 900]
 
         # High-BDT stages
         for node in nodes:
@@ -85,17 +157,6 @@ class BasePlotter:
                 bdtName = bdtNameTemplate.replace("DATE", date).replace("NODE", node).replace("SUFFIX", suffix)
                 BDToutput = baseStringForMVA_part1.replace("BDTNAME", bdtName) + baseStringForMVA_part2
                 dict_stage_cut["highBDT_node_" + node] = self.joinCuts(BDToutput + ">0", mll_cut)
-
-        # Categories (lepton flavours)
-        self.dict_cat_cut =  {
-            "ElEl": "({0}.isElEl && (runOnMC || hh_elel_fire_trigger_cut) && (runOnElEl || runOnMC) && {1}.M() > 12)".format(self.baseObject, self.ll_str),
-            "MuMu": "({0}.isMuMu && (runOnMC || hh_mumu_fire_trigger_cut) && (runOnMuMu || runOnMC) && {1}.M() > 12)".format(self.baseObject, self.ll_str),
-            "MuEl": "(({0}.isElMu || {0}.isMuEl) && (runOnMC || hh_elmu_fire_trigger_cut || hh_muel_fire_trigger_cut) && (runOnElMu || runOnMC) && {1}.M() > 12)".format(self.baseObject, self.ll_str)
-                        }   
-        cut_for_All_channel = "(" + self.dict_cat_cut["ElEl"] + "||" + self.dict_cat_cut["MuMu"] + "||" +self.dict_cat_cut["MuEl"] + ")"
-        cut_for_SF_channel = "(" + self.dict_cat_cut["ElEl"] + "||" + self.dict_cat_cut["MuMu"] + ")"
-        self.dict_cat_cut["SF"] = cut_for_SF_channel
-        self.dict_cat_cut["All"] = cut_for_All_channel
 
         ###########
         # Weights #
@@ -134,24 +195,31 @@ class BasePlotter:
         if systematic == "muisoup" or systematic == "muisodown":
             llIdIso_sf = "((({0}.isEl) ? 1 : muon_sf_id_tight_hww[{1}][0]) * (({3}.isEl) ? 1 : muon_sf_id_tight_hww[{4}][0]) * (common::combineScaleFactors<2>({{{{{{({0}.isEl) ? electron_sf_hww_wp[{1}][0] :muon_sf_iso_tight_hww[{1}][0], ({0}.isEl) ? 0. :muon_sf_iso_tight_hww[{1}]{2}}}, {{ ({3}.isEl) ? electron_sf_hww_wp[{4}][0] :muon_sf_iso_tight_hww[{4}][0], ({3}.isEl) ? 0. :muon_sf_iso_tight_hww[{4}]{2} }}}}}}, common::Variation::{5}) ))".format(self.lep1_str, self.lep1_fwkIdx, llIdIso_sfIdx, self.lep2_str, self.lep2_fwkIdx, llIdIso_strCommon)
 
-        # BTAG SF
-        jjBtag_sfIdx = "[0]"
-        jjBtag_strCommon="NOMINAL"
-        if systematic == "jjbtagup":
-            jjBtag_sfIdx = "[2]" 
-            jjBtag_strCommon="UP"
-        if systematic == "jjbtagdown":
-            jjBtag_sfIdx = "[1]"
-            jjBtag_strCommon="DOWN"
         # propagate jecup etc to the framework objects
         sys_fwk = ""
 
         if "jec" in systematic or "jer" in systematic:
             sys_fwk = "_" + systematic
 
-        jjBtag_heavyjet_sf = "(common::combineScaleFactors<2>({{{{{{ jet{0}_sf_csvv2_heavyjet_{1}[{2}][0] , jet{0}_sf_csvv2_heavyjet_{1}[{2}]{3} }}, {{ jet{0}_sf_csvv2_heavyjet_{1}[{4}][0] , jet{0}_sf_csvv2_heavyjet_{1}[{4}]{3} }}}}}}, common::Variation::{5}) )".format(sys_fwk, self.btagWP_str, self.jet1_fwkIdx, jjBtag_sfIdx, self.jet2_fwkIdx, jjBtag_strCommon)
+        # BTAG SF, only applied if requesting b-tags
+        if self.btagWP_str != 'nobtag':
+            jjBtag_sfIdx = "[0]"
+            jjBtag_strCommon="NOMINAL"
+            if systematic == "jjbtagup":
+                jjBtag_sfIdx = "[2]" 
+                jjBtag_strCommon="UP"
+            if systematic == "jjbtagdown":
+                jjBtag_sfIdx = "[1]"
+                jjBtag_strCommon="DOWN"
 
-        jjBtag_lightjet_sf = "(common::combineScaleFactors<2>({{{{{{ jet{0}_sf_csvv2_lightjet_{1}[{2}][0] , jet{0}_sf_csvv2_lightjet_{1}[{2}]{3} }}, {{ jet{0}_sf_csvv2_lightjet_{1}[{4}][0] , jet{0}_sf_csvv2_lightjet_{1}[{4}]{3} }}}}}}, common::Variation::{5}) )".format(sys_fwk, self.btagWP_str, self.jet1_fwkIdx, jjBtag_sfIdx, self.jet2_fwkIdx, jjBtag_strCommon)
+            jjBtag_heavyjet_sf = "(common::combineScaleFactors<2>({{{{{{ jet{0}_sf_csvv2_heavyjet_{1}[{2}][0] , jet{0}_sf_csvv2_heavyjet_{1}[{2}]{3} }}, {{ jet{0}_sf_csvv2_heavyjet_{1}[{4}][0] , jet{0}_sf_csvv2_heavyjet_{1}[{4}]{3} }}}}}}, common::Variation::{5}) )".format(sys_fwk, self.btagWP_str, self.jet1_fwkIdx, jjBtag_sfIdx, self.jet2_fwkIdx, jjBtag_strCommon)
+
+            jjBtag_lightjet_sf = "(common::combineScaleFactors<2>({{{{{{ jet{0}_sf_csvv2_lightjet_{1}[{2}][0] , jet{0}_sf_csvv2_lightjet_{1}[{2}]{3} }}, {{ jet{0}_sf_csvv2_lightjet_{1}[{4}][0] , jet{0}_sf_csvv2_lightjet_{1}[{4}]{3} }}}}}}, common::Variation::{5}) )".format(sys_fwk, self.btagWP_str, self.jet1_fwkIdx, jjBtag_sfIdx, self.jet2_fwkIdx, jjBtag_strCommon)
+
+        else:
+
+            jjBtag_heavyjet_sf = "1."
+            jjBtag_lightjet_sf = "1."
 
         # PU WEIGHT
         puWeight = "event_pu_weight"
@@ -185,12 +253,12 @@ class BasePlotter:
             self.systematicString = "__" + systematic
 
         dy_high_to_low_mll_weight = "dyReweighter.getWeight(%s, %s)" % (self.lep1_str + ".p4", self.lep2_str + ".p4")
-        nobtag_to_btagM_weight = "fwBtagEff.get(%s, %s, hh_jets.size())" % (self.jet1_str + ".p4", self.jet2_str + ".p4")
+        dy_nobtag_to_btagM_weight = "((isDY) ? fwBtagEff.get(%s, %s, hh_jets.size()) : 1.)" % (self.jet1_str + ".p4", self.jet2_str + ".p4")
         twoB_eff_weight = "btagEff.get(%s, %s) * btagEff.get(%s, %s)" % (self.jet1_str + ".p4", "jet_hadronFlavor[%s.idx]" % self.jet1_str, self.jet2_str + ".p4", "jet_hadronFlavor[%s.idx]" % self.jet2_str)
 
         available_weights = {'trigeff' : trigEff, 'jjbtag_heavy' : jjBtag_heavyjet_sf, 'jjbtag_light': jjBtag_lightjet_sf, 'llidiso' : llIdIso_sf, 'pu' : puWeight,
                 'dy_high_to_low_mll': dy_high_to_low_mll_weight,
-                'nobtag_to_btagM': nobtag_to_btagM_weight,
+                'dy_nobtag_to_btagM': dy_nobtag_to_btagM_weight,
                 'twoB_eff': twoB_eff_weight
                 }
 
@@ -208,6 +276,8 @@ class BasePlotter:
         self.mll_plot = []
         self.mjj_plot = []
         self.bdtoutput_plot = []
+        self.resonant_nnoutput_plot = []
+        self.nonresonant_nnoutput_plot = []
         self.mjj_vs_bdt_plot = []
 
         self.flavour_plot = []
@@ -230,11 +300,6 @@ class BasePlotter:
         self.btagging_eff_plot = []
 
         self.forSkimmer_plot = []
-
-        # Protect against the fact that data do not have jecup collections, in the nominal case we still have to check that data have one candidate 
-        sanityCheck = self.sanityCheck
-        if systematic != "nominal":
-            sanityCheck = self.joinCuts("!event_is_data", self.sanityCheck)
 
         for cat in categories:
 
@@ -291,6 +356,15 @@ class BasePlotter:
                             'binning': '(%s, %s, %s, %s)' % (binning["mjjBinning"], binning["bdtNbins"], bdtRange[0], bdtRange[1])
                     })
 
+            # Neural network output
+            for m in keras_resonant_signal_masses:
+                self.resonant_nnoutput_plot.append({
+                        'name': 'NN_resonant_M%d_%s_%s_%s%s' % (m, self.llFlav, self.suffix, self.extraString, self.systematicString),
+                        'variable': 'resonant_nn_evaluator.evaluate(%d, %s)' % (m, keras_resonant_input_variables % m),
+                        'plot_cut': self.totalCut,
+                        'binning': '(50, {}, {})'.format(0, 1)
+                })
+
             # Weight Plots
             self.jjbtagWeight_plot.append(
                         {'name': 'jjbtag_heavy_%s_%s_%s%s'%(self.llFlav, self.suffix, self.extraString,  self.systematicString), 'variable': available_weights["jjbtag_heavy"],
@@ -316,8 +390,8 @@ class BasePlotter:
             self.dyWeight_plot = [
                         {'name': 'dy_reweighting_%s_%s_%s%s'%(self.llFlav, self.suffix, self.extraString,  self.systematicString), 'variable': available_weights["dy_high_to_low_mll"],
                         'plot_cut': self.totalCut, 'binning': '(100, 0, 4)', 'weight': 'event_weight'}]
-            self.nobtagToBTagMWeight_plot = [
-                        {'name': 'nobtag_to_btagM_weight_%s_%s_%s%s'%(self.llFlav, self.suffix, self.extraString,  self.systematicString), 'variable': available_weights["nobtag_to_btagM"],
+            self.DYNobtagToBTagMWeight_plot = [
+                        {'name': 'dy_nobtag_to_btagM_weight_%s_%s_%s%s'%(self.llFlav, self.suffix, self.extraString,  self.systematicString), 'variable': available_weights["dy_nobtag_to_btagM"],
                         'plot_cut': self.totalCut, 'binning': '(50, 0, 0.05)', 'weight': 'event_weight'}]
 
             self.scaleWeight_plot.extend([

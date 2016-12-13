@@ -1,7 +1,6 @@
 import ROOT as R
 import copy, sys, os, inspect 
 
-# Usage from histFactory/plots/HHAnalysis/ : ./../../build/createHistoWithMultiDraw.exe -d ../../samples.json generatePlots.py 
 scriptDir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 sys.path.append(scriptDir)
 from basePlotter import *
@@ -28,20 +27,16 @@ def getBinningStrWithMax(nBins, start, end, max):
 
 
 include_directories = []
-headers = []
 plots = []
 library_directories = []
 libraries = []
-code_before_loop = ""
+
+code_before_loop = default_code_before_loop()
+code_in_loop = default_code_in_loop()
+code_after_loop = default_code_after_loop()
+headers = default_headers()
 
 include_directories.append(os.path.join(scriptDir, "..", "common"))
-
-headers.append("dy_reweighting.h")
-headers.append("btag_efficiency.h")
-headers.append("flavor_weighted_btag_efficiency.h")
-
-# Needed to evaluate MVA outputs
-headers.append("readMVA.h")
 
 ###### Reweighting -- template-based #########
 #sample_weights = {}
@@ -107,22 +102,7 @@ headers.append("readMVA.h")
 #            if i < j: continue
 #            sample_weights["base_" + base_name + "_" + op1 + "_" + op2] = "getHHEFTReweighter().getMVTermME(hh_gen_H1, hh_gen_H2, {}, {}, event_alpha_QCD)/getHHEFTReweighter().getBenchmarkME(hh_gen_H1, hh_gen_H2, {}, event_alpha_QCD)".format(i, j, base)
 
-# Compute HT
-code_in_loop = r"""
-    double HT = 0;
-    for (size_t i = 0; i < hh_jets.size(); i++)
-        HT += hh_jets[i].p4.Pt();
-    for (size_t i = 0; i < hh_leptons.size(); i++)
-        HT += hh_leptons[i].p4.Pt();
-"""
-
 ###########################"
-
-# Utility to retrieve b-tagging efficiency
-code_before_loop += """
-BTagEfficiency btagEff("/home/fynu/sbrochet/scratch/Framework/CMSSW_8_0_20_patch1/src/cp3_llbb/HHTools/scripts/btaggingEfficiencyOnCondor/condor/output/btagging_efficiency.root");
-FWBTagEfficiency fwBtagEff("/home/fynu/sbrochet/scratch/Framework/CMSSW_8_0_20_patch1/src/cp3_llbb/HHTools/scripts/btaggingEfficiencyOnCondor/condor/output/btagging_efficiency.root", "/home/fynu/sbrochet/scratch/Framework/CMSSW_8_0_20_patch1/src/cp3_llbb/HHTools/scripts/dyFlavorFractionsOnCondor/condor/output/dy_flavor_fraction.root");
-"""
 
 # Plot configuration
 
@@ -140,7 +120,7 @@ plots_lljj = ["mll", "mjj", "basic", "csv", "bdtinput", "evt"]
 weights_llbb = ['trigeff', 'llidiso', 'pu', 'jjbtag_heavy', 'jjbtag_light']
 categories_llbb = ["All"]
 stage_llbb = "no_cut"
-plots_llbb = plots_lljj # + ["jjbtagWeight"]
+plots_llbb = plots_lljj + ["resonant_nnoutput"]
 #plots_llbb = ["bdtinput", "mjj"]
 
 systematics = {"modifObjects" : ["nominal"]}
@@ -170,15 +150,19 @@ for systematicType in systematics.keys():
         plots.extend(basePlotter_lljj.generatePlots(categories_lljj, "mll_cut", systematic = systematic, weights = weights_lljj, requested_plots = plots_lljj))
         plots.extend(basePlotter_lljj.generatePlots(categories_lljj, "inverted_mll_cut", systematic = systematic, weights = weights_lljj, requested_plots = plots_lljj))
 
-        # mll < 76 + no btag -> btag% reweighting applied
-        plots.extend(basePlotter_lljj.generatePlots(categories_lljj, "mll_cut", systematic = systematic, weights = weights_lljj + ['nobtag_to_btagM'], requested_plots = plots_lljj + ['nobtagToBTagMWeight'], extraString='_with_nobtag_to_btagM_reweighting'))
-        # mll > 76 + no btag -> btag% reweighting applied
-        plots.extend(basePlotter_lljj.generatePlots(categories_lljj, "inverted_mll_cut", systematic = systematic, weights = weights_lljj + ['nobtag_to_btagM'], requested_plots = plots_lljj + ['nobtagToBTagMWeight'], extraString='_with_nobtag_to_btagM_reweighting'))
+        # mll < 76 + no btag -> btagM reweighting applied
+        plots.extend(basePlotter_lljj.generatePlots(categories_lljj, "mll_cut", systematic = systematic, weights = weights_lljj + ['dy_nobtag_to_btagM'], requested_plots = plots_lljj + ['DYNobtagToBTagMWeight'], extraString='_with_nobtag_to_btagM_reweighting'))
+        # mll > 76 + no btag -> btagM reweighting applied
+        plots.extend(basePlotter_lljj.generatePlots(categories_lljj, "inverted_mll_cut", systematic = systematic, weights = weights_lljj + ['dy_nobtag_to_btagM'], requested_plots = plots_lljj + ['DYNobtagToBTagMWeight'], extraString='_with_nobtag_to_btagM_reweighting'))
 
-        # mll < 76 + b-tagging effiency applied
-        plots.extend(basePlotter_lljj.generatePlots(categories_lljj, "mll_cut", systematic = systematic, weights = weights_lljj + ['twoB_eff'], requested_plots = plots_lljj, extraString='_with_btag_eff'))
-        # mll > 76 + btagging efficiency applied
-        plots.extend(basePlotter_lljj.generatePlots(categories_lljj, "inverted_mll_cut", systematic = systematic, weights = weights_lljj + ['twoB_eff'], requested_plots = plots_lljj, extraString='_with_btag_eff'))
+        # # mll < 76 + b-tagging effiency applied
+        # plots.extend(basePlotter_lljj.generatePlots(categories_lljj, "mll_cut", systematic = systematic, weights = weights_lljj + ['twoB_eff'], requested_plots = plots_lljj, extraString='_with_btag_eff'))
+        # # mll > 76 + btagging efficiency applied
+        # plots.extend(basePlotter_lljj.generatePlots(categories_lljj, "inverted_mll_cut", systematic = systematic, weights = weights_lljj + ['twoB_eff'], requested_plots = plots_lljj, extraString='_with_btag_eff'))
+
+        code_in_loop += basePlotter_lljj.get_code_in_loop()
+        code_before_loop += basePlotter_lljj.get_code_before_loop()
+        code_after_loop += basePlotter_lljj.get_code_after_loop()
         
         ## llbb 
         basePlotter_llbb = BasePlotter(baseObjectName = "hh_llmetjj_HWWleptons_btagM_csv", btagWP_str = 'medium', objects = objects)
@@ -199,3 +183,7 @@ for systematicType in systematics.keys():
         ## With mll cut + select into high-BDT regions
         #plots.extend(basePlotter_llbb.generatePlots(categories_llbb, "highBDT_node_SM", systematic = systematic, weights = weights_llbb, requested_plots = plots_llbb))
         #plots.extend(basePlotter_llbb.generatePlots(categories_llbb, "highBDT_node_2", systematic = systematic, weights = weights_llbb, requested_plots = plots_llbb))
+
+        code_in_loop += basePlotter_llbb.get_code_in_loop()
+        code_before_loop += basePlotter_llbb.get_code_before_loop()
+        code_after_loop += basePlotter_llbb.get_code_after_loop()
