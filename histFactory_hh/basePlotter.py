@@ -1076,7 +1076,14 @@ class BasePlotter:
                     'variable': "event_run",
                     'plot_cut': self.totalCut,
                     'binning': '(300, 0, 300000)'
-                }
+                },
+                {
+                    'name': 'isSF_%s_%s_%s%s' % (self.llFlav, self.suffix, self.extraString, self.systematicString),
+                    'variable': self.baseObject + ".isSF",
+                    'plot_cut': self.totalCut,
+                    'binning': '(2, 0, 2)',
+                    'type': 'bool'
+                },
             ])
 
         plotsToReturn = []
