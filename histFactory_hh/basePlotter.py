@@ -38,7 +38,7 @@ def default_headers():
             ]
 
 class BasePlotter:
-    def __init__(self, baseObjectName = "hh_llmetjj_allTight_btagM_csv", btagWP_str = 'medium', objects = "nominal", WP = ["T", "T", "T", "T", "L", "L", "M", "M", "csv"]):
+    def __init__(self, baseObjectName, btagWP_str, objects="nominal"):
         # systematic should be jecup, jecdown, jerup or jerdown. The one for lepton, btag, etc, have to be treated with the "weight" parameter in generatePlots.py (so far)
 
         self.baseObject = baseObjectName+"[0]"
@@ -69,7 +69,7 @@ class BasePlotter:
         self.jet2_fwkIdx = self.jet2_str+".idx"
 
         # Ensure we have one candidate, works also for jecup etc
-        self.sanityCheck = "Length$(%s)>0"%baseObjectName
+        self.sanityCheck = "Length$(%s)>0" % baseObjectName
 
         # Categories (lepton flavours)
         self.dict_cat_cut =  {
@@ -95,12 +95,14 @@ class BasePlotter:
     def get_code_after_loop(self):
         return self.code_after_loop
     
-    def generatePlots(self, categories = ["All"], stage = "cleaning_cut", requested_plots = [], weights = ['trigeff', 'jjbtag', 'llidiso', 'pu'], extraCut = "", systematic = "nominal", extraString = "", fit2DtemplatesBinning = None):
+    def generatePlots(self, categories, stage, requested_plots, weights, systematic="nominal", extraString="", fit2DtemplatesBinning=None, prependCuts=[], appendCuts=[]):
 
         # Protect against the fact that data do not have jecup collections, in the nominal case we still have to check that data have one candidate 
         sanityCheck = self.sanityCheck
         if systematic != "nominal":
             sanityCheck = self.joinCuts("!event_is_data", self.sanityCheck)
+
+        cuts = self.joinCuts(*(prependCuts + [sanityCheck]))
 
         # Possible stages (selection)
         # FIXME: Move to constructor
@@ -304,7 +306,7 @@ class BasePlotter:
         for cat in categories:
 
             catCut = self.dict_cat_cut[cat]
-            self.totalCut = self.joinCuts(sanityCheck, catCut, extraCut, dict_stage_cut[stage])
+            self.totalCut = self.joinCuts(cuts, catCut, dict_stage_cut[stage], *appendCuts)
             self.llFlav = cat
             self.extraString = stage + extraString
 

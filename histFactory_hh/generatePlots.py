@@ -110,7 +110,6 @@ include_directories.append(os.path.join(scriptDir, "..", "common"))
 weights_lljj = ['trigeff', 'llidiso', 'pu']
 # categories_lljj = ["All", "MuMu", "ElEl", "MuEl"] 
 categories_lljj = ["All"] 
-stage_lljj = "no_cut"
 plots_lljj = ["mll", "mjj", "basic", "csv", "bdtinput", "evt"]
 
 # Weights
@@ -119,7 +118,6 @@ plots_lljj = ["mll", "mjj", "basic", "csv", "bdtinput", "evt"]
 #llbb
 weights_llbb = ['trigeff', 'llidiso', 'pu', 'jjbtag_heavy', 'jjbtag_light']
 categories_llbb = ["All"]
-stage_llbb = "no_cut"
 plots_llbb = plots_lljj + ["resonant_nnoutput"]
 #plots_llbb = ["bdtinput", "mjj"]
 
@@ -146,19 +144,20 @@ for systematicType in systematics.keys():
         ## lljj 
         basePlotter_lljj = BasePlotter(baseObjectName = "hh_llmetjj_HWWleptons_nobtag_csv", btagWP_str = 'nobtag', objects = objects)
         
-        plots.extend(basePlotter_lljj.generatePlots(categories_lljj, stage_lljj, systematic = systematic, weights = weights_lljj, requested_plots = plots_lljj))
+        plots.extend(basePlotter_lljj.generatePlots(categories_lljj, "no_cut", systematic = systematic, weights = weights_lljj, requested_plots = plots_lljj))
         plots.extend(basePlotter_lljj.generatePlots(categories_lljj, "mll_cut", systematic = systematic, weights = weights_lljj, requested_plots = plots_lljj))
         plots.extend(basePlotter_lljj.generatePlots(categories_lljj, "inverted_mll_cut", systematic = systematic, weights = weights_lljj, requested_plots = plots_lljj))
 
-        # mll < 76 + no btag -> btagM reweighting applied
-        plots.extend(basePlotter_lljj.generatePlots(categories_lljj, "mll_cut", systematic = systematic, weights = weights_lljj + ['dy_nobtag_to_btagM'], requested_plots = plots_lljj + ['DYNobtagToBTagMWeight'], extraString='_with_nobtag_to_btagM_reweighting'))
-        # mll > 76 + no btag -> btagM reweighting applied
-        plots.extend(basePlotter_lljj.generatePlots(categories_lljj, "inverted_mll_cut", systematic = systematic, weights = weights_lljj + ['dy_nobtag_to_btagM'], requested_plots = plots_lljj + ['DYNobtagToBTagMWeight'], extraString='_with_nobtag_to_btagM_reweighting'))
+        # mll < 76 + no btag -> btagM reweighting applied ; only for DY
+        plots.extend(basePlotter_lljj.generatePlots(categories_lljj, "mll_cut", systematic=systematic, weights=weights_lljj + ['dy_nobtag_to_btagM'], requested_plots=plots_lljj + ['resonant_nnoutput', 'DYNobtagToBTagMWeight'], extraString='_with_nobtag_to_btagM_reweighting', prependCuts=['isDY']))
+        # mll > 76 + no btag -> btagM reweighting applied ; only for DY
+        plots.extend(basePlotter_lljj.generatePlots(categories_lljj, "inverted_mll_cut", systematic = systematic, weights = weights_lljj + ['dy_nobtag_to_btagM'], requested_plots = plots_lljj + ['resonant_nnoutput', 'DYNobtagToBTagMWeight'], extraString='_with_nobtag_to_btagM_reweighting', prependCuts=['isDY']))
 
         # # mll < 76 + b-tagging effiency applied
         # plots.extend(basePlotter_lljj.generatePlots(categories_lljj, "mll_cut", systematic = systematic, weights = weights_lljj + ['twoB_eff'], requested_plots = plots_lljj, extraString='_with_btag_eff'))
         # # mll > 76 + btagging efficiency applied
         # plots.extend(basePlotter_lljj.generatePlots(categories_lljj, "inverted_mll_cut", systematic = systematic, weights = weights_lljj + ['twoB_eff'], requested_plots = plots_lljj, extraString='_with_btag_eff'))
+
 
         code_in_loop += basePlotter_lljj.get_code_in_loop()
         code_before_loop += basePlotter_lljj.get_code_before_loop()
@@ -167,7 +166,7 @@ for systematicType in systematics.keys():
         ## llbb 
         basePlotter_llbb = BasePlotter(baseObjectName = "hh_llmetjj_HWWleptons_btagM_csv", btagWP_str = 'medium', objects = objects)
        
-        plots.extend(basePlotter_llbb.generatePlots(categories_llbb, stage_llbb, systematic = systematic, weights = weights_llbb, requested_plots = plots_llbb))
+        plots.extend(basePlotter_llbb.generatePlots(categories_llbb, "no_cut", systematic = systematic, weights = weights_llbb, requested_plots = plots_llbb))
         plots.extend(basePlotter_llbb.generatePlots(categories_llbb, "mll_cut", systematic = systematic, weights = weights_llbb, requested_plots = plots_llbb))
         plots.extend(basePlotter_llbb.generatePlots(categories_llbb, "inverted_mll_cut", systematic = systematic, weights = weights_llbb, requested_plots = plots_llbb))
 
