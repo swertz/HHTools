@@ -64,15 +64,15 @@ eta_binning = np.linspace(0, 2.4, 11)
 n_eta_bins = len(eta_binning) - 1
 
 btagging_eff_on_b = ROOT.TEfficiency("btagging_eff_on_b", "btagging_eff_on_b", n_pt_bins, pt_binning, n_eta_bins, eta_binning)
-# btagging_eff_on_b.SetStatisticOption(ROOT.TEfficiency.kMidP)
+btagging_eff_on_b.SetStatisticOption(ROOT.TEfficiency.kMidP)
 
 btagging_eff_on_c = ROOT.TEfficiency("btagging_eff_on_c", "btagging_eff_on_c", n_pt_bins, pt_binning, n_eta_bins, eta_binning)
-# btagging_eff_on_c.SetStatisticOption(ROOT.TEfficiency.kMidP)
+btagging_eff_on_c.SetStatisticOption(ROOT.TEfficiency.kMidP)
 
 mistagging_eff_on_light = ROOT.TEfficiency("mistagging_eff_on_light", "mistagging_eff_on_light", n_pt_bins, pt_binning, n_eta_bins, eta_binning)
-# mistagging_eff_on_light.SetStatisticOption(ROOT.TEfficiency.kMidP)
+mistagging_eff_on_light.SetStatisticOption(ROOT.TEfficiency.kMidP)
 
-btag_cut = 0.800
+btag_cut = 0.4432
 
 chain = ROOT.TChain('t')
 for f in files:
@@ -84,7 +84,7 @@ chain.SetBranchStatus("*", 0)
 
 chain.SetBranchStatus("jet_p4*", 1)
 chain.SetBranchStatus("jet_hadronFlavor*", 1)
-chain.SetBranchStatus("jet_pfCombinedInclusiveSecondaryVertexV2BJetTags*", 1)
+chain.SetBranchStatus("jet_pfCombinedMVAV2BJetTags*", 1)
 
 print("Loading chain...")
 if not entries:
@@ -122,7 +122,7 @@ for i in range(0, entries):
         else:
             object = mistagging_eff_on_light
 
-        object.Fill(chain.jet_pfCombinedInclusiveSecondaryVertexV2BJetTags[j] > btag_cut, pt, eta)
+        object.Fill(chain.jet_pfCombinedMVAV2BJetTags[j] > btag_cut, pt, eta)
 
 print("Done")
 output = ROOT.TFile.Open(output, "recreate")
