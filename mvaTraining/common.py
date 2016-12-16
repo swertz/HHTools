@@ -12,7 +12,10 @@ from root_numpy import tree2array
 from sklearn.model_selection import train_test_split
 from sklearn.utils import shuffle
 
-INPUT_FOLDER = '/home/fynu/sbrochet/scratch/Framework/CMSSW_8_0_20_patch1/src/cp3_llbb/HHTools/mvaTraining/inputs/2016-12-05_with_dy_estimate'
+from keras.models import Sequential
+from keras.layers import Dense, Dropout
+
+INPUT_FOLDER = '/home/fynu/sbrochet/scratch/Framework/CMSSW_8_0_24_patch1_HH_Analysis/src/cp3_llbb/HHTools/histFactory_hh/2016-12-13_trees_with_dy_estimate_for_mva_training_and_issf/condor/output'
 
 backgrounds = [
         {
@@ -45,11 +48,11 @@ for m in resonant_signal_masses:
 def create_resonant_model(n_inputs):
     # Define the model
     model = Sequential()
-    model.add(Dense(100, input_dim=9, activation="relu"))
-    model.add(Dense(100, activation="relu"))
-    model.add(Dense(100, activation="relu"))
+    model.add(Dense(100, input_dim=n_inputs, activation="relu", init="glorot_uniform"))
+    model.add(Dense(100, activation="relu", init='glorot_uniform'))
+    model.add(Dense(100, activation="relu", init='glorot_uniform'))
     model.add(Dropout(0.1))
-    model.add(Dense(2, activation='softmax'))
+    model.add(Dense(2, activation='softmax', init='glorot_uniform'))
 
     model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
 
@@ -80,7 +83,8 @@ def tree_to_numpy(input_file, variables, weight, cut=None, reweight_to_cross_sec
     weights = a['weight'] * relative_weight
 
     # Convert to plain numpy arrays
-    dataset = dataset.view((dataset.dtype[0], len(variables))).copy()
+    # dataset = dataset.view((dataset.dtype[0], len(variables))).copy()
+    dataset = np.array(dataset.tolist(), dtype=np.float32)
 
     return dataset, weights
 
@@ -213,11 +217,23 @@ class DatasetManager:
     def get_testing_combined_weights(self):
         return self.testing_weights
 
-    def get_signal_predictions(self, model):
+    def get_training_testing_signal_predictions(self, model):
         return self._get_predictions(model, self.train_signal_dataset), self._get_predictions(model, self.test_signal_dataset)
 
-    def get_background_predictions(self, model):
+    def get_signal_predictions(self, model):
+        return self._get_predictions(model, self.signal_dataset)
+
+    def get_signal_weights(self):
+        return self.signal_weights
+
+    def get_training_testing_background_predictions(self, model):
         return self._get_predictions(model, self.train_background_dataset), self._get_predictions(model, self.test_background_dataset)
+
+    def get_background_predictions(self, model):
+        return self._get_predictions(model, self.background_dataset)
+
+    def get_background_weights(self):
+        return self.background_weights
 
     def _get_predictions(self, model, values):
         predictions = model.predict(values)

@@ -108,16 +108,19 @@ include_directories.append(os.path.join(scriptDir, "..", "common"))
 
 # lljj 
 weights_lljj = ['trigeff', 'llidiso', 'pu']
-# categories_lljj = ["All", "MuMu", "ElEl", "MuEl"] 
-categories_lljj = ["All"] 
-plots_lljj = ["mll", "mjj", "basic", "csv", "bdtinput", "evt"]
+categories_lljj = ["All", "MuMu", "ElEl", "MuEl"] 
+# categories_lljj = ["All"] 
+plots_lljj = ["mll", "mjj", "basic", "cmva", "bdtinput"]
 
 # Weights
 # plots_lljj += ["llidisoWeight", "trigeffWeight", "puWeight"]
 
 #llbb
-weights_llbb = ['trigeff', 'llidiso', 'pu', 'jjbtag_heavy', 'jjbtag_light']
-categories_llbb = ["All"]
+# weights_llbb = ['trigeff', 'llidiso', 'pu', 'jjbtag_heavy', 'jjbtag_light']
+
+# FIXME: We don't have cMVAv2 SFs yet, so do not include b-tagging SFs
+weights_llbb = ['trigeff', 'llidiso', 'pu']
+categories_llbb = ["All", "MuMu", "ElEl", "MuEl"] 
 plots_llbb = plots_lljj + ["resonant_nnoutput"]
 #plots_llbb = ["bdtinput", "mjj"]
 
@@ -142,7 +145,7 @@ for systematicType in systematics.keys():
             objects = "nominal" #ensure that we use normal hh_objects for systematics not modifying obect such as scale factors 
 
         ## lljj 
-        basePlotter_lljj = BasePlotter(baseObjectName = "hh_llmetjj_HWWleptons_nobtag_csv", btagWP_str = 'nobtag', objects = objects)
+        basePlotter_lljj = BasePlotter(baseObjectName = "hh_llmetjj_HWWleptons_nobtag_cmva", btagWP_str = 'nobtag', objects = objects)
         
         plots.extend(basePlotter_lljj.generatePlots(categories_lljj, "no_cut", systematic = systematic, weights = weights_lljj, requested_plots = plots_lljj))
         plots.extend(basePlotter_lljj.generatePlots(categories_lljj, "mll_cut", systematic = systematic, weights = weights_lljj, requested_plots = plots_lljj))
@@ -158,13 +161,12 @@ for systematicType in systematics.keys():
         # # mll > 76 + btagging efficiency applied
         # plots.extend(basePlotter_lljj.generatePlots(categories_lljj, "inverted_mll_cut", systematic = systematic, weights = weights_lljj + ['twoB_eff'], requested_plots = plots_lljj, extraString='_with_btag_eff'))
 
-
         code_in_loop += basePlotter_lljj.get_code_in_loop()
         code_before_loop += basePlotter_lljj.get_code_before_loop()
         code_after_loop += basePlotter_lljj.get_code_after_loop()
         
         ## llbb 
-        basePlotter_llbb = BasePlotter(baseObjectName = "hh_llmetjj_HWWleptons_btagM_csv", btagWP_str = 'medium', objects = objects)
+        basePlotter_llbb = BasePlotter(baseObjectName = "hh_llmetjj_HWWleptons_btagM_cmva", btagWP_str = 'medium', objects = objects)
        
         plots.extend(basePlotter_llbb.generatePlots(categories_llbb, "no_cut", systematic = systematic, weights = weights_llbb, requested_plots = plots_llbb))
         plots.extend(basePlotter_llbb.generatePlots(categories_llbb, "mll_cut", systematic = systematic, weights = weights_llbb, requested_plots = plots_llbb))
