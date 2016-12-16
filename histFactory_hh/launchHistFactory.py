@@ -47,7 +47,7 @@ def get_sample(iSample):
 
 # Warning: put most recent tags first!
 analysis_tags = [
-        'v0.1.1+76X-75-g45bc215_HHAnalysis_2016-06-03.v0-38-gd217142'
+        'v4.1.0+80X_HHAnalysis_2016-12-14.v0'
         ]
 
 parser = argparse.ArgumentParser(description='Facility to submit histFactory jobs on condor.')
@@ -229,6 +229,11 @@ MainConfiguration.samples.extend([
     'GluGluToRadionToHHTo2B2VTo2L2Nu_M'
 ])
 
+# Non-resonant signal
+MainConfiguration.samples.extend([
+    'GluGluToHHTo2B2VTo2L2Nu_node_'
+])
+
 # NonResonant merged
 # MainConfiguration.samples.append('GluGluToHHTo2B2VTo2L2Nu_all_nodes_13TeV-madgraph')
 
@@ -266,7 +271,23 @@ for c in configurations:
         break
 
 if not skeleton_file:
-    raise Exception("No MC file found in this job")
+    print("Warning: No MC file found in this job. Looking for data")
+
+for c in configurations:
+    for id in c.sample_ids:
+        sample = get_sample(id)
+        if sample.source_dataset.datatype != "data":
+            continue
+
+        skeleton_file = "/storage/data/cms/" + sample.files.any().lfn
+        print("Using %r as skeleton" % skeleton_file)
+        break
+
+    if skeleton_file:
+        break
+
+if not skeleton_file:
+    raise Exception("No file found in this job")
 
 if args.test:
     jsonName = "jsonTest.json"

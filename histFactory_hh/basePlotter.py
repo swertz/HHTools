@@ -269,6 +269,7 @@ class BasePlotter:
         #########
         self.basic_plot = []
         self.csv_plot = []
+        self.cmva_plot = []
         self.bdtinput_plot = []
         self.cleancut_plot = []
         self.drllcut_plot = []
@@ -481,6 +482,20 @@ class BasePlotter:
                         'binning': '(50, 0, 1)'
                 }
             ])
+            self.cmva_plot.extend([
+                {
+                        'name': 'jet1_cMVAv2_%s_%s_%s%s'%(self.llFlav, self.suffix, self.extraString, self.systematicString),
+                        'variable': self.jet1_str+".CMVAv2",
+                        'plot_cut': self.totalCut,
+                        'binning': '(50, 0, 1)'
+                },
+                {
+                        'name': 'jet2_cMVAv2_%s_%s_%s%s'%(self.llFlav, self.suffix, self.extraString, self.systematicString),
+                        'variable': self.jet2_str+".CMVAv2",
+                        'plot_cut': self.totalCut,
+                        'binning': '(50, 0, 1)'
+                }
+            ])
             self.cleancut_plot.extend([
                 #{
                 #        'name': 'll_M_%s_%s_%s%s'%(self.llFlav, self.suffix, self.extraString, self.systematicString),
@@ -659,12 +674,6 @@ class BasePlotter:
                         'plot_cut': self.totalCut,
                         'binning': '(25, -3.1416, 3.1416)'
                 },
-                # {
-                        # 'name': 'jet1_JP_%s_%s_%s%s'%(self.llFlav, self.suffix, self.extraString, self.systematicString),
-                        # 'variable': self.jet1_str+".JP",
-                        # 'plot_cut': self.totalCut,
-                        # 'binning': '(50, 0, 3.5)'
-                # },
                 {
                         'name': 'jet2_eta_%s_%s_%s%s'%(self.llFlav, self.suffix, self.extraString, self.systematicString),
                         'variable': self.jet2_str+".p4.Eta()",
@@ -677,12 +686,6 @@ class BasePlotter:
                         'plot_cut': self.totalCut,
                         'binning': '(25, -3.1416, 3.1416)'
                 },
-                # {
-                        # 'name': 'jet2_JP_%s_%s_%s%s'%(self.llFlav, self.suffix, self.extraString, self.systematicString),
-                        # 'variable': self.jet2_str+".JP",
-                        # 'plot_cut': self.totalCut,
-                        # 'binning': '(50, 0, 3.5)'
-                # },
                 #{
                 #        'name': 'jet1_scaleFactor_%s_%s_%s%s'%(self.llFlav, self.suffix, self.extraString, self.systematicString),
                 #        'variable': get_csvv2_sf(self.btagWP1, self.jet1_fwkIdx),
@@ -719,18 +722,6 @@ class BasePlotter:
                         'plot_cut': self.totalCut,
                         'binning': '(50, 0, 3.1416)'
                 },
-                # {
-                        # 'name': 'jj_CSVprod_%s_%s_%s%s'%(self.llFlav, self.suffix, self.extraString, self.systematicString),
-                        # 'variable': self.jet1_str+".CSV * " + self.jet2_str+".CSV",
-                        # 'plot_cut': self.totalCut,
-                        # 'binning': '(25, 0, 1)'
-                # },
-                # {
-                        # 'name': 'jj_CSVsum_%s_%s_%s%s'%(self.llFlav, self.suffix, self.extraString, self.systematicString),
-                        # 'variable': self.jet1_str+".CSV + " + self.jet2_str+".CSV",
-                        # 'plot_cut': self.totalCut,
-                        # 'binning': '(25, 0, 2)'
-                # },
                 #{
                 #        'name': 'jj_scaleFactor_%s_%s_%s%s'%(self.llFlav, self.suffix, self.extraString, self.systematicString),
                 #        'variable': "{0} * {1}".format(get_csvv2_sf(self.btagWP1, self.jet1_fwkIdx), get_csvv2_sf(self.btagWP2, self.jet2_fwkIdx)),
