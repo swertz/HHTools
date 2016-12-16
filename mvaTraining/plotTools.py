@@ -92,6 +92,7 @@ def draw_roc(signal, background, output_dir=".", output_name="roc.pdf"):
     """
 
     x, y = get_roc(signal, background)
+    auc = metrics.auc(x, y, reorder=True)
 
     fig = plt.figure(1, figsize=(7, 7), dpi=300)
     fig.clear()
@@ -99,7 +100,7 @@ def draw_roc(signal, background, output_dir=".", output_name="roc.pdf"):
     # Create an axes instance
     ax = fig.add_subplot(111)
 
-    ax.plot(x, y, '-', color='#B64926', lw=2)
+    ax.plot(x, y, '-', color='#B64926', lw=2, label="AUC: %.4f" % auc)
     ax.margins(0.05)
 
     ax.set_xlabel("Background efficiency")
@@ -107,11 +108,13 @@ def draw_roc(signal, background, output_dir=".", output_name="roc.pdf"):
     
     fig.set_tight_layout(True)
 
+    ax.legend(loc='lower right', numpoints=1, frameon=False)
+
+    print("AUC: %.4f" % auc)
+
     fig.savefig(os.path.join(output_dir, output_name))
 
     plt.close()
-
-    print("AUC: %f" % metrics.auc(x, y, reorder=True))
 
     def get_index(y, value):
         """
