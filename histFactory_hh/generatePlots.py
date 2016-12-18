@@ -104,13 +104,17 @@ include_directories.append(os.path.join(scriptDir, "..", "common"))
 
 ###########################"
 
+# Utility to retrieve b-tagging efficiency
+#code_before_loop += """
+#FWBTagEfficiencyOnBDT fwBtagEff("/home/fynu/sbrochet/scratch/Framework/CMSSW_8_0_24_patch1_HH_Analysis/src/cp3_llbb/HHTools/scripts/btaggingEfficiencyOnCondor/condor/output/btagging_efficiency.root", "/home/fynu/swertz/scratch/CMSSW_8_0_19/src/cp3_llbb/HHTools/scripts/161214_bb_cc_vs_rest_7var_ht_nJets_dyFlavorFractionsOnCondor/condor/output/dy_flavor_fraction.root");
+#"""
+
 # Plot configuration
 
 # lljj 
 weights_lljj = ['trigeff', 'llidiso', 'pu']
 categories_lljj = ["All", "MuMu", "ElEl", "MuEl"] 
-# categories_lljj = ["All"] 
-plots_lljj = ["mll", "mjj", "basic", "cmva", "bdtinput"]
+plots_lljj = ["mll", "mjj", "basic", "csv", "bdtinput", "evt", "dy_rwgt_bdt", "totalWeight"]
 
 # Weights
 # plots_lljj += ["llidisoWeight", "trigeffWeight", "puWeight"]

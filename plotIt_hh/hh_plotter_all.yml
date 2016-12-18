@@ -2,8 +2,8 @@ configuration:
     include: ['centralConfig.yml']
 
 files:
-    include: ['MCFiles.yml', 'DataFiles.yml']
-    #include: ['DY_btag_comp.yml']
+    #include: ['MCFiles.yml', 'DataFiles.yml']
+    include: ['DY_btag_comp.yml']
     #include: ['DY_jet_flavor_comp.yml']
 
 plots:

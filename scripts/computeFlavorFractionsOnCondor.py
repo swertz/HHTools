@@ -9,7 +9,7 @@ samples = [
     'files_per_job': 30},
 ]
 
-jobs = condorSubmitter(samples, "computeFlavorFractions.py", '', 'dyFlavorFractionsOnCondor')
+jobs = condorSubmitter(samples, "computeFlavorFractionsOnBDT.py", '', '161214_bb_cc_vs_rest_7var_ht_nJets_dyFlavorFractionsOnCondor')
 
 jobs.setupCondorDirs()
 jobs.createCondorFiles()

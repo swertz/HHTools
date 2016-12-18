@@ -104,17 +104,17 @@ for key in keys:
         if not 'nobtag' in key.GetName():
             continue
 
-        if not 'mll_cut' in key.GetName():
-            continue
+        #if not 'mll_cut' in key.GetName():
+        #    continue
 
         # if 'inverted_mll_cut' in key.GetName():
             # continue
 
-        if 'with_btag_eff' in key.GetName():
+        if 'with_bdt_btag_eff' in key.GetName():
             continue
 
-        if 'with_nobtag_to_btagM' in key.GetName():
-            continue
+        #if 'with_nobtag_to_btagM' in key.GetName():
+        #    continue
 
         ## Update all the plots with title, ...
 
@@ -225,6 +225,9 @@ for key in keys:
         elif "MTformula_" in key.GetName():
             plot['x-axis'] = "MT"
             plot.update(defaultStyle_events_per_gev)
+        elif "HT" in key.GetName():
+            plot['x-axis'] = "HT"
+            plot.update(defaultStyle_events_per_gev)
         elif "projMET_" in key.GetName():
             plot['x-axis'] = "Projected #slash{E}_{T}"
             plot.update(defaultStyle_events_per_gev)
@@ -266,6 +269,11 @@ for key in keys:
             plot.update(defaultStyle_events)
         elif "cosThetaStar" in key.GetName():
             plot['x-axis'] = "cos(#theta^{*}_{CS})_{lljj#slash{E}_{T}}"
+            plot.update(defaultStyle_events)
+        
+        elif "DY_BDT" in key.GetName():
+            plot['x-axis'] = "DY reweighting BDT"
+            #plot['x-axis-range'] = [-0.2, 0.3]
             plot.update(defaultStyle_events)
         
         # Here be dragons

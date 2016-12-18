@@ -1,42 +1,47 @@
+#! /usr/bin/env python
+
 import os, sys
-from trainMVA import *
+import trainDYBDT
 from multiprocessing import Pool
 
-#inFileDir = "/home/fynu/bfrancois/scratch/framework/oct2015/CMSSW_7_4_15/src/cp3_llbb/CommonTools/treeFactory/allFlavour_trigger_btagMM/condor/output/"
-#inFileDir = "/home/fynu/bfrancois/scratch/framework/oct2015/CMSSW_7_4_15/src/cp3_llbb/CommonTools/treeFactory/allFlavour_trigger_btagMM_2016_01_14/condor/output/"
-inFileDir = "/home/fynu/bfrancois/scratch/framework/oct2015/CMSSW_7_4_15/src/cp3_llbb/HHTools/treeFactory_hh/2016-02-18/condor/output/"
-outFileDir = inFileDir + "withMVAout/"
-#outFileDir = inFileDir + "/withMVAout_DYevtSum/"
+inFileDir = "/home/fynu/swertz/scratch/CMSSW_8_0_19/src/cp3_llbb/HHTools/condor/161214_skimDY_moreInfo_0/condor/output/"
 
-filesForMerging  = [file for file in os.listdir(inFileDir) if "_histos.root" in file and not ("WJetsToLNu" in file or "QCD" in file)]
-#xmlFileDir = "/home/fynu/bfrancois/scratch/framework/oct2015/CMSSW_7_4_15/src/cp3_llbb/CommonTools/mvaTraining/HHAnalysis/weights/"
-xmlFileDir = "/home/fynu/bfrancois/scratch/framework/oct2015/CMSSW_7_4_15/src/cp3_llbb/HHTools/mvaTraining_hh/weights/"
+filesForMerging  = [ file for file in os.listdir(inFileDir) if "_histos.root" in file ]
+xmlFileDir = "/home/fynu/swertz/scratch/CMSSW_8_0_19/src/cp3_llbb/HHTools/mvaTraining_hh/weights/"
 
-date = "2016_02_19"
-suffix = "VS_TT_DYHTonly_tW_8var"  #DY_WoverSum_8var_bTagMM_noEvtW"
-label_template = "DATE_BDT_XSPIN_MASS_SUFFIX"
+#date = "2016_12_12"
+#suffix = "incl_vs_bb_8var"
+#date = "2016_12_13"
+#suffix = "ll_cl_vs_bx_cc_8var_ht"
+#date = "2016_12_13"
+#suffix = "ll_vs_rest_8var_ht"
+#date = "2016_12_13"
+#suffix = "bb_vs_rest_7var_ht"
+date = "2016_12_14"
+suffix = "bb_cc_vs_rest_7var_ht_nJets"
 
-massToMerge = ['350', '400', '500', '650']
-spinToMerge = ["0"]
-list_dict_xmlFile_label = []
-for massPoint in massToMerge :
-    for spin in spinToMerge :
-        tempdict = {}
-        label = "2016_02_19_BDT_X%s_%s_VS_TT_DYHTonly_tW_8var"%(spin, massPoint)
-        tempdict["label"] = label
-        tempdict["discriList"] = discriList
-        tempdict["spectatorList"] = spectatorList
-        tempdict["xmlFile"] = xmlFileDir+label+"_kBDT.weights.xml"
-        list_dict_xmlFile_label.append(tempdict)
-    
+label_template = "DATE_BDTDY_SUFFIX"
+label = label_template.replace("DATE", date).replace("SUFFIX", suffix)
+
+# Retrieve the variables directly from the training script - careful!
+list_dict_xmlFile_label = [
+        {
+            "label": label,
+            "discriList": trainDYBDT.discriList,
+            "spectatorList": trainDYBDT.spectatorList,
+            "xmlFile": xmlFileDir + label + "_kBDT.weights.xml",
+        },
+    ]
+
+outFileDir = inFileDir + "withMVAout_" + label
 if not os.path.isdir(outFileDir):
-    os.system("mkdir "+outFileDir)
+    os.system("mkdir " + outFileDir)
 print outFileDir
 
-pool = Pool(15)
+pool = Pool(2)
 parametersForPool = []
 for file in filesForMerging :
     parametersForPool.append([inFileDir, file, outFileDir, list_dict_xmlFile_label])
-pool.map(MVA_out_in_tree, parametersForPool)
+pool.map(trainDYBDT.MVA_out_in_tree, parametersForPool)
 pool.close()
 pool.join()
