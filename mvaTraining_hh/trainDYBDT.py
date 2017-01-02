@@ -20,40 +20,40 @@ def get_sample(name):
     resultset = dbstore.find(Sample, Sample.name == name)
     return resultset.one()
 
-date = "2016_12_18"
-suffix = "bb_cc_vs_rest_7var_ht_nJets"
+date = "2016_12_20"
+suffix = "bb_cc_vs_rest_10var"
 label_template = "DATE_BDTDY_SUFFIX"
 
-inFileDir = "/home/fynu/swertz/scratch/CMSSW_8_0_19/src/cp3_llbb/HHTools/condor/161214_skimDY_moreInfo_0/condor/output/"
+inFileDir = "/home/fynu/swertz/scratch/CMSSW_8_0_25/src/cp3_llbb/HHTools/condor/161220_skimDY_for_dy/condor/output/"
 
 # SAMPLES FOR THE TRAINING
 
-DYJetsToLL_M10to50 = "DYJetsToLL_M-10to50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_Spring16MiniAODv2_v0.1.1+76X-75-g45bc215_HHAnalysis_2016-06-03.v0-38-gd217142"
+DYJetsToLL_M10to50 = "DYJetsToLL_M-10to50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_Spring16MiniAODv2_v4.1.0+80X_HHAnalysis_2016-12-14.v0"
 DYJetsToLL_M10to50_db = get_sample(unicode(DYJetsToLL_M10to50))
 
-DYJetsToLL_M50 = "DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_Spring16MiniAODv2_v0.1.1+76X-75-g45bc215_HHAnalysis_2016-06-03.v0-38-gd217142"
+DYJetsToLL_M50 = "DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_Spring16MiniAODv2_v4.1.0+80X_HHAnalysis_2016-12-14.v0"
 DYJetsToLL_M50_db = get_sample(unicode(DYJetsToLL_M50))
 
 bkgFiles = { 
         "DYJetsToLL_M-10to50": {
-                    "files": [ inFileDir+DYJetsToLL_M10to50+"_histos.root" ],
+                    "files": [ inFileDir + DYJetsToLL_M10to50 + "_histos.root" ],
                     "relativeWeight": DYJetsToLL_M10to50_db.source_dataset.xsection/DYJetsToLL_M10to50_db.event_weight_sum
                 },
         "DYJetsToLL_M-50": {
-                    "files": [ inFileDir+DYJetsToLL_M50+"_histos.root" ],
+                    "files": [ inFileDir + DYJetsToLL_M50 + "_histos.root" ],
                     "relativeWeight": DYJetsToLL_M50_db.source_dataset.xsection/DYJetsToLL_M50_db.event_weight_sum
                 },
         }
 
 discriList = [
-        "lep1_pt",
-        "lep2_pt",
         "jet1_pt",
+        "jet1_eta",
         "jet2_pt",
+        "jet2_eta",
         "jj_pt",
         "ll_pt",
-        "ll_DR_l_l",
-        #"jj_DR_j_j",
+        "ll_eta",
+        "llmetjj_DPhi_ll_met",
         "ht",
         "nJetsL"
         ]

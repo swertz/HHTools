@@ -104,17 +104,12 @@ include_directories.append(os.path.join(scriptDir, "..", "common"))
 
 ###########################"
 
-# Utility to retrieve b-tagging efficiency
-#code_before_loop += """
-#FWBTagEfficiencyOnBDT fwBtagEff("/home/fynu/sbrochet/scratch/Framework/CMSSW_8_0_24_patch1_HH_Analysis/src/cp3_llbb/HHTools/scripts/btaggingEfficiencyOnCondor/condor/output/btagging_efficiency.root", "/home/fynu/swertz/scratch/CMSSW_8_0_19/src/cp3_llbb/HHTools/scripts/161214_bb_cc_vs_rest_7var_ht_nJets_dyFlavorFractionsOnCondor/condor/output/dy_flavor_fraction.root");
-#"""
-
 # Plot configuration
 
 # lljj 
 weights_lljj = ['trigeff', 'llidiso', 'pu']
 categories_lljj = ["All", "MuMu", "ElEl", "MuEl"] 
-plots_lljj = ["mll", "mjj", "basic", "csv", "bdtinput", "evt", "dy_rwgt_bdt", "totalWeight"]
+plots_lljj = ["mll", "mjj", "basic", "cmva", "bdtinput", "evt", "dy_rwgt_bdt"]
 
 # Weights
 # plots_lljj += ["llidisoWeight", "trigeffWeight", "puWeight"]
@@ -155,15 +150,10 @@ for systematicType in systematics.keys():
         plots.extend(basePlotter_lljj.generatePlots(categories_lljj, "mll_cut", systematic = systematic, weights = weights_lljj, requested_plots = plots_lljj))
         plots.extend(basePlotter_lljj.generatePlots(categories_lljj, "inverted_mll_cut", systematic = systematic, weights = weights_lljj, requested_plots = plots_lljj))
 
-        # mll < 76 + no btag -> btagM reweighting applied ; only for DY
-        plots.extend(basePlotter_lljj.generatePlots(categories_lljj, "mll_cut", systematic=systematic, weights=weights_lljj + ['dy_nobtag_to_btagM'], requested_plots=plots_lljj + ['resonant_nnoutput', 'DYNobtagToBTagMWeight'], extraString='_with_nobtag_to_btagM_reweighting', prependCuts=['isDY']))
-        # mll > 76 + no btag -> btagM reweighting applied ; only for DY
-        plots.extend(basePlotter_lljj.generatePlots(categories_lljj, "inverted_mll_cut", systematic = systematic, weights = weights_lljj + ['dy_nobtag_to_btagM'], requested_plots = plots_lljj + ['resonant_nnoutput', 'DYNobtagToBTagMWeight'], extraString='_with_nobtag_to_btagM_reweighting', prependCuts=['isDY']))
-
-        # # mll < 76 + b-tagging effiency applied
-        # plots.extend(basePlotter_lljj.generatePlots(categories_lljj, "mll_cut", systematic = systematic, weights = weights_lljj + ['twoB_eff'], requested_plots = plots_lljj, extraString='_with_btag_eff'))
-        # # mll > 76 + btagging efficiency applied
-        # plots.extend(basePlotter_lljj.generatePlots(categories_lljj, "inverted_mll_cut", systematic = systematic, weights = weights_lljj + ['twoB_eff'], requested_plots = plots_lljj, extraString='_with_btag_eff'))
+        # no btag -> btagM reweighting applied ; only for DY
+        plots.extend(basePlotter_lljj.generatePlots(categories_lljj, "no_cut", systematic=systematic, weights=weights_lljj + ['dy_nobtag_to_btagM_BDT'], requested_plots=plots_lljj + ['DYNobtagToBTagMWeight'], extraString='_with_nobtag_to_btagM_reweighting', prependCuts=['isDY']))
+        plots.extend(basePlotter_lljj.generatePlots(categories_lljj, "mll_cut", systematic=systematic, weights=weights_lljj + ['dy_nobtag_to_btagM_BDT'], requested_plots=plots_lljj + ['DYNobtagToBTagMWeight'], extraString='_with_nobtag_to_btagM_reweighting', prependCuts=['isDY']))
+        plots.extend(basePlotter_lljj.generatePlots(categories_lljj, "inverted_mll_cut", systematic = systematic, weights = weights_lljj + ['dy_nobtag_to_btagM_BDT'], requested_plots = plots_lljj + ['DYNobtagToBTagMWeight'], extraString='_with_nobtag_to_btagM_reweighting', prependCuts=['isDY']))
 
         code_in_loop += basePlotter_lljj.get_code_in_loop()
         code_before_loop += basePlotter_lljj.get_code_before_loop()
@@ -175,8 +165,6 @@ for systematicType in systematics.keys():
         plots.extend(basePlotter_llbb.generatePlots(categories_llbb, "no_cut", systematic = systematic, weights = weights_llbb, requested_plots = plots_llbb))
         plots.extend(basePlotter_llbb.generatePlots(categories_llbb, "mll_cut", systematic = systematic, weights = weights_llbb, requested_plots = plots_llbb))
         plots.extend(basePlotter_llbb.generatePlots(categories_llbb, "inverted_mll_cut", systematic = systematic, weights = weights_llbb, requested_plots = plots_llbb))
-
-        # plots.extend(basePlotter_llbb.generatePlots(categories_llbb, "mll_cut", systematic = systematic, weights = weights_llbb + ['nobtag_to_btagM'], requested_plots = plots_llbb + ['twoBEff'], extraString='_with_btag_eff'))
 
         # if systematic == 'nominal':
             # plots.extend(basePlotter_llbb.generatePlots(categories_llbb, "mll_cut", systematic = systematic, weights = weights_llbb, requested_plots = ["llidisoWeight", ], fit2DtemplatesBinning = chosen2Dbinnings))

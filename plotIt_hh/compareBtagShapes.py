@@ -100,6 +100,9 @@ for key in keys:
 
         if not 'All' in key.GetName():
             continue
+        
+        #if not 'no_cut' in key.GetName():
+        #    continue
 
         if not 'nobtag' in key.GetName():
             continue
@@ -110,11 +113,8 @@ for key in keys:
         # if 'inverted_mll_cut' in key.GetName():
             # continue
 
-        if 'with_bdt_btag_eff' in key.GetName():
+        if 'with_nobtag_to_btagM' in key.GetName():
             continue
-
-        #if 'with_nobtag_to_btagM' in key.GetName():
-        #    continue
 
         ## Update all the plots with title, ...
 
@@ -165,17 +165,11 @@ for key in keys:
         elif "jet2_phi" in key.GetName():
             plot['x-axis'] = "Sub-leading jet #phi"
             plot.update(defaultStyle_events)
-        elif "jet1_CSV" in key.GetName():
-            plot['x-axis'] = "Leading jet CSVv2 discriminant"
+        elif "jet1_CMVAv2" in key.GetName():
+            plot['x-axis'] = "Leading jet cMVAv2 discriminant"
             plot.update(defaultStyle_events)
-        elif "jet2_CSV" in key.GetName():
-            plot['x-axis'] = "Sub-leading jet CSVv2 discriminant"
-            plot.update(defaultStyle_events)
-        elif "jet1_JP" in key.GetName():
-            plot['x-axis'] = "Leading jet JP discriminant"
-            plot.update(defaultStyle_events)
-        elif "jet2_JP" in key.GetName():
-            plot['x-axis'] = "Sub-leading jet JP discriminant"
+        elif "jet2_CMVAv2" in key.GetName():
+            plot['x-axis'] = "Sub-leading jet cMVAv2 discriminant"
             plot.update(defaultStyle_events)
         elif "ll_pt_" in key.GetName():
             plot['x-axis'] = "Dilepton system p_{T} (GeV)"

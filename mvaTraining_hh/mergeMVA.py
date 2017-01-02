@@ -4,21 +4,15 @@ import os, sys
 import trainDYBDT
 from multiprocessing import Pool
 
-inFileDir = "/home/fynu/swertz/scratch/CMSSW_8_0_19/src/cp3_llbb/HHTools/condor/161214_skimDY_moreInfo_0/condor/output/"
+inFileDir = "/home/fynu/swertz/scratch/CMSSW_8_0_25/src/cp3_llbb/HHTools/condor/161220_skimDY_for_dy/condor/output/"
 
 filesForMerging  = [ file for file in os.listdir(inFileDir) if "_histos.root" in file ]
-xmlFileDir = "/home/fynu/swertz/scratch/CMSSW_8_0_19/src/cp3_llbb/HHTools/mvaTraining_hh/weights/"
+xmlFileDir = "/home/fynu/swertz/scratch/CMSSW_8_0_25/src/cp3_llbb/HHTools/mvaTraining_hh/weights/"
 
-#date = "2016_12_12"
-#suffix = "incl_vs_bb_8var"
-#date = "2016_12_13"
-#suffix = "ll_cl_vs_bx_cc_8var_ht"
-#date = "2016_12_13"
-#suffix = "ll_vs_rest_8var_ht"
-#date = "2016_12_13"
-#suffix = "bb_vs_rest_7var_ht"
-date = "2016_12_14"
-suffix = "bb_cc_vs_rest_7var_ht_nJets"
+#date = "2016_12_18"
+#suffix = "bb_cc_vs_rest_7var_ht_nJets"
+date = "2016_12_20"
+suffix = "bb_cc_vs_rest_10var"
 
 label_template = "DATE_BDTDY_SUFFIX"
 label = label_template.replace("DATE", date).replace("SUFFIX", suffix)
