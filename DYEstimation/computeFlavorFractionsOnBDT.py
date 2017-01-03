@@ -125,7 +125,7 @@ bdt_tmva_variables = [
 ]
 #bdt_label = "2016_12_18_BDTDY_bb_cc_vs_rest_7var_ht_nJets"
 bdt_label = "2016_12_20_BDTDY_bb_cc_vs_rest_10var"
-bdt_xml_file = "/home/fynu/swertz/scratch/CMSSW_8_0_25/src/cp3_llbb/HHTools/mvaTraining_hh/weights/{}_kBDT.weights.xml".format(bdt_label)
+bdt_xml_file = "/home/fynu/swertz/scratch/CMSSW_8_0_25/src/cp3_llbb/HHTools/DYEstimation/weights/{}_kBDT.weights.xml".format(bdt_label)
 
 dict_tmva_variables = { var[1]: array('f', [0]) for var in bdt_tmva_variables }
 m_reader = ROOT.TMVA.Reader("Silent=1")

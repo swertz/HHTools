@@ -110,6 +110,8 @@ include_directories.append(os.path.join(scriptDir, "..", "common"))
 weights_lljj = ['trigeff', 'llidiso', 'pu']
 categories_lljj = ["All", "MuMu", "ElEl", "MuEl"] 
 plots_lljj = ["mll", "mjj", "basic", "cmva", "bdtinput", "evt", "dy_rwgt_bdt"]
+#categories_lljj = ["All"] 
+#plots_lljj = ["dy_rwgt_bdt", "dy_rwgt_bdt_flavour"]
 
 # Weights
 # plots_lljj += ["llidisoWeight", "trigeffWeight", "puWeight"]
@@ -123,9 +125,12 @@ categories_llbb = ["All", "MuMu", "ElEl", "MuEl"]
 plots_llbb = plots_lljj + ["resonant_nnoutput"]
 #plots_llbb = ["bdtinput", "mjj"]
 
+# No systematics
 systematics = {"modifObjects" : ["nominal"]}
-# systematics = {"modifObjects" : ["nominal", "jecup", "jecdown", "jerup", "jerdown"], "SF" : ["elidisoup", "elidisodown", "muidup", "muiddown", "muisoup", "muisodown", "jjbtagup", "jjbtagdown", "puup", "pudown", "trigeffup", "trigeffdown", "pdfup", "pdfdown", "scale", "scaleUncorr"]}
-#systematics = {"modifObjects" : ["nominal"], "SF" : ["scale"]}
+# All systematics
+#systematics = {"modifObjects" : ["nominal", "jecup", "jecdown", "jerup", "jerdown"], "SF" : ["elidisoup", "elidisodown", "muidup", "muiddown", "muisoup", "muisodown", "jjbtagup", "jjbtagdown", "puup", "pudown", "trigeffup", "trigeffdown", "pdfup", "pdfdown", "scale", "scaleUncorr"]}
+# No b-tag SF systematics AND NO JEC/JER FOR NOW
+#systematics = { "modifObjects": ["nominal"], "SF": ["elidisoup", "elidisodown", "muidup", "muiddown", "muisoup", "muisodown", "puup", "pudown", "trigeffup", "trigeffdown", "pdfup", "pdfdown", "scale", "scaleUncorr"] }
 
 ## Define binning of 2D templates for fitting
 #chosen2Dbinnings = {
@@ -159,7 +164,7 @@ for systematicType in systematics.keys():
         code_before_loop += basePlotter_lljj.get_code_before_loop()
         code_after_loop += basePlotter_lljj.get_code_after_loop()
         
-        ## llbb 
+        # llbb 
         basePlotter_llbb = BasePlotter(baseObjectName = "hh_llmetjj_HWWleptons_btagM_cmva", btagWP_str = 'medium', objects = objects)
        
         plots.extend(basePlotter_llbb.generatePlots(categories_llbb, "no_cut", systematic = systematic, weights = weights_llbb, requested_plots = plots_llbb))

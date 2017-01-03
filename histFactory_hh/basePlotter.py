@@ -3,7 +3,7 @@ import copy, sys
 def default_code_before_loop():
     return r"""
         // Stuff for DY reweighting
-        FWBTagEfficiencyOnBDT fwBtagEff("/home/fynu/sbrochet/scratch/Framework/CMSSW_8_0_24_patch1_HH_Analysis/src/cp3_llbb/HHTools/scripts/btaggingEfficiencyOnCondor/condor/output/btagging_efficiency.root", "/home/fynu/swertz/scratch/CMSSW_8_0_25/src/cp3_llbb/HHTools/scripts/161220_bb_cc_vs_rest_10var_dyFlavorFractionsOnCondor/condor/output/dy_flavor_fraction.root");
+        FWBTagEfficiencyOnBDT fwBtagEff("/home/fynu/sbrochet/scratch/Framework/CMSSW_8_0_24_patch1_HH_Analysis/src/cp3_llbb/HHTools/scripts/btaggingEfficiencyOnCondor/condor/output/btagging_efficiency.root", "/home/fynu/swertz/scratch/CMSSW_8_0_25/src/cp3_llbb/HHTools/DYEstimation/161220_bb_cc_vs_rest_10var_dyFlavorFractionsOnCondor/condor/output/dy_flavor_fraction.root");
         
         bool isDY = m_dataset.name.find("DYJetsToLL") != std::string::npos;
 
@@ -252,7 +252,7 @@ class BasePlotter:
 
         # DY BDT reweighting
         #dy_bdt_xml = "/home/fynu/swertz/scratch/CMSSW_8_0_25/src/cp3_llbb/HHTools/mvaTraining_hh/weights/2016_12_18_BDTDY_bb_cc_vs_rest_7var_ht_nJets_kBDT.weights.xml"
-        dy_bdt_xml = "/home/fynu/swertz/scratch/CMSSW_8_0_25/src/cp3_llbb/HHTools/mvaTraining_hh/weights/2016_12_20_BDTDY_bb_cc_vs_rest_10var_kBDT.weights.xml"
+        dy_bdt_xml = "/home/fynu/swertz/scratch/CMSSW_8_0_25/src/cp3_llbb/HHTools/DYEstimation/weights/2016_12_20_BDTDY_bb_cc_vs_rest_10var_kBDT.weights.xml"
         dy_bdt_variables = [
                 ("jet1_pt",  self.jet1_str + ".p4.Pt()" ),
                 ("jet1_eta",  self.jet1_str + ".p4.Eta()" ),
@@ -306,6 +306,7 @@ class BasePlotter:
         self.evt_plot = []
 
         self.dy_rwgt_bdt_plot = []
+        self.dy_rwgt_bdt_flavour_plot = []
 
         self.other_plot = []
         self.vertex_plot = []
@@ -1174,13 +1175,16 @@ class BasePlotter:
                     }
                 ])
         
+
+            ## DY reweighting plots
+            dy_bdt_flat_binning = '(30, {-0.4325139551124535, -0.2146539640268055, -0.17684879232551598, -0.1522156780133781, -0.13344360493544538, -0.1177783085968212, -0.10431773748076387, -0.09240803627202236, -0.08144732988778663, -0.07139562851774808, -0.06195872754019471, -0.053149265226606804, -0.044689436819594426, -0.036486494035769285, -0.028370020384749492, -0.02052289170780913, -0.01265119174726717, -0.004810595256756055, 0.003258152851774066, 0.01125285685430063, 0.019322492143167114, 0.02785483333896287, 0.03659553016370119, 0.04591206104108278, 0.05601279709011762, 0.06690819726322504, 0.07861467402378061, 0.09302953795299788, 0.11151410228370977, 0.13829367256021688, 0.333748766143408})'
             self.dy_rwgt_bdt_plot.extend([
                 {
                     'name': 'DY_BDT_flat_%s_%s_%s%s'%(self.llFlav, self.suffix, self.extraString, self.systematicString),
                     'variable': 'evaluateMVA("{}", {})'.format(dy_bdt_xml, dy_bdt_variables_string),
                     'plot_cut': self.totalCut,
                     # 161220, bb_cc_vs_rest_10var:
-                    'binning': '(30, {-0.4325139551124535, -0.2146539640268055, -0.17684879232551598, -0.1522156780133781, -0.13344360493544538, -0.1177783085968212, -0.10431773748076387, -0.09240803627202236, -0.08144732988778663, -0.07139562851774808, -0.06195872754019471, -0.053149265226606804, -0.044689436819594426, -0.036486494035769285, -0.028370020384749492, -0.02052289170780913, -0.01265119174726717, -0.004810595256756055, 0.003258152851774066, 0.01125285685430063, 0.019322492143167114, 0.02785483333896287, 0.03659553016370119, 0.04591206104108278, 0.05601279709011762, 0.06690819726322504, 0.07861467402378061, 0.09302953795299788, 0.11151410228370977, 0.13829367256021688, 0.333748766143408})',
+                    'binning': dy_bdt_flat_binning,
                 },
                 {
                     'name': 'DY_BDT_%s_%s_%s%s'%(self.llFlav, self.suffix, self.extraString, self.systematicString),
@@ -1189,6 +1193,16 @@ class BasePlotter:
                     'binning': '(50, -0.4, 0.3)',
                 },
             ])
+            for flav1 in ["b", "c", "l"]:
+                for flav2 in ["b", "c", "l"]:
+                    flavour_cut = "({0}.gen_{2} && {1}.gen_{3})".format(self.jet1_str, self.jet2_str, flav1, flav2)
+                    self.dy_rwgt_bdt_flavour_plot.append({
+                            'name': 'DY_BDT_flav_%s%s_%s_%s_%s%s' % (flav1, flav2, self.llFlav, self.suffix, self.extraString, self.systematicString),
+                            'variable': 'evaluateMVA("{}", {})'.format(dy_bdt_xml, dy_bdt_variables_string),
+                            'plot_cut': self.joinCuts(self.totalCut, flavour_cut),
+                            'binning': dy_bdt_flat_binning,
+                        })
+
 
         plotsToReturn = []
         

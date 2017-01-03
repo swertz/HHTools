@@ -88,6 +88,7 @@ class Configuration:
                 raise Exception("No sample found in the database for %r" % sample)
 
 MainConfiguration = Configuration(get_configuration_file('generate{}.py'))
+#DYOnlyConfiguration = Configuration(get_configuration_file('generate{}.py'))
 DYOnlyConfiguration = Configuration(get_configuration_file('generate{}ForDY.py'), suffix='_for_dy')
 
 # Data
