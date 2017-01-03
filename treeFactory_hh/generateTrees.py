@@ -18,3 +18,4 @@ tree["cut"] = basePlotter.joinCuts(basePlotter.sanityCheck, basePlotter.dict_cat
 tree["branches"] = []
 
 plots_to_branches(plots, tree)
+

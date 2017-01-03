@@ -30,7 +30,7 @@ weights_llbb = []
 flavour = "All"
 categories_llbb = [flavour]
 stage_llbb = "no_cut"
-plots_llbb = ["mll", "mjj", "basic", "bdtinput", "ht", "other", "llidisoWeight", 'jjbtagWeight', 'trigeffWeight', 'puWeight', 'DYNobtagToBTagMWeight', 'forSkimmer', 'csv', 'gen']
+plots_llbb = ["mll", "mjj", "basic", "bdtinput", "ht", "other", "llidisoWeight", 'jjbtagWeight', 'trigeffWeight', 'puWeight', 'DYNobtagToBTagMWeight', 'forSkimmer', 'cmva', 'gen', 'evt', 'detailed_flavour']
 # plots_llbb += ["bdtoutput"]
 
 def plots_to_branches(plots, tree):

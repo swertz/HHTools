@@ -88,6 +88,7 @@ class Configuration:
                 raise Exception("No sample found in the database for %r" % sample)
 
 MainConfiguration = Configuration(get_configuration_file('generate{}.py'))
+#DYOnlyConfiguration = Configuration(get_configuration_file('generate{}.py'))
 DYOnlyConfiguration = Configuration(get_configuration_file('generate{}ForDY.py'), suffix='_for_dy')
 
 # Data
@@ -99,18 +100,18 @@ MainConfiguration.samples.extend([
 
 # Main backgrounds:
 MainConfiguration.samples.extend([
-    # 'ST_tW_top_5f_inclusiveDecays_13TeV-powheg', # tW top
-    # 'ST_tW_antitop_5f_inclusiveDecays_13TeV-powheg', # tW atop
-    # 'ST_t-channel_4f_leptonDecays_13TeV-amcatnlo', # sT t-chan
+    'ST_tW_top_5f_inclusiveDecays_13TeV-powheg', # tW top
+    'ST_tW_antitop_5f_inclusiveDecays_13TeV-powheg', # tW atop
+    'ST_t-channel_4f_leptonDecays_13TeV-amcatnlo', # sT t-chan
     # 'TT_TuneCUETP8M1_13TeV-powheg-pythia8_ext4', # TT incl NLO
     'TTTo2L2Nu_13TeV-powheg_ext1', # TT -> 2L 2Nu NLO
     ])
 
 # # DY NLO (included with other backgrounds)
-# MainConfiguration.samples.extend([
-    # 'DYJetsToLL_M-10to50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8', # DY M10-50 NLO merged
-    # 'DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8', # DY M-50 NLO merged
-# ])
+MainConfiguration.samples.extend([
+  'DYJetsToLL_M-10to50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8', # DY M10-50 NLO merged
+  'DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8', # DY M-50 NLO merged
+])
 
 # DY LO
 MainConfiguration.samples.extend([
@@ -244,13 +245,14 @@ DYOnlyConfiguration.samples = [
     'DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8', # DY M-50 NLO merged
 ]
 
-if not args.treeFactory:
-    # FIXME: We don't have currently a special configuration file for DY when doing plots
-    # For the moment, simply move samples into the main configuration
-    MainConfiguration.samples.extend(DYOnlyConfiguration.samples)
-    DYOnlyConfiguration.samples = []
+#if not args.treeFactory:
+#    # FIXME: We don't have currently a special configuration file for DY when doing plots
+#    # For the moment, simply move samples into the main configuration
+#    MainConfiguration.samples.extend(DYOnlyConfiguration.samples)
+#    DYOnlyConfiguration.samples = []
 
-configurations = [MainConfiguration, DYOnlyConfiguration]
+#configurations = [ DYOnlyConfiguration ]
+configurations = [ MainConfiguration ]
 
 for c in configurations:
     c.get_sample_ids()
@@ -398,8 +400,8 @@ def create_condor(samples, output):
                 dy_bb_sample = copy.deepcopy(sample)
                 newJson = copy.deepcopy(sample["json_skeleton"][sample["db_name"]])
 
-                dy_bb_sample["db_name"] = sample["db_name"].replace("DYJetsToLL", "DYBBOrCCOrBCToLL")
-                newJson["sample_cut"] = "(hh_llmetjj_HWWleptons_nobtag_csv.gen_bb || hh_llmetjj_HWWleptons_nobtag_csv.gen_cc || hh_llmetjj_HWWleptons_nobtag_csv.gen_bc)"
+                dy_bb_sample["db_name"] = sample["db_name"].replace("DYJetsToLL", "DYBBOrCCToLL")
+                newJson["sample_cut"] = "(hh_llmetjj_HWWleptons_nobtag_cmva.gen_bb || hh_llmetjj_HWWleptons_nobtag_cmva.gen_cc)"
 
                 dy_bb_sample["json_skeleton"][dy_bb_sample["db_name"]] = newJson
                 dy_bb_sample["json_skeleton"].pop(sample["db_name"])
@@ -410,7 +412,7 @@ def create_condor(samples, output):
                 newJson = copy.deepcopy(sample["json_skeleton"][sample["db_name"]])
 
                 dy_bx_sample["db_name"] = sample["db_name"].replace("DYJetsToLL", "DYBXOrCXToLL")
-                newJson["sample_cut"] = "(hh_llmetjj_HWWleptons_nobtag_csv.gen_bl || hh_llmetjj_HWWleptons_nobtag_csv.gen_cl)"
+                newJson["sample_cut"] = "(hh_llmetjj_HWWleptons_nobtag_cmva.gen_bl || hh_llmetjj_HWWleptons_nobtag_cmva.gen_cl || hh_llmetjj_HWWleptons_nobtag_cmva.gen_bc)"
 
                 dy_bx_sample["json_skeleton"][dy_bx_sample["db_name"]] = newJson
                 dy_bx_sample["json_skeleton"].pop(sample["db_name"])
@@ -421,7 +423,7 @@ def create_condor(samples, output):
                 newJson = copy.deepcopy(sample["json_skeleton"][sample["db_name"]])
 
                 dy_xx_sample["db_name"] = sample["db_name"].replace("DYJetsToLL", "DYXXToLL")
-                newJson["sample_cut"] = "(hh_llmetjj_HWWleptons_nobtag_csv.gen_ll)"
+                newJson["sample_cut"] = "(hh_llmetjj_HWWleptons_nobtag_cmva.gen_ll)"
 
                 dy_xx_sample["json_skeleton"][dy_xx_sample["db_name"]] = newJson
                 dy_xx_sample["json_skeleton"].pop(sample["db_name"])

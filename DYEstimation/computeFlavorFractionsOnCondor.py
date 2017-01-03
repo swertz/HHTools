@@ -3,13 +3,13 @@
 from cp3_llbb.CommonTools.condorTools import condorSubmitter
 
 samples = [
-    {'ID': 2245,
+    {'ID': 2557,
     'files_per_job': 30},
-    {'ID': 2239,
+    {'ID': 2561,
     'files_per_job': 30},
 ]
 
-jobs = condorSubmitter(samples, "computeFlavorFractions.py", '', 'dyFlavorFractionsOnCondor')
+jobs = condorSubmitter(samples, "computeFlavorFractionsOnBDT.py", '', '161220_bb_cc_vs_rest_10var_dyFlavorFractionsOnCondor')
 
 jobs.setupCondorDirs()
 jobs.createCondorFiles()

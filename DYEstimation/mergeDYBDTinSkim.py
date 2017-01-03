@@ -7,7 +7,7 @@ from multiprocessing import Pool
 inFileDir = "/home/fynu/swertz/scratch/CMSSW_8_0_25/src/cp3_llbb/HHTools/condor/161220_skimDY_for_dy/condor/output/"
 
 filesForMerging  = [ file for file in os.listdir(inFileDir) if "_histos.root" in file ]
-xmlFileDir = "/home/fynu/swertz/scratch/CMSSW_8_0_25/src/cp3_llbb/HHTools/mvaTraining_hh/weights/"
+xmlFileDir = "/home/fynu/swertz/scratch/CMSSW_8_0_25/src/cp3_llbb/HHTools/DYEstimation/weights/"
 
 #date = "2016_12_18"
 #suffix = "bb_cc_vs_rest_7var_ht_nJets"

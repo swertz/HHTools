@@ -100,18 +100,18 @@ for key in keys:
 
         if not 'All' in key.GetName():
             continue
+        
+        #if not 'no_cut' in key.GetName():
+        #    continue
 
         if not 'nobtag' in key.GetName():
             continue
 
-        if not 'mll_cut' in key.GetName():
-            continue
+        #if not 'mll_cut' in key.GetName():
+        #    continue
 
         # if 'inverted_mll_cut' in key.GetName():
             # continue
-
-        if 'with_btag_eff' in key.GetName():
-            continue
 
         if 'with_nobtag_to_btagM' in key.GetName():
             continue
@@ -165,17 +165,11 @@ for key in keys:
         elif "jet2_phi" in key.GetName():
             plot['x-axis'] = "Sub-leading jet #phi"
             plot.update(defaultStyle_events)
-        elif "jet1_CSV" in key.GetName():
-            plot['x-axis'] = "Leading jet CSVv2 discriminant"
+        elif "jet1_CMVAv2" in key.GetName():
+            plot['x-axis'] = "Leading jet cMVAv2 discriminant"
             plot.update(defaultStyle_events)
-        elif "jet2_CSV" in key.GetName():
-            plot['x-axis'] = "Sub-leading jet CSVv2 discriminant"
-            plot.update(defaultStyle_events)
-        elif "jet1_JP" in key.GetName():
-            plot['x-axis'] = "Leading jet JP discriminant"
-            plot.update(defaultStyle_events)
-        elif "jet2_JP" in key.GetName():
-            plot['x-axis'] = "Sub-leading jet JP discriminant"
+        elif "jet2_CMVAv2" in key.GetName():
+            plot['x-axis'] = "Sub-leading jet cMVAv2 discriminant"
             plot.update(defaultStyle_events)
         elif "ll_pt_" in key.GetName():
             plot['x-axis'] = "Dilepton system p_{T} (GeV)"
@@ -225,6 +219,9 @@ for key in keys:
         elif "MTformula_" in key.GetName():
             plot['x-axis'] = "MT"
             plot.update(defaultStyle_events_per_gev)
+        elif "HT" in key.GetName():
+            plot['x-axis'] = "HT"
+            plot.update(defaultStyle_events_per_gev)
         elif "projMET_" in key.GetName():
             plot['x-axis'] = "Projected #slash{E}_{T}"
             plot.update(defaultStyle_events_per_gev)
@@ -266,6 +263,11 @@ for key in keys:
             plot.update(defaultStyle_events)
         elif "cosThetaStar" in key.GetName():
             plot['x-axis'] = "cos(#theta^{*}_{CS})_{lljj#slash{E}_{T}}"
+            plot.update(defaultStyle_events)
+        
+        elif "DY_BDT" in key.GetName():
+            plot['x-axis'] = "DY reweighting BDT"
+            #plot['x-axis-range'] = [-0.2, 0.3]
             plot.update(defaultStyle_events)
         
         # Here be dragons
