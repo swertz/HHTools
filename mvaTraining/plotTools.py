@@ -131,3 +131,37 @@ def draw_roc(signal, background, output_dir=".", output_name="roc.pdf"):
     print("Background efficiency for signal efficiency of 0.70: %f" % x[get_index(y, 0.70)])
     print("Background efficiency for signal efficiency of 0.80: %f" % x[get_index(y, 0.80)])
     print("Background efficiency for signal efficiency of 0.90: %f" % x[get_index(y, 0.90)])
+
+def draw_keras_history(history, output_dir='.', output_name='loss.pdf'):
+    """
+    Plot loss value for training and validation samples
+
+    Argument:
+      history:  Keras training history
+    """
+
+    fig = plt.figure(1, figsize=(7, 7), dpi=300)
+    fig.clear()
+
+    # Create an axes instance
+    ax = fig.add_subplot(111)
+
+    training_losses = history.history['loss']
+    validation_losses = history.history['val_loss']
+    epochs = np.arange(0, len(training_losses))
+
+    ax.plot(epochs, training_losses, '-', color='#8E2800', lw=2, label="Training loss")
+    ax.plot(epochs, validation_losses, '-', color='#468966', lw=2, label="Validation loss")
+
+    ax.margins(0.05)
+
+    ax.set_xlabel("Epochs")
+    ax.set_ylabel("Loss")
+    
+    fig.set_tight_layout(True)
+
+    ax.legend(loc='upper right', numpoints=1, frameon=False)
+
+    fig.savefig(os.path.join(output_dir, output_name))
+
+    plt.close()
