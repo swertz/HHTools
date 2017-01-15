@@ -1,5 +1,7 @@
 import glob
 import os
+import re
+import math
 
 import array
 import numpy as np
@@ -10,12 +12,23 @@ from ROOT import TChain, TFile, TTree
 from root_numpy import tree2array
 
 from sklearn.model_selection import train_test_split
-from sklearn.utils import shuffle
+from sklearn.utils import shuffle, safe_indexing
 
 from keras.models import Sequential
 from keras.layers import Dense, Dropout
+from keras.optimizers import Adam, SGD
+from keras.regularizers import l2
+from keras.layers.normalization import BatchNormalization
+from keras.layers.advanced_activations import LeakyReLU
 
-INPUT_FOLDER = '/home/fynu/sbrochet/scratch/Framework/CMSSW_8_0_24_patch1_HH_Analysis/src/cp3_llbb/HHTools/histFactory_hh/2016-12-13_trees_with_dy_estimate_for_mva_training_and_issf/condor/output'
+INPUT_FOLDER = '/home/fynu/sbrochet/scratch/Framework/CMSSW_8_0_24_patch1_HH_Analysis/src/cp3_llbb/HHTools/mvaTraining/inputs/2017-01-10_with_dy_estimate_from_bdt'
+
+def format_nonresonant_parameters(param):
+    kl = str(param[0])
+    kt = str(param[1])
+    X_Y =  (kl + "_" + kt).replace(".", "p")
+
+    return X_Y
 
 backgrounds = [
         {
@@ -45,13 +58,22 @@ resonant_signal_masses = [400, 650, 900]
 for m in resonant_signal_masses:
     resonant_signals[m] = 'GluGluToRadionToHHTo2B2VTo2L2Nu_M-%d_narrow_Spring16MiniAODv2_*_histos.root' % m
 
+# Key is k_lambda, k_top
+nonresonant_parameters = [(kl, kt) for kl in [-15, -5, -1, 0.0001, 1, 5, 15] for kt in [0.5, 1, 1.75, 2.5]]
+
+# Create map of signal points
+nonresonant_signals = {}
+for grid_point in nonresonant_parameters:
+    X_Y = format_nonresonant_parameters(grid_point)
+    nonresonant_signals[grid_point] = 'GluGluToHHTo2B2VTo2L2Nu_base_*_point_{}_13TeV-madgraph_*_histos.root'.format(X_Y)
+
 def create_resonant_model(n_inputs):
     # Define the model
     model = Sequential()
     model.add(Dense(100, input_dim=n_inputs, activation="relu", init="glorot_uniform"))
     model.add(Dense(100, activation="relu", init='glorot_uniform'))
     model.add(Dense(100, activation="relu", init='glorot_uniform'))
-    model.add(Dropout(0.1))
+    model.add(Dropout(0.2))
     model.add(Dense(2, activation='softmax', init='glorot_uniform'))
 
     model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
@@ -60,7 +82,69 @@ def create_resonant_model(n_inputs):
 
     return model
 
+def create_nonresonant_model(n_inputs):
+
+    # Define the model
+    model = Sequential()
+    model.add(Dense(128, input_dim=n_inputs, init="glorot_uniform"))
+    model.add(LeakyReLU(alpha=0.2))
+
+    n_hidden_layers = 3
+    for i in range(n_hidden_layers):
+        model.add(Dense(128, init='glorot_uniform'))
+        model.add(LeakyReLU(alpha=0.2))
+
+    model.add(Dropout(0.2))
+    model.add(Dense(2, activation='softmax', init='glorot_uniform'))
+
+    # optimizer = SGD(lr=0.03, decay=1e-6, momentum=0.9, nesterov=True)
+    optimizer = Adam(lr=0.0001)
+
+    model.compile(loss='categorical_crossentropy', optimizer=optimizer, metrics=['accuracy'])
+
+    model.summary()
+
+    return model
+
+def join_expression(*exprs):
+    if len(exprs) == 0:
+        return ""
+    elif len(exprs) == 1:
+        return exprs[0]
+    else:
+        total_expr = "("
+        for expr in exprs:
+            expr = expr.strip().strip("*")
+            if len(expr) == 0:
+                continue
+            total_expr += "(" + expr + ")*" 
+        total_expr = total_expr.strip("*") + ")"
+        return total_expr
+
+def skim_arrays(*arrays, **options):
+    """
+    Randomly select entries from arrays
+    """
+    rs = np.random.RandomState(42)
+
+    fraction = options.pop('fraction', 1)
+
+    if fraction != 1:
+        n_entries = int(math.floor(fraction * len(arrays[0])))
+
+        indices = np.arange(len(arrays[0]))
+        rs.shuffle(indices)
+        indices = indices[:n_entries]
+
+        return [safe_indexing(a, indices) for a in arrays]
+
+    return arrays
+
 def tree_to_numpy(input_file, variables, weight, cut=None, reweight_to_cross_section=False):
+    """
+    Convert a ROOT TTree to a numpy array.
+    """
+
     file_handle = TFile.Open(input_file)
 
     tree = file_handle.Get('t')
@@ -72,6 +156,33 @@ def tree_to_numpy(input_file, variables, weight, cut=None, reweight_to_cross_sec
         relative_weight = cross_section / file_handle.Get("event_weight_sum").GetVal()
 
     # relative_weight = cross_section / file_handle.Get("event_weight_sum").GetVal()
+
+    if isinstance(weight, dict):
+        # Keys are regular expression and values are actual weights. Find the key matching
+        # the input filename
+        found = False
+        weight_expr = None
+        if '__base__' in weight:
+            weight_expr = weight['__base__']
+
+        for k, v in weight.items():
+            if k == '__base__':
+                continue
+
+            groups = re.search(k, input_file)
+            if not groups:
+                continue
+            else:
+                if found:
+                    raise Exception("The input file is matched by more than one weight regular expression. %r" % input_file)
+
+                found = True
+                weight_expr = join_expression(weight_expr, v)
+
+        if not weight_expr:
+            raise Exception("Not weight expression found for input file %r" % weight_expr)
+
+        weight = weight_expr
 
     # Read the tree and convert it to a numpy structured array
     a = tree2array(tree, branches=variables + [weight], selection=cut)
@@ -91,13 +202,36 @@ def tree_to_numpy(input_file, variables, weight, cut=None, reweight_to_cross_sec
 
 class DatasetManager:
     def __init__(self, variables, weight_expression, selection):
+        """
+        Create a new dataset manager
+
+        Parameters:
+            variables: list of input variables. This can be either branch names or a more
+              complexe mathematical expression
+            selection: a cut expression applied to each event. Only events passing this selection are
+              kept
+            weight_expression: either:
+              - a string representing a global weight expression
+              - a dict. Keys are regular expression, and values are weight expression. The weight
+                  expression chosen will be the one where the keys matches the input file name.
+        """
+
         self.variables = variables
-        self.weight_expression = weight_expression
         self.selection = selection
+        self.weight_expression = weight_expression
 
         self.resonant_mass_probabilities = None
 
-    def load_resonant_signal(self, masses=resonant_signal_masses, add_mass_column=False):
+    def load_resonant_signal(self, masses=resonant_signal_masses, add_mass_column=False, fraction=1):
+        """
+        Load resonant signal
+
+        Parameters:
+          masses: list of masses to load
+          add_mass_column: if True, a column is added at the end of the dataset with the mass of the sample
+          fraction: the fraction of signal events to keep. Default to 1, ie keeping all the events
+        """
+
         datasets = []
         weights = []
         p = [[], []]
@@ -107,7 +241,9 @@ class DatasetManager:
         for m in masses:
             f = get_file_from_glob(os.path.join(INPUT_FOLDER, resonant_signals[m]))
             dataset, weight = tree_to_numpy(f, self.variables, self.weight_expression, self.selection, reweight_to_cross_section=False)
-            weights.append(weight)
+
+            if fraction != 1:
+                dataset, weight = skim_arrays(dataset, weight, fraction=fraction)
 
             p[0].append(m)
             p[1].append(len(dataset))
@@ -118,6 +254,7 @@ class DatasetManager:
                 dataset = np.c_[dataset, mass_col]
 
             datasets.append(dataset)
+            weights.append(weight)
 
         # Normalize probabilities in order that sum(p) = 1
         p[1] = np.array(p[1], dtype='float')
@@ -129,10 +266,62 @@ class DatasetManager:
 
         print("Done. Number of signal events: %d ; Sum of weights: %.4f" % (len(self.signal_dataset), np.sum(self.signal_weights)))
 
-    def load_backgrounds(self, add_mass_column=False):
+    def load_nonresonant_signal(self, parameters_list=nonresonant_parameters, add_parameters_columns=False, fraction=1):
+        datasets = []
+        weights = []
+        p = [[], []]
+
+        print("Loading nonresonant signal...")
+
+        for parameters in parameters_list:
+            print("For parameters: {}".format(parameters))
+            files = get_files_from_glob(os.path.join(INPUT_FOLDER, nonresonant_signals[parameters]))
+
+            dataset = []
+            weight = []
+            for f in files:
+                dataset_, weight_ = tree_to_numpy(f, self.variables, self.weight_expression, self.selection, reweight_to_cross_section=False)
+                weight.append(weight_)
+                dataset.append(dataset_)
+
+            dataset = np.concatenate(dataset)
+            weight = np.concatenate(weight)
+
+            if fraction != 1:
+                dataset, weight = skim_arrays(dataset, weight, fraction=fraction)
+
+            p[0].append(parameters)
+            p[1].append(len(dataset))
+
+            if add_parameters_columns:
+                for parameter in parameters:
+                    col = np.empty(len(dataset))
+                    col.fill(parameter)
+                    dataset = np.c_[dataset, col]
+
+            datasets.append(dataset)
+            weights.append(weight)
+
+        # Normalize probabilities in order that sum(p) = 1
+        p[1] = np.array(p[1], dtype='float')
+        p[1] /= np.sum(p[1])
+
+        self.signal_dataset = np.concatenate(datasets)
+        self.signal_weights = np.concatenate(weights)
+        self.nonresonant_parameters_probabilities = p
+
+        print("Done. Number of signal events: %d ; Sum of weights: %.4f" % (len(self.signal_dataset), np.sum(self.signal_weights)))
+
+    def load_backgrounds(self, add_mass_column=False, add_parameters_columns=False):
+
+        if add_mass_column and add_parameters_columns:
+            raise Exception("add_mass_column and add_parameters_columns are mutually exclusive")
 
         if add_mass_column and not self.resonant_mass_probabilities:
             raise Exception("You need to first load the resonant signal before the background")
+
+        if add_parameters_columns and not self.nonresonant_parameters_probabilities:
+            raise Exception("You need to first load the nonresonant signals before the background")
 
         datasets = []
         weights = []
@@ -144,10 +333,18 @@ class DatasetManager:
             dataset, weight = tree_to_numpy(f, self.variables, self.weight_expression, self.selection, reweight_to_cross_section=True)
             weights.append(weight)
 
+            probabilities = None
             if add_mass_column:
+                probabilities = self.resonant_mass_probabilities
+            elif add_parameters_columns:
+                probabilities = self.nonresonant_parameters_probabilities
+
+            if probabilities:
                 rs = np.random.RandomState(42)
-                mass_col = np.array(rs.choice(self.resonant_mass_probabilities[0], len(dataset), p=self.resonant_mass_probabilities[1]), dtype='float')
-                dataset = np.c_[dataset, mass_col]
+
+                indices = rs.choice(len(probabilities[0]), len(dataset), p=probabilities[1])
+                cols = np.array(np.take(probabilities[0], indices, axis=0), dtype='float')
+                dataset = np.c_[dataset, cols]
 
             datasets.append(dataset)
 
@@ -155,6 +352,12 @@ class DatasetManager:
         self.background_weights = np.concatenate(weights)
 
         print("Done. Number of background events: %d ; Sum of weights: %.4f" % (len(self.background_dataset), np.sum(self.background_weights)))
+
+    def update_background_mass_column(self):
+        rs = np.random.RandomState(42)
+        mass_col = np.array(rs.choice(self.resonant_mass_probabilities[0], len(self.background_dataset), p=self.resonant_mass_probabilities[1]), dtype='float')
+
+        self.background_dataset[:, len(self.variables)] = mass_col
 
 
     def split(self, reweight_background_training_sample=True):
@@ -179,15 +382,15 @@ class DatasetManager:
         # Create merged training and testing dataset, with targets
         self.training_dataset = np.concatenate([self.train_signal_dataset, self.train_background_dataset])
         self.training_weights = np.concatenate([self.train_signal_weights, self.train_background_weights])
-        self.testing_dataset = np.concatenate([self.train_signal_dataset, self.train_background_dataset])
-        self.testing_weights = np.concatenate([self.train_signal_weights, self.train_background_weights])
+        self.testing_dataset = np.concatenate([self.test_signal_dataset, self.test_background_dataset])
+        self.testing_weights = np.concatenate([self.test_signal_weights, self.test_background_weights])
 
         # Create one-hot vector, the target of the training
         # A hot-vector is a N dimensional vector, where N is the number of classes
         # Here we assume that class 0 is signal, and class 1 is background
         # So we have [1 0] for signal and [0 1] for background
         self.training_targets = np.array([[1, 0]] * len(self.train_signal_dataset) + [[0, 1]] * len(self.train_background_dataset))
-        self.testing_targets = np.array([[1, 0]] * len(self.train_signal_dataset) + [[0, 1]] * len(self.train_background_dataset))
+        self.testing_targets = np.array([[1, 0]] * len(self.test_signal_dataset) + [[0, 1]] * len(self.test_background_dataset))
 
         # Shuffle everything
         self.training_dataset, self.training_weights, self.training_targets = shuffle(self.training_dataset, self.training_weights, self.training_targets, random_state=42)
@@ -197,7 +400,7 @@ class DatasetManager:
         return self.train_signal_dataset, self.train_background_dataset
 
     def get_testing_datasets(self):
-        return self.train_signal_dataset, self.train_background_dataset
+        return self.test_signal_dataset, self.test_background_dataset
 
     def get_training_weights(self):
         return self.train_signal_weights, self.train_background_weights
@@ -236,7 +439,7 @@ class DatasetManager:
         return self.background_weights
 
     def _get_predictions(self, model, values):
-        predictions = model.predict(values)
+        predictions = model.predict(values, batch_size=5000, verbose=1)
         return np.delete(predictions, 1, axis=1).flatten()
 
 def get_file_from_glob(f):
@@ -245,3 +448,10 @@ def get_file_from_glob(f):
         raise Exception('Only one input file is supported per glob pattern: %s' % files)
 
     return files[0]
+
+def get_files_from_glob(f):
+    files = glob.glob(f)
+    if len(files) == 0:
+        raise Exception('No file matching glob pattern: %s' % f)
+
+    return files
