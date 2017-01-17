@@ -8,7 +8,7 @@ sys.path.append(os.path.join(scriptDir, "../histFactory_hh"))
 from basePlotter import *
 from TreesDefinition import *
 
-# llbb 
+# lljj
 basePlotter = BasePlotter(baseObjectName = "hh_llmetjj_HWWleptons_nobtag_cmva", btagWP_str = 'nobtag', objects = "nominal")
 plots.extend(basePlotter.generatePlots(categories_llbb, stage_llbb, systematic = "nominal", weights = weights_llbb, requested_plots = plots_llbb))
 
@@ -19,7 +19,7 @@ tree["branches"] = []
 
 plots_to_branches(plots, tree)
 
-
+# llbb
 #llbbPlotter = BasePlotter(baseObjectName = "hh_llmetjj_HWWleptons_btagM_cmva", btagWP_str = 'medium', objects = "nominal")
 #
 #is_llbb = llbbPlotter.joinCuts(llbbPlotter.sanityCheck, llbbPlotter.dict_cat_cut['All'])

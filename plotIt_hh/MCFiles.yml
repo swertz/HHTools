@@ -294,28 +294,58 @@
 #  group: DY
 #  order: 7
   
-# NLO
-'DYJetsToLL_M-10to50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_*_histos.root':
-  type: mc
-  group: DY
-  order: 7
+## NLO
+#'DYJetsToLL_M-10to50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_*_histos.root':
+#  type: mc
+#  group: DY
+#  order: 7
+#
+#'DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_*_histos.root':
+#  type: mc
+#  group: DY
+#  order: 7
 
-'DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_*_histos.root':
+# Estimated from Data (other background MC subtracted)
+'dyEstimation.root':
   type: mc
   group: DY
   order: 7
+  rename:
+    - from: "btagM"
+      to: "nobtag"
+    - from: "cut"
+      to: "cut_with_nobtag_to_btagM_reweighting"
 
 # Signal, non-resonant
 
-#'GluGluToHHTo2B2VTo2L2Nu_node_SM_13TeV-madgraph_v0.1.4+76X_HHAnalysis_2016-06-03.v0_histos.root':
-  #type: signal
-  #cross-section: 10000
+'GluGluToHHTo2B2VTo2L2Nu_node_SM_13TeV-madgraph_*_histos.root':
+  type: signal
+  cross-section: 1000
+  line-color: '#2ca02c' # from https://github.com/vega/vega/wiki/Scales#scale-range-literals
   #line-color: '#05C10C'
-  ##line-color: '#008A00'
-  #legend: 'SM'
-  #legend-order: 14
-  #line-width: 2.7
-  #line-type: 1
+  #line-color: '#008A00'
+  legend: 'SM'
+  legend-order: 14
+  line-width: 2.7
+  line-type: 1
+
+'GluGluToHHTo2B2VTo2L2Nu_point_-5_1p75_13TeV-madgraph_*_histos.root':
+  type: signal
+  cross-section: 1000
+  line-color: '#d62728'
+  legend: '(#kappa_{#lambda}, #kappa_{t}) = (-5, 1.75)'
+  legend-order: 13
+  line-width: 2.7
+  line-type: 1
+
+'GluGluToHHTo2B2VTo2L2Nu_point_5_0p5_13TeV-madgraph_*_histos.root':
+  type: signal
+  cross-section: 1000
+  line-color: '#9467bd'
+  legend: '(#kappa_{#lambda}, #kappa_{t}) = (5, 0.5)'
+  legend-order: 13
+  line-width: 2.7
+  line-type: 1
 
 #'GluGluToHHTo2B2VTo2L2Nu_node_box_13TeV-madgraph_v0.1.4+76X_HHAnalysis_2016-06-03.v0_histos.root':
 #  type: signal
@@ -458,7 +488,7 @@
 #  legend-order: 5
 #  line-width: 2
 #  line-type: 1
-#
+
 'GluGluToRadionToHHTo2B2VTo2L2Nu_M-650_narrow_*_histos.root':
   type: signal
   cross-section: 1000

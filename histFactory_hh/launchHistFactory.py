@@ -89,6 +89,7 @@ class Configuration:
 
 MainConfiguration = Configuration(get_configuration_file('generate{}.py'))
 #DYOnlyConfiguration = Configuration(get_configuration_file('generate{}.py'))
+SignalConfiguration = Configuration(get_configuration_file('generate{}ForSignal.py'), '_for_signal')
 DYOnlyConfiguration = Configuration(get_configuration_file('generate{}ForDY.py'), suffix='_for_dy')
 
 # Data
@@ -100,17 +101,17 @@ MainConfiguration.samples.extend([
 
 # Main backgrounds:
 MainConfiguration.samples.extend([
-    'ST_tW_top_5f_inclusiveDecays_13TeV-powheg', # tW top
-    'ST_tW_antitop_5f_inclusiveDecays_13TeV-powheg', # tW atop
-    'ST_t-channel_4f_leptonDecays_13TeV-amcatnlo', # sT t-chan
+    #'ST_tW_top_5f_inclusiveDecays_13TeV-powheg', # tW top
+    #'ST_tW_antitop_5f_inclusiveDecays_13TeV-powheg', # tW atop
+    #'ST_t-channel_4f_leptonDecays_13TeV-amcatnlo', # sT t-chan
     # 'TT_TuneCUETP8M1_13TeV-powheg-pythia8_ext4', # TT incl NLO
     'TTTo2L2Nu_13TeV-powheg_ext1', # TT -> 2L 2Nu NLO
     ])
 
-# # DY NLO (included with other backgrounds)
+# DY NLO (included with other backgrounds)
 MainConfiguration.samples.extend([
-  'DYJetsToLL_M-10to50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8', # DY M10-50 NLO merged
-  'DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8', # DY M-50 NLO merged
+  #'DYJetsToLL_M-10to50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8', # DY M10-50 NLO merged
+  #'DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8', # DY M-50 NLO merged
 ])
 
 # DY LO
@@ -219,24 +220,20 @@ MainConfiguration.samples.extend([
    # #1719, # Pt-20toInfMuEnriched
    # ])
 
-# NonResonant with GEN info
-MainConfiguration.samples.extend([
-    # 'GluGluToHHTo2B2VTo2L2Nu_node_SM_13TeV-madgraph', # SM
-    # 'GluGluToHHTo2B2VTo2L2Nu_node_box_13TeV-madgraph', # box
-    ])
+## Signals: separate configuration, since we only run on llbb stage
 
 # Resonant signal
-MainConfiguration.samples.extend([
+SignalConfiguration.samples.extend([
     'GluGluToRadionToHHTo2B2VTo2L2Nu_M'
 ])
 
 # Non-resonant signal
-MainConfiguration.samples.extend([
+SignalConfiguration.samples.extend([
     'GluGluToHHTo2B2VTo2L2Nu_node_'
 ])
 
 # NonResonant merged
-# MainConfiguration.samples.append('GluGluToHHTo2B2VTo2L2Nu_all_nodes_13TeV-madgraph')
+# SignalConfiguration.samples.append('GluGluToHHTo2B2VTo2L2Nu_all_nodes_13TeV-madgraph')
 
 # DY NLO (separated from the rest because it's estimated from the data with help of the no-btag sample)
 # Just comment if you don't want to process DY separately from the rest
@@ -245,14 +242,20 @@ DYOnlyConfiguration.samples = [
     'DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8', # DY M-50 NLO merged
 ]
 
-#if not args.treeFactory:
-#    # FIXME: We don't have currently a special configuration file for DY when doing plots
-#    # For the moment, simply move samples into the main configuration
-#    MainConfiguration.samples.extend(DYOnlyConfiguration.samples)
-#    DYOnlyConfiguration.samples = []
+if not args.treeFactory:
+    # We don't have currently a special configuration file for DY when doing plots
+    # Simply move samples into the main configuration
+    MainConfiguration.samples.extend(DYOnlyConfiguration.samples)
+    DYOnlyConfiguration.samples = []
+if args.treeFactory:
+    # We don't have currently a special configuration file for signals when doing skims
+    # Simply move samples into the main configuration
+    MainConfiguration.samples.extend(SignalConfiguration.samples)
+    SignalConfiguration.samples = []
 
-#configurations = [ DYOnlyConfiguration ]
-configurations = [ MainConfiguration ]
+#configurations = [ MainConfiguration, DYOnlyConfiguration ]
+configurations = [ MainConfiguration, SignalConfiguration]
+#configurations= [ MainConfiguration ]
 
 for c in configurations:
     c.get_sample_ids()
@@ -351,7 +354,24 @@ def create_condor(samples, output):
     splitDY = False
 
     operators_MV = ["OtG", "Otphi", "O6", "OH"]
-    rwgt_base = [ "SM", "box" ] + range(2, 13)
+    
+    def get_node(db_name):
+        split_name = db_name.split("_")
+        node = None
+        for i, it in enumerate(split_name):
+            if it == "node":
+                node = split_name[i+1]
+                break
+        if node is None:
+            raise Exception("Could not extract node from DB name {}".format(db_name))
+        return node
+
+    def get_node_id(node):
+        if node == "SM": return "0"
+        elif node == "box": return "1"
+        else: return node
+
+    training_grid = [ (kl, kt) for kl in [-15, -5, -1, 0.0001, 1, 5, 15] for kt in [0.5, 1, 1.75, 2.5] ]
 
     ## Modify the input samples to add sample cuts and stuff
     if args.filter:
@@ -435,6 +455,31 @@ def create_condor(samples, output):
 
             if 'WJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8' in sample["db_name"]:
                 sample["json_skeleton"][sample["db_name"]]["sample_cut"] = "event_ht < 100"
+
+            # Benchmark to training grid reweighting (ME-based)
+            if "node" in sample["db_name"]:
+                base = get_node(sample["db_name"])
+                
+                for grid_point in training_grid:
+                    kl = str(grid_point[0])
+                    kt = str(grid_point[1])
+                    
+                    weight_args = [get_node_id(base), kl, kt]
+
+                    newSample = copy.deepcopy(sample)
+                    newJson = copy.deepcopy(sample["json_skeleton"][sample["db_name"]])
+                
+                    point_str = "base_" + base + "_point_" + kl + "_" + kt
+                    point_str = point_str.replace(".", "p")
+                    newSample["db_name"] = sample["db_name"].replace("node_" + base, point_str)
+                    newJson["sample-weight"] = "training_grid"
+                    newJson["sample-weight-args"] = weight_args
+                
+                    newSample["json_skeleton"][newSample["db_name"]] = newJson
+                    newSample["json_skeleton"].pop(sample["db_name"])
+                    mySub.sampleCfg.append(newSample)
+
+                #mySub.sampleCfg.remove(sample)
 
             ## Cluster to 1507 points reweighting (template-based)
             #if "all_nodes" in sample["db_name"]:

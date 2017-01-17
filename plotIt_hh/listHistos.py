@@ -11,7 +11,7 @@ import argparse
 parser = argparse.ArgumentParser(description='Facility to produce the yml with plots information.')
 parser.add_argument('--yields', help='If you just want to produce the yields and systematics.', action="store_true")
 parser.add_argument('-d', '--directory', dest='directory', required=True, help='Directory of the input rootfiles.')
-parser.add_argument('--blinded', dest='unblinded', help='If you want to produce blinded plots', action="store_false")
+parser.add_argument('--unblinded', dest='unblinded', help='If you want to produce unblinded plots', action="store_true")
 args = parser.parse_args()
 
 if not os.path.exists(args.directory):
@@ -101,7 +101,13 @@ for key in keys:
         if "All" not in key.GetName():
             continue
 
-        if 'with_btag' in key.GetName() or 'high_mll' in key.GetName():
+        if not 'btagM' in key.GetName():
+            continue
+
+        #if not "no_cut" in key.GetName():
+        #    continue
+
+        if "nobtag_to_btagM_reweighting" in key.GetName():
             continue
 
         ## Update all the plots with title, ...
@@ -153,6 +159,12 @@ for key in keys:
             plot.update(defaultStyle_events)
         elif "jet2_CSV" in key.GetName():
             plot['x-axis'] = "Sub-leading jet CSVv2 discriminant"
+            plot.update(defaultStyle_events)
+        elif "jet1_CMVAv2" in key.GetName():
+            plot['x-axis'] = "Leading jet cMVAv2 discriminant"
+            plot.update(defaultStyle_events)
+        elif "jet2_CMVAv2" in key.GetName():
+            plot['x-axis'] = "Sub-leading jet cMVAv2 discriminant"
             plot.update(defaultStyle_events)
         elif "jet1_JP" in key.GetName():
             plot['x-axis'] = "Leading jet JP discriminant"
@@ -208,6 +220,9 @@ for key in keys:
         elif "MTformula_" in key.GetName():
             plot['x-axis'] = "MT"
             plot.update(defaultStyle_events_per_gev)
+        elif "HT" in key.GetName():
+            plot['x-axis'] = "HT"
+            plot.update(defaultStyle_events_per_gev)
         elif "projMET_" in key.GetName():
             plot['x-axis'] = "Projected #slash{E}_{T}"
             plot.update(defaultStyle_events_per_gev)
@@ -251,6 +266,10 @@ for key in keys:
             plot['x-axis'] = "cos(#theta^{*}_{CS})_{lljj#slash{E}_{T}}"
             plot.update(defaultStyle_events)
         
+        elif "DY_BDT" in key.GetName():
+            plot['x-axis'] = "DY reweighting BDT"
+            plot.update(defaultStyle_events)
+        
         # Here be dragons
 
         elif "MT2" in key.GetName():
@@ -288,10 +307,10 @@ for key in keys:
 
         elif "NN_" in key.GetName():
             plot['x-axis'] = "NN output"
+            plot['log-y'] = "both"
             plot.update(defaultStyle_events)
-            if "mll_cut" in key.GetName():
-                if not args.unblinded and "blind" not in key.GetName():
-                    plot['blinded-range'] = [0.7, 1]
+            if not args.unblinded and "blind" not in key.GetName() and "inverted" not in key.GetName():
+                plot['blinded-range'] = [0.7, 1]
         
         elif "MVA_" in key.GetName() and "_vs_" in key.GetName():
             plot['x-axis'] = "BDT output, m_{jj} bins"

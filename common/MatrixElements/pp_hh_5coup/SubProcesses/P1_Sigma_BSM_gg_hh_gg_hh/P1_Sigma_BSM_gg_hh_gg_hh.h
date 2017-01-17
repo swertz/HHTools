@@ -29,7 +29,7 @@
 #include <functional> 
 
 #include <Parameters_BSM_gg_hh.h> 
-#include <SubProcess.h> 
+#include "../../include/SubProcess.h"
 
 #include <MatrixElement.h> 
 

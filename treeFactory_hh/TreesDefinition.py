@@ -24,6 +24,17 @@ sample_weights = {}
 # for node in range(1, 13):
     # sample_weights[ "cluster_node_" + str(node) ] = "getBenchmarkReweighter().getWeight({}-1, hh_gen_mHH, hh_gen_costhetastar)".format(node)
 
+training_grid_reweighter = GridReweighting(scriptDir)
+
+code_before_loop += training_grid_reweighter.before_loop()
+code_in_loop += training_grid_reweighter.in_loop()
+code_after_loop += training_grid_reweighter.after_loop()
+include_directories += training_grid_reweighter.include_dirs()
+headers += training_grid_reweighter.headers()
+library_directories += training_grid_reweighter.library_dirs()
+libraries += training_grid_reweighter.libraries()
+sample_weights["training_grid"] = training_grid_reweighter.sample_weight()
+
 # Plot configuration
 
 weights_llbb = []

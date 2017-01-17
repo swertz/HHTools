@@ -6,6 +6,17 @@ import argparse
 import ROOT as R
 R.PyConfig.IgnoreCommandLineOptions = True
 R.gROOT.Reset()
+R.gROOT.SetBatch(1)
+
+import os
+import sys
+
+CMSSW_BASE = os.environ['CMSSW_BASE']
+SCRAM_ARCH = os.environ['SCRAM_ARCH']
+sys.path.append(os.path.join(CMSSW_BASE, 'src', 'cp3_llbb', 'CommonTools', 'toolBox'))
+
+from drawCanvas import drawTGraph
+
 
 totalName = "DY_BDT_flat_All_hh_llmetjj_HWWleptons_nobtag_cmva_no_cut"
 passNameTemplate = "DY_BDT_flav_{}{}_All_hh_llmetjj_HWWleptons_nobtag_cmva_no_cut"
@@ -17,10 +28,15 @@ parser.add_argument('-o', '--output', help='Output', required=True)
 parser.add_argument('-s', '--scale', action='store_true', help='Scale by process XS/sum(weights). Is most likely already done if it comes from the plotter')
 parser.add_argument('-t', '--total', default=totalName, help='Name of the histogram for all events (inclusive)')
 parser.add_argument('-p', '--passed', default=passNameTemplate, help='Name of the "pass" histogram for the flavour fractions (with two "{}" being replaced by the flavours)')
+parser.add_argument('-c', '--compare', help="If specified, create comparison plots of the efficiencies in the given folder")
 
 options = parser.parse_args()
 
-systematics = ["nominal", "elidisoup", "elidisodown", "muidup", "muiddown", "muisoup", "muisodown", "puup", "pudown", "trigeffup", "trigeffdown", "pdfup", "pdfdown", "scaleUncorrup", "scaleUncorrdown"]
+baseSystematics = ["elidiso", "muid", "muiso", "pu", "trigeff", "pdf", "scaleUncorr"]
+systematics = ["nominal"]
+for syst in baseSystematics:
+    systematics.append(syst + "up")
+    systematics.append(syst + "down")
 
 flavours = ["b", "c", "l"]
 
@@ -85,5 +101,28 @@ for fracList in flavourFractions.values():
     for frac in fracList[1:]:
         thisFrac.Add(frac)
     thisFrac.Write()
+    fracList = [ thisFrac ]
 
 r_file.Close()
+
+if options.compare is not None:
+    outDir = options.compare
+    if not os.path.isdir(outDir):
+        os.mkdir(outDir)
+
+    for flav1 in flavours:
+        for flav2 in flavours:
+            for syst in baseSystematics:
+                name = "{}{}_frac".format(flav1, flav2)
+                graphs = {
+                        "nominal": flavourFractions[name][0].CreateGraph(),
+                        "up": flavourFractions[name + "__" + syst + "up"][0].CreateGraph(),
+                        "down": flavourFractions[name + "__" + syst + "down"][0].CreateGraph()
+                    }
+                
+                leg = R.TLegend(0.7, 0.91, 0.943, 1.)
+                leg.SetNColumns(3)
+                for item in graphs.items():
+                    leg.AddEntry(item[1], item[0], "P")
+
+                drawTGraph(graphs.values(), "{}{}_{}".format(flav1, flav2, syst), legend=leg, xLabel="DY BDT", yLabel="Flavour fraction for {}{}".format(flav1, flav2), leftText="Systematic: " + syst, dir=outDir)

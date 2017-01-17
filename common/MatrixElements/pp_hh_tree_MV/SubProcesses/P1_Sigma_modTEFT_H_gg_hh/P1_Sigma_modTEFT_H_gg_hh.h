@@ -29,7 +29,7 @@
 #include <functional> 
 
 #include <Parameters_modTEFT_H.h> 
-#include <SubProcess.h> 
+#include "../../include/SubProcess.h"
 
 #include <MatrixElement.h> 
 
@@ -80,7 +80,8 @@ class P1_Sigma_modTEFT_H_gg_hh: public momemta::MatrixElement
     double matrix_1_gg_hh(); 
 
     // map of final states
-    std::map < std::vector<int> , std::vector < pp_hh_5coup_BSM_gg_hh::SubProcess <
+    std::map < std::vector<int> , std::vector < pp_hh_tree_MV_standalone_modTEFT_H::SubProcess <
+    //std::map < std::vector<int> , std::vector < pp_hh_5coup_BSM_gg_hh::SubProcess <
         P1_Sigma_modTEFT_H_gg_hh >> > mapFinalStates;
 
     // Reference to the model parameters instance passed in the constructor

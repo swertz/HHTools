@@ -62,20 +62,20 @@
 
 'no_btag':
   legend: 'No btag'
-  legend-order: 4
+  legend-order: 1
   line-width: 2.7
   line-type: 1
   fill-type: 0
-  line-color: '#00A0B0'
+  line-color: '#1BA1E2'
   legend-style: l
 
 'with_btag':
   legend: '#geq 2 btag'
-  legend-order: 3
+  legend-order: 2
   line-width: 2.7
   line-type: 1
   fill-type: 0
-  line-color: '#BF0A2B'
+  line-color: '#E51400'
   legend-style: l
 
 'no_btag_with_eff':
@@ -89,12 +89,39 @@
   legend-style: l
 
 'no_btag_with_reweighting':
-  legend: 'No btag with reweighting'
-  legend-order: 1
+  legend: 'W[No btag]'
+  legend-order: 3
   line-width: 2.7
   line-type: 1
   fill-type: 0
-  line-color: '#7D8A2E'
+  line-color: '#AA00FF'
+  legend-style: l
+
+'data_nobtag_subtracted':
+  legend: 'Data (nobtag), bkg. subtracted'
+  legend-order: 4
+  line-width: 2.7
+  line-type: 1
+  fill-type: 0
+  fill-color: '#A4C400'
+  legend-style: l
+
+'data_btagM_subtracted':
+  legend: 'Data (btag), bkg. subtracted'
+  legend-order: 5
+  line-width: 2.7
+  line-type: 1
+  fill-type: 0
+  fill-color: '#C02942'
+  legend-style: l
+
+'reweighted_data_subtracted':
+  legend: 'W[Data (nobtag), bkg. subtracted]'
+  legend-order: 6
+  line-width: 2.7
+  line-type: 1
+  fill-type: 0
+  fill-color: '#008A00'
   legend-style: l
 
 'real_b':

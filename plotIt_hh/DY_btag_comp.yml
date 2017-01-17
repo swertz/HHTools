@@ -1,23 +1,51 @@
 # NLO
-- file: 'DY*JetsToLL_M-*_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_*_histos.root'
-  type: mc
-  stack-index: 1
-  group: no_btag
 
-- file: 'DY*JetsToLL_M-*_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_*_histos.root'
+# lljj
+- file: 'DYJetsToLL_M-*_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_*_histos.root'
   type: mc
-  stack-index: 2
+  group: no_btag
+  stack-index: 1
+
+# llbb
+- file: 'DYJetsToLL_M-*_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_*_histos.root'
+  type: mc
   group: with_btag
+  stack-index: 2
   rename:
     - from: "nobtag"
       to: "btagM"
 
-- file: 'DY*JetsToLL_M-*_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_*_histos.root'
+# lljj with reweighting
+- file: 'DYJetsToLL_M-*_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_*_histos.root'
   type: mc
-  stack-index: 4
   group: no_btag_with_reweighting
+  stack-index: 3
   rename:
-    - from: "mll_cut"
-      to: "mll_cut_with_nobtag_to_btagM_reweighting"
-    - from: "no_cut"
-      to: "no_cut_with_nobtag_to_btagM_reweighting"
+    - from: "cut"
+      to: "cut_with_nobtag_to_btagM_reweighting"
+
+# Data, to compare
+
+# lljj, ttbar subtracted
+- file: 'dyFromData.root'
+  type: mc
+  group: data_nobtag_subtracted
+  stack-index: 4
+
+# llbb, ttbar subtracted
+- file: 'dyFromData.root'
+  type: mc
+  group: data_btagM_subtracted
+  stack-index: 5
+  rename:
+    - from: "nobtag"
+      to: "btagM"
+
+# lljj with reweighting, ttbar with reweighting subtracted
+- file: 'dyEstimation.root'
+  type: mc
+  group: reweighted_data_subtracted
+  stack-index: 6
+  rename:
+    - from: "cut"
+      to: "cut_with_nobtag_to_btagM_reweighting"
