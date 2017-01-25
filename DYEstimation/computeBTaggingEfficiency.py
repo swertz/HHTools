@@ -4,6 +4,7 @@ import argparse
 import os
 import struct
 import sys
+import functools
 
 import numpy as np
 
@@ -73,29 +74,29 @@ output = "btagging_efficiency.root"
 
 #### 1D efficiencies
 
-# Vs. Pt in Eta bins
-pt_binning = np.asarray([20, 30, 40, 50, 75, 100, 150, 200, 300, 500], dtype='float')
-n_pt_bins = len(pt_binning) - 1
+# # Vs. Pt in Eta bins
+# pt_binning = np.asarray([20, 30, 40, 50, 75, 100, 150, 200, 300, 500], dtype='float')
+# n_pt_bins = len(pt_binning) - 1
 
-eta_binning = [0, 0.6, 1.2, 1.8, 2.4]
+# eta_binning = [0, 0.6, 1.2, 1.8, 2.4]
 
-flavours = ["b", "c", "light", "g", "dus"]
+# flavours = ["b", "c", "light", "g", "dus"]
 
-efficiencies_pt = {}
+# efficiencies_pt = {}
 
-for f in flavours:
-    eff_eta_bins = {}
-    
-    for bin in range(len(eta_binning) - 1):
-        eta_range = (eta_binning[bin], eta_binning[bin+1])
-        this_name = "btagging_eff_on_" + f + "_vs_pt_eta_" + str(eta_range)
-        this_eff = ROOT.TEfficiency(this_name, this_name, n_pt_bins, pt_binning)
-        this_eff.SetStatisticOption(ROOT.TEfficiency.kBUniform)
-        this_eff.SetUseWeightedEvents()
-        this_eff.SetWeight(cross_section / event_wgt_sum)
-        eff_eta_bins[eta_range] = this_eff
-    
-    efficiencies_pt[f] = eff_eta_bins
+# for f in flavours:
+    # eff_eta_bins = {}
+
+    # for bin in range(len(eta_binning) - 1):
+        # eta_range = (eta_binning[bin], eta_binning[bin+1])
+        # this_name = "btagging_eff_on_" + f + "_vs_pt_eta_" + str(eta_range)
+        # this_eff = ROOT.TEfficiency(this_name, this_name, n_pt_bins, pt_binning)
+        # this_eff.SetStatisticOption(ROOT.TEfficiency.kBUniform)
+        # this_eff.SetUseWeightedEvents()
+        # this_eff.SetWeight(cross_section / event_wgt_sum)
+        # eff_eta_bins[eta_range] = this_eff
+
+    # efficiencies_pt[f] = eff_eta_bins
 
 # Vs. Pt and and Vs. Eta
 #pt_binning = np.asarray([20, 30, 40, 50, 75, 100, 150, 200, 300, 400, 500], dtype='float')
@@ -122,26 +123,11 @@ for f in flavours:
 #    efficiencies_eta[f] = this_eff_eta
 
 #### 2D efficiencies
-#pt_binning = np.asarray([20, 30, 40, 50, 75, 100, 150, 200, 300, 400, 500, 4000], dtype='float')
-#n_pt_bins = len(pt_binning) - 1
-#
-#eta_binning = np.linspace(0, 2.4, 11)
-#n_eta_bins = len(eta_binning) - 1
-#
-#btagging_eff_on_b = ROOT.TEfficiency("btagging_eff_on_b", "btagging_eff_on_b", n_pt_bins, pt_binning, n_eta_bins, eta_binning)
-#btagging_eff_on_b.SetStatisticOption(ROOT.TEfficiency.kMidP)
-#btagging_eff_on_b.SetUseWeightedEvents()
-#btagging_eff_on_b.SetWeight(cross_section / event_wgt_sum)
-#
-#btagging_eff_on_c = ROOT.TEfficiency("btagging_eff_on_c", "btagging_eff_on_c", n_pt_bins, pt_binning, n_eta_bins, eta_binning)
-#btagging_eff_on_c.SetStatisticOption(ROOT.TEfficiency.kMidP)
-#btagging_eff_on_c.SetUseWeightedEvents()
-#btagging_eff_on_c.SetWeight(cross_section / event_wgt_sum)
-#
-#mistagging_eff_on_light = ROOT.TEfficiency("mistagging_eff_on_light", "mistagging_eff_on_light", n_pt_bins, pt_binning, n_eta_bins, eta_binning)
-#mistagging_eff_on_light.SetStatisticOption(ROOT.TEfficiency.kMidP)
-#mistagging_eff_on_light.SetUseWeightedEvents()
-#mistagging_eff_on_light.SetWeight(cross_section / event_wgt_sum)
+pt_binning = np.asarray([20, 30, 40, 50, 75, 100, 150, 200, 300, 400, 500, 4000], dtype='float')
+n_pt_bins = len(pt_binning) - 1
+
+eta_binning = np.linspace(0, 2.4, 6)
+n_eta_bins = len(eta_binning) - 1
 
 # cMVAv2 Medium WP
 btag_cut = 0.4432
@@ -154,13 +140,115 @@ ROOT.TH1.SetDefaultSumw2(True)
 
 chain.SetBranchStatus("*", 0)
 
-chain.SetBranchStatus("jet_p4*", 1)
-chain.SetBranchStatus("jet_hadronFlavor*", 1)
-chain.SetBranchStatus("jet_partonFlavor*", 1)
-chain.SetBranchStatus("jet_pfCombinedMVAV2BJetTags*", 1)
-chain.SetBranchStatus("hh_llmetjj_HWWleptons_nobtag_cmva*", 1)
+chain.SetBranchStatus("jet_*p4*", 1)
+chain.SetBranchStatus("jet_*hadronFlavor*", 1)
+# chain.SetBranchStatus("jet_*partonFlavor*", 1)
+chain.SetBranchStatus("jet_*pfCombinedMVAV2BJetTags*", 1)
+# chain.SetBranchStatus("hh_llmetjj_HWWleptons_nobtag_cmva*", 1)
 chain.SetBranchStatus("event_weight", 1)
-chain.SetBranchStatus("event_pu_weight", 1)
+chain.SetBranchStatus("event_pu_weight*", 1)
+chain.SetBranchStatus("event_pdf_weight*", 1)
+chain.SetBranchStatus("event_scale_weights*", 1)
+
+systematics_list = ['nominal', 'pu', 'pdf', 'jec', 'jer', 'scaleUncorr']
+
+systematics_on_nominal = {
+        'nominal': {
+            'weight': lambda c: chain.event_weight * chain.event_pu_weight * chain.event_pdf_weight,
+            'cut': lambda c: True
+            },
+        'pdfup': {
+            'weight': lambda c: chain.event_weight * chain.event_pu_weight * chain.event_pdf_weight_up,
+            'cut': lambda c: True
+            },
+        'pdfdown': {
+            'weight': lambda c: chain.event_weight * chain.event_pu_weight * chain.event_pdf_weight_down,
+            'cut': lambda c: True
+            },
+        'puup': {
+            'weight': lambda c: chain.event_weight * chain.event_pu_weight_up * chain.event_pdf_weight,
+            'cut': lambda c: True
+            },
+        'pudown': {
+            'weight': lambda c: chain.event_weight * chain.event_pu_weight_down * chain.event_pdf_weight,
+            'cut': lambda c: True
+            }
+        }
+
+for i in range(0, 6):
+    systematics_on_nominal['scaleUncorr' + str(i)] = {
+            'weight': functools.partial(lambda i, c,: chain.event_weight * chain.event_pu_weight * chain.event_pdf_weight * chain.event_scale_weights[i], i),
+            'cut': lambda c: True
+    }
+
+systematics_jets = {
+        'jecup': {
+            'p4': lambda c: c.jet_jecup_p4,
+            'flavor': lambda c: c.jet_jecup_hadronFlavor,
+            'btag': lambda c: c.jet_jecup_pfCombinedMVAV2BJetTags
+            },
+        'jecdown': {
+            'p4': lambda c: c.jet_jecdown_p4,
+            'flavor': lambda c: c.jet_jecdown_hadronFlavor,
+            'btag': lambda c: c.jet_jecdown_pfCombinedMVAV2BJetTags
+            },
+        'jerup': {
+            'p4': lambda c: c.jet_jerup_p4,
+            'flavor': lambda c: c.jet_jerup_hadronFlavor,
+            'btag': lambda c: c.jet_jerup_pfCombinedMVAV2BJetTags
+            },
+        'jerdown': {
+            'p4': lambda c: c.jet_jerdown_p4,
+            'flavor': lambda c: c.jet_jerdown_hadronFlavor,
+            'btag': lambda c: c.jet_jerdown_pfCombinedMVAV2BJetTags
+            },
+        }
+
+def create_efficiencies(syst=""):
+    if len(syst) > 0:
+        syst = "__" + syst
+
+    btagging_eff_on_b = ROOT.TEfficiency("btagging_eff_on_b%s" % syst, "btagging_eff_on_b%s" % syst, n_pt_bins, pt_binning, n_eta_bins, eta_binning)
+    btagging_eff_on_b.SetStatisticOption(ROOT.TEfficiency.kBUniform)
+    btagging_eff_on_b.SetUseWeightedEvents()
+    btagging_eff_on_b.SetWeight(cross_section / event_wgt_sum)
+
+    btagging_eff_on_c = ROOT.TEfficiency("btagging_eff_on_c%s" % syst, "btagging_eff_on_c%s" % syst, n_pt_bins, pt_binning, n_eta_bins, eta_binning)
+    btagging_eff_on_c.SetStatisticOption(ROOT.TEfficiency.kBUniform)
+    btagging_eff_on_c.SetUseWeightedEvents()
+    btagging_eff_on_c.SetWeight(cross_section / event_wgt_sum)
+
+    mistagging_eff_on_light = ROOT.TEfficiency("mistagging_eff_on_light%s" % syst, "mistagging_eff_on_light%s" % syst, n_pt_bins, pt_binning, n_eta_bins, eta_binning)
+    mistagging_eff_on_light.SetStatisticOption(ROOT.TEfficiency.kBUniform)
+    mistagging_eff_on_light.SetUseWeightedEvents()
+    mistagging_eff_on_light.SetWeight(cross_section / event_wgt_sum)
+
+    return (btagging_eff_on_b, btagging_eff_on_c, mistagging_eff_on_light)
+
+btagging_eff_on_b = {}
+btagging_eff_on_c = {}
+mistagging_eff_on_light = {}
+
+for s in systematics_list:
+    if s == 'nominal':
+        a, b, c = create_efficiencies()
+        btagging_eff_on_b[s] = a
+        btagging_eff_on_c[s] = b
+        mistagging_eff_on_light[s] = c
+    elif s == 'scaleUncorr':
+        for i in range(0, 6):
+            s_ = s + str(i)
+            a, b, c = create_efficiencies(s_)
+            btagging_eff_on_b[s_] = a
+            btagging_eff_on_c[s_] = b
+            mistagging_eff_on_light[s_] = c
+    else:
+        for v in ['up', 'down']:
+            s_ = s + v
+            a, b, c = create_efficiencies(s_)
+            btagging_eff_on_b[s_] = a
+            btagging_eff_on_c[s_] = b
+            mistagging_eff_on_light[s_] = c
 
 print("Loading chain...")
 if not entries:
@@ -175,6 +263,7 @@ for i in range(0, entries):
     if (i % 10000 == 0):
         print("Event %d over %d" % (i + 1, entries))
 
+    # Nominal jet collection
     njets = chain.jet_p4.size()
 
     for j in range(0, njets):
@@ -186,68 +275,132 @@ for i in range(0, entries):
 
         if eta > 2.4:
             continue
-    
-        # Weight: take into account? Also lepton ID SF?
-        weight = chain.event_weight * chain.event_pu_weight * chain.hh_llmetjj_HWWleptons_nobtag_cmva[0].trigger_efficiency
-        
+
         flavor = ord(chain.jet_hadronFlavor[j])
-        partonFlavor = abs(struct.unpack('b', chain.jet_partonFlavor[j])[0])
+        # partonFlavor = abs(struct.unpack('b', chain.jet_partonFlavor[j])[0])
 
-        #### 1D efficiencies
-        if flavor == 5:
-            flavor = "b"
-        elif flavor == 4:
-            flavor = "c"
-        else:
-            flavor = "light"
-        
-        # Vs. Pt in Eta bins
-        def find_bin(eff_dict, eta):
-            for bin, eff in eff_dict.items():
-                if eta >= bin[0] and eta < bin[1]:
-                    return eff
-        
-        find_bin(efficiencies_pt[flavor], eta).FillWeighted(chain.jet_pfCombinedMVAV2BJetTags[j] > btag_cut, weight, pt)
+        for s, info in systematics_on_nominal.items():
 
-        if partonFlavor == 21:
-            partonFlavor = "g"
-        elif partonFlavor == 1 or partonFlavor == 2 or partonFlavor == 3:
-            partonFlavor = "dus"
-        if isinstance(partonFlavor, str):
-            find_bin(efficiencies_pt[partonFlavor], eta).FillWeighted(chain.jet_pfCombinedMVAV2BJetTags[j] > btag_cut, weight, pt)
+            if not info['cut'](chain):
+                continue
 
-        # Vs. Pt and Vs. Eta
-        #efficiencies_pt[flavor].FillWeighted(chain.jet_pfCombinedMVAV2BJetTags[j] > btag_cut, weight, pt)
-        #efficiencies_eta[flavor].FillWeighted(chain.jet_pfCombinedMVAV2BJetTags[j] > btag_cut, weight, eta)
+            weight = info['weight'](chain)
+            object = None
 
-        #### 2D efficiencies
-        #object = None
+            #### 1D efficiencies (not updated for systematics!)
+            # if flavor == 5:
+                # flavor = "b"
+            # elif flavor == 4:
+                # flavor = "c"
+            # else:
+                # flavor = "light"
 
-        #if flavor == 5:
-        #    object = btagging_eff_on_b
-        #elif flavor == 4:
-        #    object = btagging_eff_on_c
-        #else:
-        #    object = mistagging_eff_on_light
+            # # Vs. Pt in Eta bins
+            # def find_bin(eff_dict, eta):
+                # for bin, eff in eff_dict.items():
+                    # if eta >= bin[0] and eta < bin[1]:
+                        # return eff
 
-        #object.FillWeighted(chain.jet_pfCombinedMVAV2BJetTags[j] > btag_cut, weight, pt, eta)
+            # find_bin(efficiencies_pt[flavor], eta).FillWeighted(chain.jet_pfCombinedMVAV2BJetTags[j] > btag_cut, weight, pt)
+
+            # if partonFlavor == 21:
+                # partonFlavor = "g"
+            # elif partonFlavor == 1 or partonFlavor == 2 or partonFlavor == 3:
+                # partonFlavor = "dus"
+            # if isinstance(partonFlavor, str):
+                # find_bin(efficiencies_pt[partonFlavor], eta).FillWeighted(chain.jet_pfCombinedMVAV2BJetTags[j] > btag_cut, weight, pt)
+
+            # Vs. Pt and Vs. Eta (not updated for systematics!)
+            #efficiencies_pt[flavor].FillWeighted(chain.jet_pfCombinedMVAV2BJetTags[j] > btag_cut, weight, pt)
+            #efficiencies_eta[flavor].FillWeighted(chain.jet_pfCombinedMVAV2BJetTags[j] > btag_cut, weight, eta)
+
+            #### 2D efficiencies
+            if flavor == 5:
+               object = btagging_eff_on_b[s]
+            elif flavor == 4:
+               object = btagging_eff_on_c[s]
+            else:
+               object = mistagging_eff_on_light[s]
+
+            object.FillWeighted(chain.jet_pfCombinedMVAV2BJetTags[j] > btag_cut, weight, pt, eta)
+
+    # Systematics
+    for name, collections in systematics_jets.items():
+
+        jets = collections['p4'](chain)
+
+        njets = jets.size()
+
+        for j in range(0, njets):
+            pt = jets[j].Pt()
+            eta = jets[j].Eta()
+
+            if pt < 20:
+                continue
+
+            if eta > 2.4:
+                continue
+
+            flavor = ord(collections['flavor'](chain)[j])
+
+            weight = systematics_on_nominal['nominal']['weight'](chain)
+            object = None
+
+            #### 1D efficiencies (not updated for systematics!)
+            # if flavor == 5:
+                # flavor = "b"
+            # elif flavor == 4:
+                # flavor = "c"
+            # else:
+                # flavor = "light"
+
+            # # Vs. Pt in Eta bins
+            # def find_bin(eff_dict, eta):
+                # for bin, eff in eff_dict.items():
+                    # if eta >= bin[0] and eta < bin[1]:
+                        # return eff
+
+            # find_bin(efficiencies_pt[flavor], eta).FillWeighted(chain.jet_pfCombinedMVAV2BJetTags[j] > btag_cut, weight, pt)
+
+            # if partonFlavor == 21:
+                # partonFlavor = "g"
+            # elif partonFlavor == 1 or partonFlavor == 2 or partonFlavor == 3:
+                # partonFlavor = "dus"
+            # if isinstance(partonFlavor, str):
+                # find_bin(efficiencies_pt[partonFlavor], eta).FillWeighted(chain.jet_pfCombinedMVAV2BJetTags[j] > btag_cut, weight, pt)
+
+            # Vs. Pt and Vs. Eta (not updated for systematics!)
+            #efficiencies_pt[flavor].FillWeighted(chain.jet_pfCombinedMVAV2BJetTags[j] > btag_cut, weight, pt)
+            #efficiencies_eta[flavor].FillWeighted(chain.jet_pfCombinedMVAV2BJetTags[j] > btag_cut, weight, eta)
+
+            #### 2D efficiencies
+            if flavor == 5:
+               object = btagging_eff_on_b[name]
+            elif flavor == 4:
+               object = btagging_eff_on_c[name]
+            else:
+               object = mistagging_eff_on_light[name]
+
+            object.FillWeighted(collections['btag'](chain)[j] > btag_cut, weight, pt, eta)
+
 
 print("Done")
 output = ROOT.TFile.Open(output, "recreate")
 
 ## 1D efficiencies
 # Vs. Pt in Eta bins
-for f in flavours:
-    for eff in efficiencies_pt[f].values():
-        eff.Write()
+# for f in flavours:
+    # for eff in efficiencies_pt[f].values():
+        # eff.Write()
 # Vs. Pt and Vs. Eta
 #for f in flavours:
 #    efficiencies_pt[f].Write()
 #    efficiencies_eta[f].Write()
 
 ## 2D efficiencies
-#btagging_eff_on_b.Write()
-#btagging_eff_on_c.Write()
-#mistagging_eff_on_light.Write()
+for s in btagging_eff_on_b.keys():
+    btagging_eff_on_b[s].Write()
+    btagging_eff_on_c[s].Write()
+    mistagging_eff_on_light[s].Write()
 
 output.Close()
