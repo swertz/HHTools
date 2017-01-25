@@ -121,7 +121,7 @@ for key in keys:
         alreadyIn.append(key.GetName())
         plot = {
                 'x-axis': key.GetName(),
-                'normalized': True,
+                #'normalized': True,
                 'rename': [
                     {'from': '(.*)(_log.)?\.(.*)', 'to': '\\1_DY_btag_comparison\\2.\\3'},
                     {'from': '_nobtag', 'to': ''}

@@ -47,7 +47,8 @@ def get_sample(iSample):
 
 # Warning: put most recent tags first!
 analysis_tags = [
-        'v4.1.0+80X_HHAnalysis_2016-12-14.v0'
+        'v4.2.0+80X_HHAnalysis_2017-01-18.v0'
+        #'v4.1.0+80X_HHAnalysis_2016-12-14.v0'
         ]
 
 parser = argparse.ArgumentParser(description='Facility to submit histFactory jobs on condor.')
@@ -65,57 +66,56 @@ def get_configuration_file(placeholder):
     return placeholder.format("Trees" if args.treeFactory else "Plots")
 
 def get_sample_splitting(sample):
+    if "TTTo2L2Nu" in sample:
+        return 5
     return 10
 
+samples_dict = {}
+
 class Configuration:
-    def __init__(self, config, suffix=''):
-        self.samples = []
+    def __init__(self, config, suffix='', samples=[]):
+        self.samples = samples
         self.sample_ids = []
         self.configuration_file = config
         self.suffix = suffix
 
     def get_sample_ids(self):
-        for sample in self.samples:
-            found = False
-            for tag in analysis_tags:
-                ids_ = get_sample_ids_from_name(build_sample_name(sample, tag))
-                if ids_:
-                    found = True
-                    self.sample_ids.extend(ids_)
-                    break
+        for sample_class in self.samples:
+            for sample in samples_dict[sample_class]:
+                found = False
+                for tag in analysis_tags:
+                    ids_ = get_sample_ids_from_name(build_sample_name(sample, tag))
+                    if ids_:
+                        found = True
+                        self.sample_ids.extend(ids_)
+                        break
 
-            if not found:
-                raise Exception("No sample found in the database for %r" % sample)
-
-MainConfiguration = Configuration(get_configuration_file('generate{}.py'))
-#DYOnlyConfiguration = Configuration(get_configuration_file('generate{}.py'))
-SignalConfiguration = Configuration(get_configuration_file('generate{}ForSignal.py'), '_for_signal')
-DYOnlyConfiguration = Configuration(get_configuration_file('generate{}ForDY.py'), suffix='_for_dy')
+                if not found:
+                    raise Exception("No sample found in the database for %r" % sample)
 
 # Data
-MainConfiguration.samples.extend([
-    'DoubleEG', # DoubleEG
-    'MuonEG', # MuonEG
-    'DoubleMuon', # DoubleMuon
-    ])
+samples_dict["Data"] = [
+    'DoubleEG',
+    'MuonEG',
+    'DoubleMuon',
+    ]
 
 # Main backgrounds:
-MainConfiguration.samples.extend([
-    #'ST_tW_top_5f_inclusiveDecays_13TeV-powheg', # tW top
-    #'ST_tW_antitop_5f_inclusiveDecays_13TeV-powheg', # tW atop
-    #'ST_t-channel_4f_leptonDecays_13TeV-amcatnlo', # sT t-chan
-    # 'TT_TuneCUETP8M1_13TeV-powheg-pythia8_ext4', # TT incl NLO
-    'TTTo2L2Nu_13TeV-powheg_ext1', # TT -> 2L 2Nu NLO
-    ])
+samples_dict["Main_Training"] = [
+    'ST_tW_top_5f_noFullyHadronicDecays_13TeV-powheg',
+    'ST_tW_antitop_5f_noFullyHadronicDecays_13TeV-powheg',
+    ##'TT_TuneCUETP8M1_13TeV-powheg-pythia8_ext4', # TT incl NLO
+    'TTTo2L2Nu_13TeV-powheg', # TT -> 2L 2Nu NLO
+    ]
 
 # DY NLO (included with other backgrounds)
-MainConfiguration.samples.extend([
-  #'DYJetsToLL_M-10to50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8', # DY M10-50 NLO merged
-  #'DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8', # DY M-50 NLO merged
-])
+#MainConfiguration.samples.extend([
+#  #'DYJetsToLL_M-10to50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8', # DY M10-50 NLO merged
+#  #'DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8', # DY M-50 NLO merged
+#])
 
 # DY LO
-MainConfiguration.samples.extend([
+samples_dict["DY_LO"] = [
     # M-50 incl. merged
     # 'DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_extended',
     # M-50, binned HT > 100
@@ -130,86 +130,91 @@ MainConfiguration.samples.extend([
     # 'DYJetsToLL_M-5to50_HT-200to400_TuneCUETP8M1_13TeV-madgraphMLM-pythia8', # 200-400 non-merged
     # 'DYJetsToLL_M-5to50_HT-400to600_TuneCUETP8M1_13TeV-madgraphMLM-pythia8', # 400-600 non-merged
     # 'DYJetsToLL_M-5to50_HT-600toInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_extended', # 600-Inf merged
-    ])
+    ]
 
 #
 # Other backgrounds
 # VV
-MainConfiguration.samples.extend([
+samples_dict["VV_VVV"] = [
     #'VVTo2L2Nu_13TeV_amcatnloFXFX_madspin_pythia8', # VV(2L2Nu)
 
-    # 'WWToLNuQQ_13TeV-powheg', # WW(LNuQQ)
-    # 'WWTo2L2Nu_13TeV-powheg', # WW(2L2Nu)
+    'WWToLNuQQ_13TeV-powheg', # WW(LNuQQ)
+    'WWTo2L2Nu_13TeV-powheg', # WW(2L2Nu)
 
-    # 'WZTo3LNu_TuneCUETP8M1_13TeV-powheg-pythia8', # WZ(3LNu)
-    # 'WZTo1L3Nu_13TeV_amcatnloFXFX_madspin_pythia8', # WZ(L3Nu)
-    # 'WZTo1L1Nu2Q_13TeV_amcatnloFXFX_madspin_pythia8', # WZ(LNu2Q)
-    # 'WZTo2L2Q_13TeV_amcatnloFXFX_madspin_pythia8', # WZ(2L2Q)
+    'WZTo3LNu_TuneCUETP8M1_13TeV-powheg-pythia8', # WZ(3LNu)
+    'WZTo1L3Nu_13TeV_amcatnloFXFX_madspin_pythia8', # WZ(L3Nu)
+    'WZTo1L1Nu2Q_13TeV_amcatnloFXFX_madspin_pythia8', # WZ(LNu2Q)
+    'WZTo2L2Q_13TeV_amcatnloFXFX_madspin_pythia8', # WZ(2L2Q)
 
-    # 'ZZTo4L_13TeV_powheg_pythia8', # ZZ(4L)
-    # 'ZZTo2L2Nu_13TeV_powheg_pythia8', # ZZ(2L2Nu)
-    # 'ZZTo2L2Q_13TeV_amcatnloFXFX_madspin_pythia8', # ZZ(2L2Q)
+    'ZZTo4L_13TeV_powheg_pythia8', # ZZ(4L)
+    'ZZTo2L2Nu_13TeV_powheg_pythia8', # ZZ(2L2Nu)
+    'ZZTo2L2Q_13TeV_amcatnloFXFX_madspin_pythia8', # ZZ(2L2Q)
 
-    # 'WZZ_TuneCUETP8M1_13TeV-amcatnlo-pythia8', # WZZ
-    ])
+    'WZZ_TuneCUETP8M1_13TeV-amcatnlo-pythia8', # WZZ
+    'WWW_TuneCUETP8M1_13TeV-amcatnlo-pythia8',
+    'WWZ_TuneCUETP8M1_13TeV-amcatnlo-pythia8',
+    'ZZZ_TuneCUETP8M1_13TeV-amcatnlo-pythia8',
+    ]
 
 # Higgs
-MainConfiguration.samples.extend([
-    # # ggH ==> no H(ZZ)?
-    # 'GluGluHToWWTo2L2Nu_M125_13TeV_powheg_JHUgen_pythia8', # H(WW(2L2Nu))
-    # 'GluGluHToBB_M125_13TeV_powheg_pythia8', # H(BB)
+samples_dict["Higgs"] = [
+    # ggH ==> no H(ZZ)?
+    'GluGluHToWWTo2L2Nu_M125_13TeV_powheg_JHUgen_pythia8', # H(WW(2L2Nu))
+    'GluGluHToBB_M125_13TeV_powheg_pythia8', # H(BB)
 
-    # # ZH
-    # 'GluGluZH_HToWWTo2L2Nu_ZTo2L_M125_13TeV_powheg_pythia8', # ggZ(LL)H(WW(2L2Nu))
-    # 'HZJ_HToWW_M125_13TeV_powheg_pythia8', # ZH(WW)
-    # 'ggZH_HToBB_ZToLL_M125_13TeV_powheg_pythia8', # ggZ(LL)H(BB)
-    # 'ZH_HToBB_ZToLL_M125_13TeV_powheg_pythia8', # Z(LL)H(BB)
-    # 'ggZH_HToBB_ZToNuNu_M125_13TeV_powheg_pythia8', # ggZ(NuNu)H(BB)
+    # ZH
+    'GluGluZH_HToWWTo2L2Nu_ZTo2L_M125_13TeV_powheg_pythia8', # ggZ(LL)H(WW(2L2Nu))
+    'HZJ_HToWW_M125_13TeV_powheg_pythia8', # ZH(WW)
+    'ggZH_HToBB_ZToLL_M125_13TeV_powheg_pythia8', # ggZ(LL)H(BB)
+    'ZH_HToBB_ZToLL_M125_13TeV_powheg_pythia8', # Z(LL)H(BB)
+    'ggZH_HToBB_ZToNuNu_M125_13TeV_powheg_pythia8', # ggZ(NuNu)H(BB)
 
-    # # VBF
-    # 'VBFHToBB_M-125_13TeV_powheg_pythia8', # VBFH(BB)
-    # 'VBFHToWWTo2L2Nu_M125_13TeV_powheg_JHUgen_pythia8', # VBFH(WW(2L2Nu))
+    # VBF
+    'VBFHToBB_M-125_13TeV_powheg_pythia8_weightfix', # VBFH(BB)
+    'VBFHToWWTo2L2Nu_M125_13TeV_powheg_JHUgen_pythia8', # VBFH(WW(2L2Nu))
 
-    # # WH
-    # 'WplusH_HToBB_WToLNu_M125_13TeV_powheg_pythia8', # W+(LNu)H(BB)
-    # 'WminusH_HToBB_WToLNu_M125_13TeV_powheg_pythia8', # W-(LNu)H(BB)
-    # 'HWplusJ_HToWW_M125_13TeV_powheg_pythia8', # W+H(WW)
-    # 'HWminusJ_HToWW_M125_13TeV_powheg_pythia8', # W-H(WW)
+    # WH
+    'WplusH_HToBB_WToLNu_M125_13TeV_powheg_pythia8', # W+(LNu)H(BB)
+    'WminusH_HToBB_WToLNu_M125_13TeV_powheg_pythia8', # W-(LNu)H(BB)
+    'HWplusJ_HToWW_M125_13TeV_powheg_pythia8', # W+H(WW)
+    'HWminusJ_HToWW_M125_13TeV_powheg_pythia8', # W-H(WW)
 
-    # # bbH
-    # 'bbHToBB_M-125_4FS_ybyt_13TeV_amcatnlo', # bbH(BB) ybyt
-    # 'bbHToBB_M-125_4FS_yb2_13TeV_amcatnlo', # bbH(BB) yb2
-    # 'bbHToWWTo2L2Nu_M-125_4FS_ybyt_13TeV_amcatnlo', # bbH(WW) ybyt
-    # 'bbHToWWTo2L2Nu_M-125_4FS_yb2_13TeV_amcatnlo', # bbH(WW) yb2
-    ])
+    # bbH
+    'bbHToBB_M-125_4FS_ybyt_13TeV_amcatnlo', # bbH(BB) ybyt
+    'bbHToBB_M-125_4FS_yb2_13TeV_amcatnlo', # bbH(BB) yb2
+    #'bbHToWWTo2L2Nu_M-125_4FS_ybyt_13TeV_amcatnlo', # bbH(WW) ybyt
+    #'bbHToWWTo2L2Nu_M-125_4FS_yb2_13TeV_amcatnlo', # bbH(WW) yb2
+    ]
 
 # Top
-MainConfiguration.samples.extend([
-    # 'ST_s-channel_4f_leptonDecays_13TeV-amcatnlo', # sT s-channel
-    # 'TTWJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-madspin-pythia8', # TTW(LNu)
-    # 'TTWJetsToQQ_TuneCUETP8M1_13TeV-amcatnloFXFX-madspin-pythia8', # TTW(QQ)
-    # 'TTZToLLNuNu_M-10_TuneCUETP8M1_13TeV-amcatnlo-pythia8', # TTZ(2L2Nu)
-    # 'TTZToQQ_TuneCUETP8M1_13TeV-amcatnlo-pythia8', # TTZ(QQ),
-    # 'ttHTobb_M125_13TeV_powheg_pythia8', # ttH(bb)
-    # 'ttHToNonbb_M125_13TeV_powheg_pythia8', # ttH(nonbb)
-    ])
+samples_dict["Top_Other"] = [
+    'ST_t-channel_top_4f_inclusiveDecays_13TeV-powheg', # sT t-chan
+    'ST_t-channel_antitop_4f_inclusiveDecays_13TeV-powheg', # sT t-chan
+    'ST_s-channel_4f_leptonDecays_13TeV-amcatnlo', # sT s-channel
+    'TTWJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-madspin-pythia8', # TTW(LNu)
+    'TTWJetsToQQ_TuneCUETP8M1_13TeV-amcatnloFXFX-madspin-pythia8', # TTW(QQ)
+    'TTZToLLNuNu_M-10_TuneCUETP8M1_13TeV-amcatnlo-pythia8', # TTZ(2L2Nu)
+    'TTZToQQ_TuneCUETP8M1_13TeV-amcatnlo-pythia8', # TTZ(QQ),
+    'ttHTobb_M125_TuneCUETP8M2_13TeV_powheg_pythia8', # ttH(bb)
+    'ttHToNonbb_M125_TuneCUETP8M2_13TeV_powheg_pythia8', # ttH(nonbb)
+    ]
 
 # # TT aMC@NLO
 # MainConfiguration.samples.append('TTJets_TuneCUETP8M1_amcatnloFXFX')
 
 # Wjets
-MainConfiguration.samples.extend([
-    # 'WJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8', # JetsLNu
+samples_dict["WJets"] = [
+    'WJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8', # JetsLNu
 
     # # HT binned
     # 'WJetsToLNu_HT-200To400_TuneCUETP8M1_13TeV-madgraphMLM-pythia8', # 200-400
     # 'WJetsToLNu_HT-800To1200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8', # 800-1200
     # 'WJetsToLNu_HT-1200To2500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8', # 1200 - 2500
     # 'WJetsToLNu_HT-2500ToInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8', # 2500 - Inf
-    ])
+    ]
 
 # QCD ==> 30to50 missing
-# MainConfiguration.samples.extend([
+# samples_dict["QCD"] = 
    # 1661, # Pt-15to20EMEnriched
    # 1671, # Pt-20to30EMEnriched
    # 1681, # Pt-50to80EMEnriched
@@ -223,38 +228,54 @@ MainConfiguration.samples.extend([
 ## Signals: separate configuration, since we only run on llbb stage
 
 # Resonant signal
-SignalConfiguration.samples.extend([
+samples_dict["Signal_Resonant"] = [
     'GluGluToRadionToHHTo2B2VTo2L2Nu_M'
-])
-
-# Non-resonant signal
-SignalConfiguration.samples.extend([
-    'GluGluToHHTo2B2VTo2L2Nu_node_'
-])
-
-# NonResonant merged
-# SignalConfiguration.samples.append('GluGluToHHTo2B2VTo2L2Nu_all_nodes_13TeV-madgraph')
-
-# DY NLO (separated from the rest because it's estimated from the data with help of the no-btag sample)
-# Just comment if you don't want to process DY separately from the rest
-DYOnlyConfiguration.samples = [
-    'DYJetsToLL_M-10to50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8', # DY M10-50 NLO merged
-    'DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8', # DY M-50 NLO merged
 ]
 
-if not args.treeFactory:
-    # We don't have currently a special configuration file for DY when doing plots
-    # Simply move samples into the main configuration
-    MainConfiguration.samples.extend(DYOnlyConfiguration.samples)
-    DYOnlyConfiguration.samples = []
-if args.treeFactory:
-    # We don't have currently a special configuration file for signals when doing skims
-    # Simply move samples into the main configuration
-    MainConfiguration.samples.extend(SignalConfiguration.samples)
-    SignalConfiguration.samples = []
+# Non-resonant signal
+samples_dict["Signal_NonResonant"] = [
+    'GluGluToHHTo2B2VTo2L2Nu_node_'
+]
+# Number of samples used as basis for the reweighting
+number_of_bases = 11
+
+# DY NLO
+samples_dict["DY_NLO"] = [
+    'DYJetsToLL_M-10to50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8',
+    #'DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8',
+    'DYToLL_0J_13TeV-amcatnloFXFX-pythia8_extended_ext0_plus_ext1',
+    'DYToLL_1J_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8',
+    'DYToLL_2J_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8',
+]
+
+MainConfiguration = Configuration(get_configuration_file('generate{}.py'), samples=[
+    "Main_Training",
+    "DY_NLO",
+    "Higgs",
+    "VV_VVV",
+    "Top_Other",
+    "WJets",
+    ])
+SignalConfiguration = Configuration(get_configuration_file('generate{}ForSignal.py'), suffix='_for_signal', samples=["Signal_Resonant", "Signal_NonResonant"])
+DataConfiguration = Configuration(get_configuration_file('generate{}ForData.py'), suffix='_for_data', samples=["Data"])
+
+#if args.treeFactory:
+#    DYOnlyConfiguration = Configuration(get_configuration_file('generate{}ForDY.py'), suffix='_for_dy')
+#    SignalConfiguration = Configuration(get_configuration_file('generate{}.py'))
+#if not args.treeFactory:
+#    DYOnlyConfiguration = Configuration(get_configuration_file('generate{}.py'))
+
+## Depending on doing skims or not, adapt the configurations:
+#if not args.treeFactory:
+#    MainConfiguration.samples.extend(DYOnlyConfiguration.samples)
+#    DYOnlyConfiguration.samples = []
+#
+#if args.treeFactory:
+#    MainConfiguration.samples.extend(SignalConfiguration.samples)
+#    SignalConfiguration.samples = []
 
 #configurations = [ MainConfiguration, DYOnlyConfiguration ]
-configurations = [ MainConfiguration, SignalConfiguration]
+configurations = [ MainConfiguration, SignalConfiguration, DataConfiguration ]
 #configurations= [ MainConfiguration ]
 
 for c in configurations:
@@ -315,6 +336,8 @@ if args.treeFactory:
     executable = "skimmer.exe"
     configPath = '../treeFactory_hh'
 
+## Build factory instances -- can be skipped
+
 if not args.skip:
     def create_factory(config_file, output):
         print("")
@@ -343,6 +366,8 @@ if not args.skip:
         if len(c.sample_ids) > 0:
             create_factory(os.path.join(configPath, c.configuration_file), args.output + c.suffix)
 
+## Write files needed to run on cluster
+
 def create_condor(samples, output):
     ## Create Condor submitter to handle job creating
     mySub = condorSubmitter(samples, "%s/build/" % output + executable, "DUMMY", output + "/", rescale=True)
@@ -353,8 +378,6 @@ def create_condor(samples, output):
     splitTT = False
     splitDY = False
 
-    operators_MV = ["OtG", "Otphi", "O6", "OH"]
-    
     def get_node(db_name):
         split_name = db_name.split("_")
         node = None
@@ -367,11 +390,12 @@ def create_condor(samples, output):
         return node
 
     def get_node_id(node):
-        if node == "SM": return "0"
-        elif node == "box": return "1"
+        if node == "SM": return "-1"
+        elif node == "box": return "0"
         else: return node
 
-    training_grid = [ (kl, kt) for kl in [-15, -5, -1, 0.0001, 1, 5, 15] for kt in [0.5, 1, 1.75, 2.5] ]
+    #training_grid = [ (kl, kt) for kl in [-15, -5, -1, 0.0001, 1, 5, 15] for kt in [0.5, 1, 1.75, 2.5] ]
+    training_grid = [ (kl, kt) for kl in [-20, 0.0001, 1, 2.4, 3.8, 5, 20] for kt in [0.5, 1, 1.75, 2.5] ]
 
     ## Modify the input samples to add sample cuts and stuff
     if args.filter:
@@ -464,7 +488,7 @@ def create_condor(samples, output):
                     kl = str(grid_point[0])
                     kt = str(grid_point[1])
                     
-                    weight_args = [get_node_id(base), kl, kt]
+                    weight_args = [get_node_id(base), kl, kt, number_of_bases]
 
                     newSample = copy.deepcopy(sample)
                     newJson = copy.deepcopy(sample["json_skeleton"][sample["db_name"]])
@@ -518,6 +542,7 @@ def create_condor(samples, output):
             #    mySub.sampleCfg.remove(sample)
 
             ## Cluster to MV reweighting (ME-based)
+            #operators_MV = ["OtG", "Otphi", "O6", "OH"]
             #if "node" in sample["db_name"]:
             #    for base, base_name in enumerate(rwgt_base):
             #        for i, op1 in enumerate(operators_MV):

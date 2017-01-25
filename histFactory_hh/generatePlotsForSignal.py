@@ -6,18 +6,18 @@ sys.path.append(scriptDir)
 from basePlotter import *
 from HHAnalysis import HH
 
-include_directories = []
 plots = []
 library_directories = []
-libraries = []
 sample_weights = {}
 
 code_before_loop = default_code_before_loop()
 code_in_loop = default_code_in_loop()
 code_after_loop = default_code_after_loop()
-headers = default_headers()
 
-include_directories.append(os.path.join(scriptDir, "..", "common"))
+include_directories = default_include_directories(scriptDir)
+headers = default_headers()
+libraries = default_libraries()
+sources = default_sources(scriptDir)
 
 ###### Reweighting -- template-based #########
 #sample_weights = {}
@@ -56,6 +56,7 @@ include_directories += training_grid_reweighter.include_dirs()
 headers += training_grid_reweighter.headers()
 library_directories += training_grid_reweighter.library_dirs()
 libraries += training_grid_reweighter.libraries()
+sources += training_grid_reweighter.sources()
 
 sample_weights["training_grid"] = training_grid_reweighter.sample_weight()
 
@@ -74,19 +75,16 @@ sample_weights["training_grid"] = training_grid_reweighter.sample_weight()
 # Plot configuration
 
 #llbb
-# weights_llbb = ['trigeff', 'llidiso', 'pu', 'jjbtag_heavy', 'jjbtag_light']
-
-# FIXME: We don't have cMVAv2 SFs yet, so do not include b-tagging SFs
-weights_llbb = ['trigeff', 'llidiso', 'pu']
-categories_llbb = ["All", "MuMu", "ElEl", "MuEl"] 
+weights_llbb = ['trigeff', 'llidiso', 'pu', 'jjbtag_heavy', 'jjbtag_light']
+categories_llbb = ["MuMu", "ElEl", "MuEl"] 
 plots_llbb = ["mll", "mjj", "basic", "cmva", "bdtinput", "evt", "dy_bdt_inputs", "dy_rwgt_bdt", "resonant_nnoutput", "nonresonant_nnoutput"]
 
 # No systematics
-systematics = {"modifObjects" : ["nominal"]}
+#systematics = { "modifObjects": ["nominal"] }
 # All systematics
-#systematics = {"modifObjects" : ["nominal", "jecup", "jecdown", "jerup", "jerdown"], "SF" : ["elidisoup", "elidisodown", "muidup", "muiddown", "muisoup", "muisodown", "jjbtagup", "jjbtagdown", "puup", "pudown", "trigeffup", "trigeffdown", "pdfup", "pdfdown", "scale", "scaleUncorr"]}
-# No b-tag SF systematics AND NO JEC/JER FOR NOW
-#systematics = { "modifObjects": ["nominal"], "SF": ["elidisoup", "elidisodown", "muidup", "muiddown", "muisoup", "muisodown", "puup", "pudown", "trigeffup", "trigeffdown", "pdfup", "pdfdown", "scale", "scaleUncorr"] }
+systematics = { "modifObjects": ["nominal", "jecup", "jecdown", "jerup", "jerdown"], "SF": ["elidisoup", "elidisodown", "muidup", "muiddown", "muisoup", "muisodown", "jjbtaglightup", "jjbtaglightdown", "jjbtagheavyup", "jjbtagheavydown", "puup", "pudown", "trigeffup", "trigeffdown", "pdfup", "pdfdown"] }
+for i in range(6):
+    systematics["SF"].append("scaleUncorr{}".format(i))
 
 for systematicType in systematics.keys():
     
@@ -94,14 +92,10 @@ for systematicType in systematics.keys():
         if systematicType == "modifObjects":
             objects = systematic
         else:
-            objects = "nominal" #ensure that we use normal hh_objects for systematics not modifying obect such as scale factors 
+            objects = "nominal"
 
         basePlotter_llbb = BasePlotter(baseObjectName = "hh_llmetjj_HWWleptons_btagM_cmva", btagWP_str = 'medium', objects = objects)
        
         plots.extend(basePlotter_llbb.generatePlots(categories_llbb, "no_cut", systematic = systematic, weights = weights_llbb, requested_plots = plots_llbb))
         plots.extend(basePlotter_llbb.generatePlots(categories_llbb, "mll_cut", systematic = systematic, weights = weights_llbb, requested_plots = plots_llbb))
         plots.extend(basePlotter_llbb.generatePlots(categories_llbb, "inverted_mll_cut", systematic = systematic, weights = weights_llbb, requested_plots = plots_llbb))
-
-        code_in_loop += basePlotter_llbb.get_code_in_loop()
-        code_before_loop += basePlotter_llbb.get_code_before_loop()
-        code_after_loop += basePlotter_llbb.get_code_after_loop()

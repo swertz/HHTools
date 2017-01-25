@@ -32,11 +32,14 @@ parser.add_argument('-c', '--compare', help="If specified, create comparison plo
 
 options = parser.parse_args()
 
-baseSystematics = ["elidiso", "muid", "muiso", "pu", "trigeff", "pdf", "scaleUncorr"]
+baseSystematics = ["elidiso", "muid", "muiso", "pu", "trigeff", "pdf", "jec", "jer"]
 systematics = ["nominal"]
 for syst in baseSystematics:
     systematics.append(syst + "up")
     systematics.append(syst + "down")
+baseSystematics.append("scaleUncorr")
+for i in range(6):
+    systematics.append("scaleUncorr{}".format(i))
 
 flavours = ["b", "c", "l"]
 
@@ -46,15 +49,33 @@ def getSystString(syst):
     else:
         return "__" + syst
 
-flavourFractions = {}
-for flav1 in flavours:
-    for flav2 in flavours:
-        for syst in systematics:
+def addHistos(lst):
+    if len(lst) == 0:
+        return
+    for h in lst[1:]:
+        lst[0].Add(h)
+
+def checkHistos(pas, total):
+    assert(pas.GetNbinsX() == total.GetNbinsX())
+    assert(pas.GetXaxis().GetXmax() == pas.GetXaxis().GetXmax()) 
+    assert(pas.GetXaxis().GetXmin() == pas.GetXaxis().GetXmin()) 
+
+    for i in range(0, total.GetNbinsX() + 2):
+        if total.GetBinContent(i) < pas.GetBinContent(i):
+            print "Warning: histogram {} inconsistent bin content for bin {}: {} > {}".format(total.GetName(), i, pas.GetBinContent(i), total.GetBinContent(i))
+            pas.SetBinContent(i, total.GetBinContent(i))
+
+passHistos = {}
+totalHistos = {}
+for syst in systematics:
+    totalHistos["total_" + getSystString(syst)] = []
+    for flav1 in flavours:
+        for flav2 in flavours:
             name = "{}{}_frac{}".format(flav1, flav2, getSystString(syst))
-            flavourFractions[name] = []
+            passHistos[name] = []
 
 for file in options.input:
-    print "Building TEfficiency objects from file {}...".format(file)
+    print "Reading histograms from file {}...".format(file)
 
     r_file = R.TFile.Open(file)
     if not r_file.IsOpen():
@@ -62,33 +83,33 @@ for file in options.input:
 
     for syst in systematics:
         systString = getSystString(syst)
+            
+        xs = 1.
+        wgt_sum = 1.
+        if options.scale:
+            try:
+                xs = r_file.Get("cross_section").GetVal()
+            except:
+                print "Did not find cross section, will use 1."
+            try:
+                wgt_sum = r_file.Get("event_weight_sum").GetVal()
+            except:
+                print "Did not find event weight sum, will use 1."
+            
+        totalHist = r_file.Get(options.total + systString)
+        totalHist.SetDirectory(0)
+        #totalHist.Scale(xs / wgt_sum)
+        totalHistos["total_" + systString].append(totalHist)
         
         for flav1 in flavours:
             for flav2 in flavours:
                 name = "{}{}_frac{}".format(flav1, flav2, systString)
                 
-                totalHist = r_file.Get(totalName + systString)
-                passHist = r_file.Get(passNameTemplate.format(flav1, flav2) + systString)
-                
-                thisEff = R.TEfficiency(passHist, totalHist)
-                thisEff.SetName(name)
-                thisEff.SetStatisticOption(R.TEfficiency.kBJeffrey)
-                
-                if options.scale:
-                    try:
-                        xs = r_file.Get("cross_section").GetVal()
-                    except:
-                        print "Did not find cross section, will use 1."
-                        xs = 1
-                    try:
-                        wgt_sum = r_file.Get("event_weight_sum").GetVal()
-                        print "Did not find event weight sum, will use 1."
-                    except:
-                        wgt_sum = 1
-                    
-                    thisEff.SetWeight(xs / wgt_sum)
+                passHist = r_file.Get(options.passed.format(flav1, flav2) + systString)
+                #passHist.Scale(xs / wgt_sum)
+                passHist.SetDirectory(0)
 
-                flavourFractions[name].append(thisEff)
+                passHistos[name].append(passHist)
 
     r_file.Close()
 
@@ -96,12 +117,26 @@ r_file = R.TFile.Open(options.output, "recreate")
 if not r_file.IsOpen():
     raise Exception("Could not read from file {}".format(options.output))
 
-for fracList in flavourFractions.values():
-    thisFrac = fracList[0]
-    for frac in fracList[1:]:
-        thisFrac.Add(frac)
-    thisFrac.Write()
-    fracList = [ thisFrac ]
+flavourFractions = {}
+
+for syst in systematics:
+    systString = getSystString(syst)
+    
+    addHistos(totalHistos["total_" + systString])
+    
+    for flav1 in flavours:
+        for flav2 in flavours:
+            name = "{}{}_frac{}".format(flav1, flav2, systString)
+            addHistos(passHistos[name])
+            print "Doing " + name
+            passHisto = passHistos[name][0]
+            totalHisto = totalHistos["total_" + systString][0]
+            checkHistos(passHisto, totalHisto)
+            thisEff = R.TEfficiency(passHisto, totalHisto)
+            thisEff.SetName(name)
+            thisEff.SetStatisticOption(R.TEfficiency.kBUniform)
+            flavourFractions[name] = thisEff
+            thisEff.Write()
 
 r_file.Close()
 
@@ -112,13 +147,20 @@ if options.compare is not None:
 
     for flav1 in flavours:
         for flav2 in flavours:
-            for syst in baseSystematics:
-                name = "{}{}_frac".format(flav1, flav2)
-                graphs = {
-                        "nominal": flavourFractions[name][0].CreateGraph(),
-                        "up": flavourFractions[name + "__" + syst + "up"][0].CreateGraph(),
-                        "down": flavourFractions[name + "__" + syst + "down"][0].CreateGraph()
-                    }
+            name = "{}{}_frac".format(flav1, flav2)
+            
+            for syst in baseSystematics:    
+                graphs = {}
+                if "scale" in syst:
+                    graphs["nominal"] = flavourFractions[name].CreateGraph()
+                    for i in range(6):
+                        graphs[str(i)] = flavourFractions[name + "__" + syst + str(i)].CreateGraph()
+                else:
+                    graphs = {
+                            "nominal": flavourFractions[name].CreateGraph(),
+                            "up": flavourFractions[name + "__" + syst + "up"].CreateGraph(),
+                            "down": flavourFractions[name + "__" + syst + "down"].CreateGraph()
+                        }
                 
                 leg = R.TLegend(0.7, 0.91, 0.943, 1.)
                 leg.SetNColumns(3)
@@ -126,3 +168,5 @@ if options.compare is not None:
                     leg.AddEntry(item[1], item[0], "P")
 
                 drawTGraph(graphs.values(), "{}{}_{}".format(flav1, flav2, syst), legend=leg, xLabel="DY BDT", yLabel="Flavour fraction for {}{}".format(flav1, flav2), leftText="Systematic: " + syst, dir=outDir)
+                
+            drawTGraph([flavourFractions[name].CreateGraph()], "{}{}_nominal".format(flav1, flav2), legend=None, xLabel="DY BDT", yLabel="Fraction", leftText="Nominal flavour fraction for {}{}".format(flav1, flav2), dir=outDir)

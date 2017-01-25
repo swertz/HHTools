@@ -7,14 +7,13 @@ sys.path.append(os.path.join(scriptDir, "../histFactory_hh"))
 
 from basePlotter import *
 
-include_directories = []
 plots = []
 library_directories = []
 libraries = []
 
-include_directories.append(os.path.join(scriptDir, "..", "common"))
-
+include_directories = default_include_directories(scriptDir)
 headers = default_headers()
+sources = default_sources(scriptDir)
 
 code_before_loop = default_code_before_loop()
 code_in_loop = default_code_in_loop()
@@ -33,6 +32,7 @@ include_directories += training_grid_reweighter.include_dirs()
 headers += training_grid_reweighter.headers()
 library_directories += training_grid_reweighter.library_dirs()
 libraries += training_grid_reweighter.libraries()
+sources += training_grid_reweighter.sources()
 sample_weights["training_grid"] = training_grid_reweighter.sample_weight()
 
 # Plot configuration
@@ -41,8 +41,8 @@ weights_llbb = []
 flavour = "All"
 categories_llbb = [flavour]
 stage_llbb = "no_cut"
-plots_llbb = ["mll", "mjj", "basic", "bdtinput", "ht", "other", "llidisoWeight", 'jjbtagWeight', 'trigeffWeight', 'puWeight', 'DYNobtagToBTagMWeight', 'forSkimmer', 'cmva', 'gen', 'evt', 'detailed_flavour']
-# plots_llbb += ["bdtoutput"]
+plots_llbb = ["mll", "mjj", "basic", "bdtinput", "ht", "other", "llidisoWeight", 'jjbtagWeight', 'trigeffWeight', 'puWeight', 'forSkimmer', 'cmva', 'gen', 'evt', 'detailed_flavour']
+plots_llbb += ["dy_rwgt_bdt", "DYNobtagToBTagMWeight"]
 
 def plots_to_branches(plots, tree):
     for plot in plots:

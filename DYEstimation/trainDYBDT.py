@@ -20,28 +20,53 @@ def get_sample(name):
     resultset = dbstore.find(Sample, Sample.name == name)
     return resultset.one()
 
-date = "2016_12_20"
+date = "2017_01_23"
 suffix = "bb_cc_vs_rest_10var"
 label_template = "DATE_BDTDY_SUFFIX"
 
-inFileDir = "/home/fynu/swertz/scratch/CMSSW_8_0_25/src/cp3_llbb/HHTools/condor/161220_skimDY_for_dy/condor/output/"
+inFileDir = "/home/fynu/swertz/scratch/CMSSW_8_0_25/src/cp3_llbb/HHTools/condor/170123_skimDY_for_dy/condor/output/"
 
 # SAMPLES FOR THE TRAINING
 
-DYJetsToLL_M10to50 = "DYJetsToLL_M-10to50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_Spring16MiniAODv2_v4.1.0+80X_HHAnalysis_2016-12-14.v0"
-DYJetsToLL_M10to50_db = get_sample(unicode(DYJetsToLL_M10to50))
+DYJetsToLL_M10to50_ext1 = "DYJetsToLL_M-10to50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_ext1_Summer16MiniAODv2_v4.2.0+80X_HHAnalysis_2017-01-18.v0"
+DYJetsToLL_M10to50_ext1_db = get_sample(unicode(DYJetsToLL_M10to50_ext1))
 
-DYJetsToLL_M50 = "DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_Spring16MiniAODv2_v4.1.0+80X_HHAnalysis_2016-12-14.v0"
+DYJetsToLL_M50 = "DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_Summer16MiniAODv2_v4.2.0+80X_HHAnalysis_2017-01-18.v0"
 DYJetsToLL_M50_db = get_sample(unicode(DYJetsToLL_M50))
 
+DYJetsToLL_M50_0J = "DYToLL_0J_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_Summer16MiniAODv2_v4.2.0+80X_HHAnalysis_2017-01-18.v0"
+DYJetsToLL_M50_0J_db = get_sample(unicode(DYJetsToLL_M50_0J))
+DYJetsToLL_M50_0J_ext1 = "DYToLL_0J_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_Summer16MiniAODv2_ext1_v4.2.0+80X_HHAnalysis_2017-01-18.v0"
+DYJetsToLL_M50_0J_ext1_db = get_sample(unicode(DYJetsToLL_M50_0J_ext1))
+DYJetsToLL_M50_1J = "DYToLL_1J_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_Summer16MiniAODv2_v4.2.0+80X_HHAnalysis_2017-01-18.v0"
+DYJetsToLL_M50_1J_db = get_sample(unicode(DYJetsToLL_M50_1J))
+DYJetsToLL_M50_2J = "DYToLL_2J_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_Summer16MiniAODv2_v4.2.0+80X_HHAnalysis_2017-01-18.v0"
+DYJetsToLL_M50_2J_db = get_sample(unicode(DYJetsToLL_M50_2J))
+
 bkgFiles = { 
-        "DYJetsToLL_M-10to50": {
-                    "files": [ inFileDir + DYJetsToLL_M10to50 + "_histos.root" ],
-                    "relativeWeight": DYJetsToLL_M10to50_db.source_dataset.xsection/DYJetsToLL_M10to50_db.event_weight_sum
+        "DYJetsToLL_M-10to50_ext1": {
+                    "files": [ inFileDir + DYJetsToLL_M10to50_ext1 + "_histos.root" ],
+                    "relativeWeight": DYJetsToLL_M10to50_ext1_db.source_dataset.xsection/DYJetsToLL_M10to50_ext1_db.event_weight_sum
                 },
-        "DYJetsToLL_M-50": {
-                    "files": [ inFileDir + DYJetsToLL_M50 + "_histos.root" ],
-                    "relativeWeight": DYJetsToLL_M50_db.source_dataset.xsection/DYJetsToLL_M50_db.event_weight_sum
+        #"DYJetsToLL_M-50": {
+        #            "files": [ inFileDir + DYJetsToLL_M50 + "_histos.root" ],
+        #            "relativeWeight": DYJetsToLL_M50_db.source_dataset.xsection/DYJetsToLL_M50_db.event_weight_sum
+        #        },
+        "DYJetsToLL_M-50_0J": {
+                    "files": [ inFileDir + DYJetsToLL_M50_0J + "_histos.root" ],
+                    "relativeWeight": DYJetsToLL_M50_0J_db.source_dataset.xsection/DYJetsToLL_M50_0J_db.event_weight_sum
+                },
+        "DYJetsToLL_M-50_0J_ext1": {
+                    "files": [ inFileDir + DYJetsToLL_M50_0J_ext1 + "_histos.root" ],
+                    "relativeWeight": DYJetsToLL_M50_0J_ext1_db.source_dataset.xsection/DYJetsToLL_M50_0J_ext1_db.event_weight_sum
+                },
+        "DYJetsToLL_M-50_1J": {
+                    "files": [ inFileDir + DYJetsToLL_M50_1J + "_histos.root" ],
+                    "relativeWeight": DYJetsToLL_M50_1J_db.source_dataset.xsection/DYJetsToLL_M50_1J_db.event_weight_sum
+                },
+        "DYJetsToLL_M-50_2J": {
+                    "files": [ inFileDir + DYJetsToLL_M50_2J + "_histos.root" ],
+                    "relativeWeight": DYJetsToLL_M50_2J_db.source_dataset.xsection/DYJetsToLL_M50_2J_db.event_weight_sum
                 },
         }
 
