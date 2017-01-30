@@ -138,13 +138,14 @@ double FWBTagEfficiencyOnBDT::get_cached(const LorentzVector& jet1, const Lorent
     }
 }
 
-double FWBTagEfficiencyOnBDT::get(const LorentzVector& jet1, const LorentzVector& jet2, float BDTout, const std::string& syst) {
+double FWBTagEfficiencyOnBDT::get(const LorentzVector& jet1, const LorentzVector& jet2, float BDTout, std::string syst) {
 
     /*
      * Some assumptions:
      *  - b-tag efficiencies are binning in pt and eta for all jets
      *  - flavor fractions are binned in BDT
      * Special systematics: "dyStat(up|down)" -> take the statistical error on the fractions/efficiencies as the systematic uncertainty
+     * Special systematics: "dyScaleUncorr?" -> take the "scaleUncorr?" efficiencies/fractions
      * If the given systematics has not been computed for the efficiencies or fractions, the nominal value is returned.
      */
 
@@ -169,6 +170,16 @@ double FWBTagEfficiencyOnBDT::get(const LorentzVector& jet1, const LorentzVector
     //std::cout << "nominal weight: " << nominal_weight << std::endl;
     //std::cout << "quantile 50%: " << monte_carlo_quantile(get_btag_bin(jet1), get_btag_bin(jet2), get_frac_bin(BDTout), 0.5, 10000) << std::endl;
     
+    // Scale uncertainty: special treatment
+    // If it's a "regular" scale, return the nominal value
+    // If it's a "DY" scale, return the modified weight, but not forget to rename
+    // the syst string to match the efficiencies/fractions names
+    if (syst.find("scale") != std::string::npos) {
+        syst = "nominal";
+    } else if (syst.find("dyScale") == 0) {
+        syst.replace(0, std::string("dyScale").size(), "scale");
+    }
+
     // Nominal value
     if (syst == "nominal")
         return std::max(0., nominal_weight);

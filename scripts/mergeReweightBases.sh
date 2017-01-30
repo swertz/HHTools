@@ -23,8 +23,7 @@ fi
 
 for point in ${point_list[*]}; do
     new_name=GluGluToHHTo2B2VTo2L2Nu_point_${point}_13TeV${name_suffix}
-    hadd ${new_name} GluGluToHHTo2B2VTo2L2Nu_base_*_point_${point}_*.root
-    if [ "$2" == "-r" ]; then rm ${to_add}; fi
+    hadd ${new_name} GluGluToHHTo2B2VTo2L2Nu_base_*_point_${point}_*.root && { if [ "$2" == "-r" ]; then rm GluGluToHHTo2B2VTo2L2Nu_base_*_point_${point}_*.root; fi }
 done
 
 popd

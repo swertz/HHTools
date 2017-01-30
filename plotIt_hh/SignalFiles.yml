@@ -1,0 +1,228 @@
+# Signal, non-resonant
+
+'GluGluToHHTo2B2VTo2L2Nu_node_SM_13TeV-madgraph_*_histos.root':
+  type: signal
+  cross-section: 5000
+  line-color: '#2ca02c' # from https://github.com/vega/vega/wiki/Scales#scale-range-literals
+  #line-color: '#05C10C'
+  #line-color: '#008A00'
+  legend: 'SM'
+  legend-order: 14
+  line-width: 2.7
+  line-type: 1
+
+'GluGluToHHTo2B2VTo2L2Nu_point_5_2p5_13TeV-madgraph_*_histos.root':
+  type: signal
+  cross-section: 5000
+  line-color: '#d62728'
+  legend: '(#kappa_{#lambda}, #kappa_{t}) = (5, 2.5)'
+  legend-order: 13
+  line-width: 2.7
+  line-type: 1
+
+'GluGluToHHTo2B2VTo2L2Nu_point_-20_0p5_13TeV-madgraph_*_histos.root':
+  type: signal
+  cross-section: 5000
+  line-color: '#9467bd'
+  legend: '(#kappa_{#lambda}, #kappa_{t}) = (-20, 0.5)'
+  legend-order: 13
+  line-width: 2.7
+  line-type: 1
+
+#'GluGluToHHTo2B2VTo2L2Nu_node_box_13TeV-madgraph_*_histos.root':
+#  type: signal
+#  cross-section: 10000
+#  line-color: '#000000'
+#  #line-color: '#F0A30A'
+#  legend: 'Box'
+#  legend-order: 13
+#  line-width: 2
+#  line-type: 1
+#
+#'GluGluToHHTo2B2VTo2L2Nu_node_1_13TeV-madgraph_*_histos.root':
+#  type: signal
+#  cross-section: 10000
+#  line-color: '#FF6600'
+#  #line-color: '#76608A'
+#  legend: 'BM1'
+#  legend-order: 12
+#  line-width: 2
+#  line-type: 1
+
+#'GluGluToHHTo2B2VTo2L2Nu_node_2_13TeV-madgraph_*_histos.root':
+  #type: signal
+  #cross-section: 10000
+  #line-color: '#FFC501'
+  ##line-color: '#FA6800'
+  #legend: 'BM2'
+  #legend-order: 11
+  #line-width: 2
+  #line-type: 1
+
+#'GluGluToHHTo2B2VTo2L2Nu_node_3_13TeV-madgraph_*_histos.root':
+#  type: signal
+#  cross-section: 10000
+#  line-color: '#FF0000'
+#  #line-color: '#E51400'
+#  legend: 'BM3'
+#  legend-order: 10
+#  line-width: 2
+#  line-type: 1
+#
+#'GluGluToHHTo2B2VTo2L2Nu_node_4_13TeV-madgraph_*_histos.root':
+#  type: signal
+#  cross-section: 10000
+#  line-color: '#006600'
+#  #line-color: '#A20025'
+#  legend: 'BM4'
+#  legend-order: 9
+#  line-width: 2
+#  line-type: 1
+
+#'GluGluToHHTo2B2VTo2L2Nu_node_5_13TeV-madgraph_*_histos.root':
+  #type: signal
+  #cross-section: 10000
+  #line-color: '#D200C4'
+  ##line-color: '#0050EF'
+  #legend: 'BM5'
+  #legend-order: 8
+  #line-width: 2
+  #line-type: 1
+
+#'GluGluToHHTo2B2VTo2L2Nu_node_6_13TeV-madgraph_*_histos.root':
+  #type: signal
+  #cross-section: 10000
+  #legend: 'BM6'
+  #line-color: '#000099'
+  ##line-color: '#A4C500'
+  #legend-order: 7
+  #line-width: 2
+  #line-type: 1
+
+#'GluGluToHHTo2B2VTo2L2Nu_node_7_13TeV-madgraph_*_histos.root':
+  #type: signal
+  #cross-section: 10000
+  #line-color: '#0066FF'
+  ##line-color: '#D80073'
+  #legend: 'BM7'
+  #legend-order: 6
+  #line-width: 2
+#  line-type: 1
+#
+#'GluGluToHHTo2B2VTo2L2Nu_node_8_13TeV-madgraph_*_histos.root':
+#  type: signal
+#  cross-section: 10000
+#  line-color: '#9900CC'
+#  #line-color: '#AA00FF'
+#  legend: 'BM8'
+#  legend-order: 5
+#  line-width: 2
+#  line-type: 1
+#
+#'GluGluToHHTo2B2VTo2L2Nu_node_9_13TeV-madgraph_*_histos.root':
+#  type: signal
+#  cross-section: 10000
+#  line-color: '#006666'
+#  #line-color: '#00ABA9'
+#  legend: 'BM9'
+#  legend-order: 4
+#  line-width: 2
+#  line-type: 1
+#
+#'GluGluToHHTo2B2VTo2L2Nu_node_10_13TeV-madgraph_*_histos.root':
+#  type: signal
+#  cross-section: 10000
+#  line-color: '#FF66FF'
+#  #line-color: '#825A2C'
+#  legend: 'BM10'
+#  legend-order: 3
+#  line-width: 2
+#  line-type: 1
+#
+#'GluGluToHHTo2B2VTo2L2Nu_node_11_13TeV-madgraph_*_histos.root':
+#  type: signal
+#  cross-section: 10000
+#  line-color: '#666666'
+#  #line-color: '#6D8764'
+#  legend: 'BM11'
+#  legend-order: 2
+#  line-width: 2
+#  line-type: 1
+
+#'GluGluToHHTo2B2VTo2L2Nu_node_12_13TeV-madgraph_*_histos.root':
+  #type: signal
+  #cross-section: 10000
+  #line-color: '#F00000'
+  ##line-color: '#647687'
+  #legend: 'BM12'
+  #legend-order: 1
+  #line-width: 2
+  #line-type: 1
+
+# Signal, resonant
+
+'GluGluToRadionToHHTo2B2VTo2L2Nu_M-400_narrow_*_histos.root':
+  type: signal
+  cross-section: 5000
+  line-color: '#ff0000'
+  legend: 'm_{X} = 400 GeV'
+  legend-order: 5
+  line-width: 2
+  line-type: 1
+
+#'GluGluToRadionToHHTo2B2VTo2L2Nu_M-650_narrow_*_histos.root':
+#  type: signal
+#  cross-section: 5000
+#  line-color: '#ff0000'
+#  legend: 'm_{X} = 650 GeV'
+#  legend-order: 3
+#  line-width: 2
+#  line-type: 1
+
+'GluGluToRadionToHHTo2B2VTo2L2Nu_M-900_narrow_*_histos.root':
+  type: signal
+  cross-section: 5000
+  line-color: '#000000'
+  legend: 'm_{X} = 900 GeV'
+  legend-order: 1
+  line-width: 2
+  line-type: 1
+
+#'GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-400_narrow_*_histos.root':
+#  type: signal
+#  cross-section: 2000
+#  #generated-events: 298800
+#  line-color: '#008000'
+#  legend: 'X2 (400) 2 pb'
+#  legend-order: 4
+#  line-width: 2
+#  line-type: 2
+#
+#'GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-650_narrow_*_histos.root':
+#  type: signal
+#  cross-section: 250
+#  #generated-events: 299800.0
+#  line-color: '#ff0000'
+#  legend: 'X2 (650) 0.25 pb'
+#  legend-order: 2
+#  line-width: 2
+#  line-type: 2
+#
+#'GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-900_narrow_*_histos.root':
+#  type: signal
+#  cross-section: 200
+#  #generated-events: 289200.0
+#  line-color: '#000000'
+#  legend: 'X2 (900) 0.2 pb'
+#  legend-order: 0
+#  line-width: 2
+#  line-type: 2
+#'GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-500_narrow_*_histos.root':
+#  type: signal
+#  cross-section: 03
+#  #generated-events: 289200.0
+#  line-color: '#000000'
+#  legend: 'X2 (500)'
+#  legend-order: 0
+#  line-width: 2
+#  line-type: 2

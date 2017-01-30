@@ -80,7 +80,7 @@ class FWBTagEfficiencyOnBDT {
          *
         double propagate_variance(const LorentzVector& jet1, const LorentzVector& jet2, float BDTout, const std::string& syst);*/
 
-        double get(const LorentzVector& jet1, const LorentzVector& jet2, float BDTout, const std::string& syst="nominal");
+        double get(const LorentzVector& jet1, const LorentzVector& jet2, float BDTout, std::string syst="nominal");
         
         double get_cached(const LorentzVector& jet1, const LorentzVector& jet2, float BDTout, const std::string& syst="nominal");
 

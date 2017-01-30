@@ -23,10 +23,12 @@ def default_code_before_loop():
 def default_code_in_loop():
     return r"""
         double HT = 0;
-        for (size_t i = 0; i < hh_jets.size(); i++)
+        for (size_t i = 0; i < hh_jets.size(); i++) {
             HT += hh_jets[i].p4.Pt();
-        for (size_t i = 0; i < hh_leptons.size(); i++)
+        }
+        for (size_t i = 0; i < hh_leptons.size(); i++) {
             HT += hh_leptons[i].p4.Pt();
+        }
 
         resonant_nn_evaluator.clear();
         nonresonant_nn_evaluator.clear();
@@ -128,44 +130,46 @@ class BasePlotter:
         self.suffix = baseObjectName
         self.btagWP_str = btagWP_str
         
-        self.lep1_str = "hh_leptons[%s.ilep1]"%self.baseObject
-        self.lep2_str = "hh_leptons[%s.ilep2]"%self.baseObject
-        self.jet1_str = "hh_jets[%s.ijet1]"%self.baseObject
-        self.jet2_str = "hh_jets[%s.ijet2]"%self.baseObject
-        self.ll_str = "%s.ll_p4"%self.baseObject 
-        self.jj_str = "%s.jj_p4"%self.baseObject
+        self.lep1_str = "hh_leptons[%s.ilep1]" % self.baseObject
+        self.lep2_str = "hh_leptons[%s.ilep2]" % self.baseObject
+        self.jet1_str = "hh_jets[%s.ijet1]" % self.baseObject
+        self.jet2_str = "hh_jets[%s.ijet2]" % self.baseObject
+        self.ll_str = "%s.ll_p4" % self.baseObject 
+        self.jj_str = "%s.jj_p4" % self.baseObject
 
         if objects != "nominal":
-            baseObjectName = baseObjectName.replace("hh_", "hh_"+objects+"_")
-            self.lep1_str = self.lep1_str.replace("hh_", "hh_"+objects+"_")
-            self.lep2_str = self.lep2_str.replace("hh_", "hh_"+objects+"_")
-            self.jet1_str = self.jet1_str.replace("hh_", "hh_"+objects+"_")
-            self.jet2_str = self.jet2_str.replace("hh_", "hh_"+objects+"_")
-            self.ll_str = self.ll_str.replace("hh_", "hh_"+objects+"_")
-            self.jj_str = self.jj_str.replace("hh_", "hh_"+objects+"_")
-            self.baseObject = self.baseObject.replace("hh_", "hh_"+objects+"_")
+            baseObjectName = baseObjectName.replace("hh_", "hh_" + objects + "_")
+            self.lep1_str = self.lep1_str.replace("hh_", "hh_" + objects + "_")
+            self.lep2_str = self.lep2_str.replace("hh_", "hh_" + objects + "_")
+            self.jet1_str = self.jet1_str.replace("hh_", "hh_" + objects + "_")
+            self.jet2_str = self.jet2_str.replace("hh_", "hh_" + objects + "_")
+            self.ll_str = self.ll_str.replace("hh_", "hh_" + objects + "_")
+            self.jj_str = self.jj_str.replace("hh_", "hh_" + objects + "_")
+            self.baseObject = self.baseObject.replace("hh_", "hh_" + objects + "_")
 
         # needed to get scale factors (needs to be after the object modification due to systematics)
-        self.lep1_fwkIdx = self.lep1_str+".idx"
-        self.lep2_fwkIdx = self.lep2_str+".idx"
-        self.jet1_fwkIdx = self.jet1_str+".idx"
-        self.jet2_fwkIdx = self.jet2_str+".idx"
+        self.lep1_fwkIdx = self.lep1_str + ".idx"
+        self.lep2_fwkIdx = self.lep2_str + ".idx"
+        self.jet1_fwkIdx = self.jet1_str + ".idx"
+        self.jet2_fwkIdx = self.jet2_str + ".idx"
 
         # Ensure we have one candidate, works also for jecup etc
         self.sanityCheck = "Length$(%s)>0" % baseObjectName
 
         # Categories (lepton flavours)
         self.dict_cat_cut =  {
-            "ElEl": "({0}.isElEl && (runOnMC || hh_elel_fire_trigger_cut) && (runOnElEl || runOnMC) && {1}.M() > 12)".format(self.baseObject, self.ll_str),
-            "MuMu": "({0}.isMuMu && (runOnMC || hh_mumu_fire_trigger_cut) && (runOnMuMu || runOnMC) && {1}.M() > 12)".format(self.baseObject, self.ll_str),
-            "MuEl": "(({0}.isElMu || {0}.isMuEl) && (runOnMC || hh_elmu_fire_trigger_cut || hh_muel_fire_trigger_cut) && (runOnElMu || runOnMC) && {1}.M() > 12)".format(self.baseObject, self.ll_str)
+            "ElEl": "({0}.isElEl && (runOnElEl || runOnMC) && {1}.M() > 12)".format(self.baseObject, self.ll_str),
+            "MuMu": "({0}.isMuMu && (runOnMuMu || runOnMC) && {1}.M() > 12)".format(self.baseObject, self.ll_str),
+            "MuEl": "(({0}.isElMu || {0}.isMuEl) && (runOnElMu || runOnMC) && {1}.M() > 12)".format(self.baseObject, self.ll_str)
                         }
         cut_for_All_channel = "(" + self.dict_cat_cut["ElEl"] + "||" + self.dict_cat_cut["MuMu"] + "||" +self.dict_cat_cut["MuEl"] + ")"
         cut_for_SF_channel = "(" + self.dict_cat_cut["ElEl"] + "||" + self.dict_cat_cut["MuMu"] + ")"
         self.dict_cat_cut["SF"] = cut_for_SF_channel
         self.dict_cat_cut["All"] = cut_for_All_channel
 
-    def generatePlots(self, categories, stage, requested_plots, weights, systematic="nominal", extraString="", fit2DtemplatesBinning=None, prependCuts=[], appendCuts=[], allowWeightedData=False):
+    
+    
+    def generatePlots(self, categories, stage, requested_plots, weights, systematic="nominal", extraString="", prependCuts=[], appendCuts=[], allowWeightedData=False):
 
         # Protect against the fact that data do not have jecup collections, in the nominal case we still have to check that data have one candidate 
         sanityCheck = self.sanityCheck
@@ -179,7 +183,6 @@ class BasePlotter:
         mll_cut = "((91 - {0}.M()) > 15)".format(self.ll_str)
         inverted_mll_cut = "((91 - {0}.M()) <= 15)".format(self.ll_str)
         high_mll_cut = "(({0}.M() - 91) > 15)".format(self.ll_str)
-
         mjj_blind = "({0}.M() < 75 || {0}.M() > 140)".format(self.jj_str)
 
         dict_stage_cut = {
@@ -195,12 +198,13 @@ class BasePlotter:
         keras_nonresonant_input_variables = '{%s, %s, %s, %s, %s, %s, %s, %s, (double) %s, %%f, %%f}' % (self.jj_str + ".Pt()", self.ll_str + ".Pt()", self.ll_str + ".M()", self.baseObject + ".DR_l_l", self.baseObject + ".DR_j_j", self.baseObject + ".DPhi_ll_jj", self.baseObject + ".minDR_l_j", self.baseObject + ".MT_formula", self.baseObject + ".isSF")
         
         # Keras resonant NN
-        keras_resonant_signal_masses = [260, 300, 400, 550, 650, 800, 900]
+        resonant_signal_masses = [260, 300, 400, 550, 650, 800, 900]
+        restricted_resonant_signals = [260, 400, 900] # For 1D plots, only select a few points
 
         # Keras non-resonant NN
-        #keras_nonresonant_signal_grid = [ (kl, kt) for kl in [-15, -5, -1, 0.0001, 1, 5, 15] for kt in [0.5, 1, 1.75, 2.5] ]
-        keras_nonresonant_signal_grid = [ (kl, kt) for kl in [-20, 0.0001, 1, 2.4, 3.8, 5, 20] for kt in [0.5, 1, 1.75, 2.5] ]
-        keras_nonresonant_shift = { "kl": 20.0, "kt": 0 } # Shift parameters to be positive everywhere (goes in line with the training)
+        nonresonant_signal_grid = [ (kl, kt) for kl in [-20, 0.0001, 1, 2.4, 3.8, 5, 20] for kt in [0.5, 1, 1.75, 2.5] ]
+        nonresonant_grid_shift = { "kl": 20.0, "kt": 0 } # Shift parameters to be positive everywhere (goes in line with the training)
+        restricted_nonresonant_signals = [ (1, 1), (2.4, 2.5), (-20, 0.5) ] # For 1D plots, only select a few points
 
         ###########
         # Weights #
@@ -267,7 +271,7 @@ class BasePlotter:
 
             jjBtag_heavyjet_sf = "(common::combineScaleFactors<2>({{ {{ {{ jet{0}_sf_cmvav2_heavyjet_{1}[{2}][0] , jet{0}_sf_cmvav2_heavyjet_{1}[{2}]{3} }}, {{ jet{0}_sf_cmvav2_heavyjet_{1}[{4}][0], jet{0}_sf_cmvav2_heavyjet_{1}[{4}]{3} }} }} }}, common::Variation::{5}) )".format(sys_fwk, self.btagWP_str, self.jet1_fwkIdx, jjBtag_heavy_sfIdx, self.jet2_fwkIdx, jjBtag_heavy_strCommon)
 
-            ## WARNING MINIMUM SET AT 0.8 / +-0.07
+            ## FIXME WARNING MINIMUM SET AT 0.8 / +-0.07
             jjBtag_lightjet_sf = "(common::combineScaleFactors<2>({{ {{ {{ std::max((float)0.8, (float)jet{0}_sf_cmvav2_lightjet_{1}[{2}][0]), std::max((float)0.07, (float)jet{0}_sf_cmvav2_lightjet_{1}[{2}]{3}) }}, {{ std::max((float)0.8, (float)jet{0}_sf_cmvav2_lightjet_{1}[{4}][0]), std::max((float)0.07, (float)jet{0}_sf_cmvav2_lightjet_{1}[{4}]{3}) }} }} }}, common::Variation::{5}) )".format(sys_fwk, self.btagWP_str, self.jet1_fwkIdx, jjBtag_light_sfIdx, self.jet2_fwkIdx, jjBtag_light_strCommon)
             #jjBtag_lightjet_sf = "(common::combineScaleFactors<2>({{ {{ {{ jet{0}_sf_cmvav2_lightjet_{1}[{2}][0] , jet{0}_sf_cmvav2_lightjet_{1}[{2}]{3} }},{{ jet{0}_sf_cmvav2_lightjet_{1}[{4}][0], jet{0}_sf_cmvav2_lightjet_{1}[{4}]{3} }} }} }}, common::Variation::{5}) )".format(sys_fwk, self.btagWP_str, self.jet1_fwkIdx, jjBtag_light_sfIdx, self.jet2_fwkIdx, jjBtag_light_strCommon)
 
@@ -285,7 +289,7 @@ class BasePlotter:
         # PDF weight
         pdfWeight = ""
         normalization = "nominal"
-        if systematic == "pdfup" : # do not change the name of "pdfup", use latter for the proper normalization
+        if systematic == "pdfup": # do not change the name of "pdfup", use latter for the proper normalization
             pdfWeight = "event_pdf_weight_up"
             normalization = "pdf_up"
         if systematic == "pdfdown":
@@ -299,11 +303,12 @@ class BasePlotter:
         if systematic == "trigeffdown":
             trigEff = "({0}.trigger_efficiency_downVariated)".format(self.baseObject)
         # Include dZ filter efficiency for ee (not for mumu since we no longer use the DZ version of the trigger)
+        # FIXME
         trigEff += "*(({0}.isElEl && runOnMC) ? 0.995 : 1)".format(self.baseObject)
 
-        # Append the proper extension to the name plot if needed (scale name are down at the end of the code)
+        # Append the proper extension to the name plot if needed
         self.systematicString = ""
-        if not systematic == "nominal" and not "scale" in systematic:
+        if not systematic == "nominal":
             self.systematicString = "__" + systematic
 
         # DY BDT reweighting
@@ -338,18 +343,14 @@ class BasePlotter:
         self.basic_plot = []
         self.csv_plot = []
         self.cmva_plot = []
-        self.bdtinput_plot = []
-        self.cleancut_plot = []
-        self.drllcut_plot = []
-        self.drjjcut_plot = []
-        self.dphilljjcut_plot = []
+        self.nn_inputs_plot = []
         self.isElEl_plot = []
-        self.mll_plot = []
         self.mjj_plot = []
-        self.bdtoutput_plot = []
+ 
+        self.mjj_vs_resonant_nnoutput_plot = []
+        self.mjj_vs_nonresonant_nnoutput_plot = []
         self.resonant_nnoutput_plot = []
         self.nonresonant_nnoutput_plot = []
-        self.mjj_vs_bdt_plot = []
 
         self.flavour_plot = []
         self.detailed_flavour_plot = []
@@ -362,6 +363,8 @@ class BasePlotter:
         self.puWeight_plot = []
         self.scaleWeight_plot = []
         self.pdfWeight_plot = []
+        self.DYNobtagToBTagMWeight_plot = []
+        
         self.gen_plot = []
         self.evt_plot = []
 
@@ -371,9 +374,7 @@ class BasePlotter:
 
         self.other_plot = []
         self.vertex_plot = []
-        self.ht_plot = []
-
-        self.btagging_eff_plot = []
+        self.genht_plot = []
 
         self.forSkimmer_plot = []
 
@@ -385,16 +386,9 @@ class BasePlotter:
             self.llFlav = cat
             self.extraString = stage + extraString
 
-            self.mll_plot.append({
-                        'name': 'll_M_%s_%s_%s%s'%(self.llFlav, self.suffix, self.extraString, self.systematicString),
-                        'variable': self.ll_str+".M()",
-                        'plot_cut': self.totalCut,
-                        'binning': '(50, 10, 250)'
-                })
-            
             self.mjj_plot.append({
                         'name': 'jj_M_%s_%s_%s%s'%(self.llFlav, self.suffix, self.extraString, self.systematicString),
-                        'variable': self.jj_str+".M()",
+                        'variable': self.jj_str + ".M()",
                         'plot_cut': self.totalCut,
                         'binning': '(50, 10, 410)'
                 })
@@ -407,65 +401,68 @@ class BasePlotter:
                         'binning': '(2, 0, 2)'
                 })
             
-            ## BDT output plots
-            #for bdtName in bdtNames:
-            #    bdtRange = (-0.6, 0.6) # default BDT range
-            #    # Special BDT ranges
-            #    if "BDT_SM" in bdtName: bdtRange = (-0.5, 0.5)
-            #    if "BDT_2" in bdtName: bdtRange = (-0.5, 0.6)
-
-            #    self.bdtoutput_plot.append({
-            #            'name': 'MVA_%s_%s_%s_%s%s' % (bdtName, self.llFlav, self.suffix, self.extraString, self.systematicString),
-            #            'variable': BDToutputsVariable[bdtName],
-            #            'plot_cut': self.totalCut,
-            #            'binning': '(50, {}, {})'.format(bdtRange[0], bdtRange[1])
-            #    })
-            #    
-            #    # 2D templates: different binnings
-
-            #    if fit2DtemplatesBinning is None: continue
-
-            #    for binName, binning in fit2DtemplatesBinning.items():
-
-            #        self.mjj_vs_bdt_plot.append({
-            #                'name': 'jj_M_vs_MVA_%s_%s_%s_%s_%s%s' % (binName, bdtName, self.llFlav, self.suffix, self.extraString, self.systematicString),
-            #                'variable': self.jj_str + ".M() ::: " + BDToutputsVariable[bdtName],
-            #                'plot_cut': self.totalCut,
-            #                'binning': '(%s, %s, %s, %s)' % (binning["mjjBinning"], binning["bdtNbins"], bdtRange[0], bdtRange[1])
-            #        })
-
             # Neural network output
-            for m in keras_resonant_signal_masses:
-                self.resonant_nnoutput_plot.append({
-                        'name': 'NN_resonant_M%d_%s_%s_%s%s' % (m, self.llFlav, self.suffix, self.extraString, self.systematicString),
-                        'variable': 'resonant_nn_evaluator.evaluate(%s)' % (keras_resonant_input_variables % m),
-                        'plot_cut': self.totalCut,
-                        'binning': '(50, {}, {})'.format(0, 1)
-                })
-                self.resonant_nnoutput_plot.append({
+            for m in resonant_signal_masses:
+                if m in restricted_resonant_signals:
+                    self.resonant_nnoutput_plot.append({
+                            'name': 'NN_resonant_M%d_%s_%s_%s%s' % (m, self.llFlav, self.suffix, self.extraString, self.systematicString),
+                            'variable': 'resonant_nn_evaluator.evaluate(%s)' % (keras_resonant_input_variables % m),
+                            'plot_cut': self.totalCut,
+                            'binning': '(50, {}, {})'.format(0, 1)
+                    })
+                self.mjj_vs_resonant_nnoutput_plot.append({
                         'name': 'mjj_vs_NN_resonant_M%d_%s_%s_%s%s' % (m, self.llFlav, self.suffix, self.extraString, self.systematicString),
                         'variable': self.jj_str + '.M() ::: resonant_nn_evaluator.evaluate(%s)' % (keras_resonant_input_variables % m),
                         'plot_cut': self.totalCut,
                         'binning': '(3, { 0, 75, 140, 13000 }, 25, 0, 1)'
                 })
-            for point in keras_nonresonant_signal_grid:
+            for point in nonresonant_signal_grid:
                 kl = point[0]
                 kt = point[1]
                 point_str = "point_{}_{}".format(kl, kt).replace(".", "p").replace("-", "m")
-                kl += keras_nonresonant_shift["kl"]
-                kt += keras_nonresonant_shift["kt"]
-                self.nonresonant_nnoutput_plot.append({
-                        'name': 'NN_nonresonant_%s_%s_%s_%s%s' % (point_str, self.llFlav, self.suffix, self.extraString, self.systematicString),
-                        'variable': 'nonresonant_nn_evaluator.evaluate(%s)' % (keras_nonresonant_input_variables % (kl, kt)),
-                        'plot_cut': self.totalCut,
-                        'binning': '(50, {}, {})'.format(0, 1)
-                })
-                self.nonresonant_nnoutput_plot.append({
+                kl += nonresonant_grid_shift["kl"]
+                kt += nonresonant_grid_shift["kt"]
+                if point in restricted_nonresonant_signals:
+                    self.nonresonant_nnoutput_plot.append({
+                            'name': 'NN_nonresonant_%s_%s_%s_%s%s' % (point_str, self.llFlav, self.suffix, self.extraString, self.systematicString),
+                            'variable': 'nonresonant_nn_evaluator.evaluate(%s)' % (keras_nonresonant_input_variables % (kl, kt)),
+                            'plot_cut': self.totalCut,
+                            'binning': '(50, {}, {})'.format(0, 1)
+                    })
+                self.mjj_vs_nonresonant_nnoutput_plot.append({
                         'name': 'mjj_vs_NN_nonresonant_%s_%s_%s_%s%s' % (point_str, self.llFlav, self.suffix, self.extraString, self.systematicString),
                         'variable': self.jj_str + '.M() ::: nonresonant_nn_evaluator.evaluate(%s)' % (keras_nonresonant_input_variables % (kl, kt)),
                         'plot_cut': self.totalCut,
                         'binning': '(3, { 0, 75, 140, 13000 }, 25, 0, 1)'
                 })
+            
+            # DY reweighting plots
+            dy_bdt_flat_binning = '(40, {-0.5139261638387755, -0.28898196567405476, -0.2476582749856528, -0.21996646493207206, -0.1991670200454712, -0.18167569032901326, -0.16599964930321504, -0.15156757188594833, -0.13818661103236354, -0.12567874006226315, -0.11381442895759973, -0.10263199524142008, -0.09196628930949025, -0.08190636298862279, -0.0722791277618637, -0.06310992276046588, -0.05426600234483494, -0.04569692655758403, -0.03740621352909089, -0.029288264245728928, -0.021465863317879297, -0.013527078590598906, -0.005835657418566017, 0.001713033791860969, 0.009345489580270679, 0.016925843221660714, 0.02461982942842052, 0.03227487210746482, 0.04026572735765449, 0.04846055203674637, 0.057014862886138835, 0.06595620832498035, 0.07527427505752232, 0.08502963174016062, 0.09567345692228932, 0.10739628516126071, 0.12074974301699766, 0.1368035706668398, 0.15707625645811507, 0.18698084196962542, 0.237, 0.287, 0.337, 0.38725443171761686})'
+            self.dy_rwgt_bdt_plot.extend([
+                {
+                    'name': 'DY_BDT_flat_%s_%s_%s%s'%(self.llFlav, self.suffix, self.extraString, self.systematicString),
+                    'variable': 'dy_bdt.evaluate({})'.format(dy_bdt_variables_string),
+                    'plot_cut': self.totalCut,
+                    # 161220, bb_cc_vs_rest_10var:
+                    'binning': dy_bdt_flat_binning,
+                },
+                {
+                    'name': 'DY_BDT_%s_%s_%s%s'%(self.llFlav, self.suffix, self.extraString, self.systematicString),
+                    'variable': 'dy_bdt.evaluate({})'.format(dy_bdt_variables_string),
+                    'plot_cut': self.totalCut,
+                    'binning': '(50, -0.5, 0.4)',
+                },
+            ])
+            for flav1 in ["b", "c", "l"]:
+                for flav2 in ["b", "c", "l"]:
+                    flavour_cut = "({0}.gen_{2} && {1}.gen_{3})".format(self.jet1_str, self.jet2_str, flav1, flav2)
+                    self.dy_rwgt_bdt_flavour_plot.append({
+                            'name': 'DY_BDT_flav_%s%s_%s_%s_%s%s' % (flav1, flav2, self.llFlav, self.suffix, self.extraString, self.systematicString),
+                            'variable': 'dy_bdt.evaluate({})'.format(dy_bdt_variables_string),
+                            'plot_cut': self.joinCuts(self.totalCut, flavour_cut),
+                            'binning': dy_bdt_flat_binning,
+                        })
+
 
             # Weight Plots
             self.jjbtagWeight_plot.append(
@@ -489,9 +486,9 @@ class BasePlotter:
             self.puWeight_plot.append(
                         {'name': 'pu_%s_%s_%s%s'%(self.llFlav, self.suffix, self.extraString,  self.systematicString), 'variable': available_weights["pu"],
                         'plot_cut': self.totalCut, 'binning': '(100, 0, 4)', 'weight': 'event_weight'})
-            self.DYNobtagToBTagMWeight_plot = [
+            self.DYNobtagToBTagMWeight_plot.append(
                         {'name': 'dy_nobtag_to_btagM_weight_%s_%s_%s%s'%(self.llFlav, self.suffix, self.extraString,  self.systematicString), 'variable': available_weights["dy_nobtag_to_btagM_BDT"],
-                        'plot_cut': self.totalCut, 'binning': '(50, 0, 0.05)', 'weight': 'event_weight'}]
+                        'plot_cut': self.totalCut, 'binning': '(50, 0, 0.05)', 'weight': 'event_weight'})
 
             self.scaleWeight_plot.extend([
                         {'name': 'scale0_%s_%s_%s%s'%(self.llFlav, self.suffix, self.extraString,  self.systematicString), 'variable': "std::abs(event_scale_weights[0])",
@@ -513,7 +510,7 @@ class BasePlotter:
                         'name': 'lep1_pt_%s_%s_%s%s'%(self.llFlav, self.suffix, self.extraString, self.systematicString),
                         'variable': self.lep1_str+".p4.Pt()",
                         'plot_cut': self.totalCut,
-                        'binning': '(50, 15, 400)'
+                        'binning': '(50, 20, 400)'
                 },
                 {
                         'name': 'lep2_pt_%s_%s_%s%s'%(self.llFlav, self.suffix, self.extraString, self.systematicString),
@@ -525,26 +522,44 @@ class BasePlotter:
                         'name': 'jet1_pt_%s_%s_%s%s'%(self.llFlav, self.suffix, self.extraString, self.systematicString),
                         'variable': self.jet1_str+".p4.Pt()",
                         'plot_cut': self.totalCut,
-                        'binning': '(55, 20, 405)'
+                        'binning': '(50, 20, 500)'
                 },
                 {
                         'name': 'jet2_pt_%s_%s_%s%s'%(self.llFlav, self.suffix, self.extraString, self.systematicString),
                         'variable': self.jet2_str+".p4.Pt()",
                         'plot_cut': self.totalCut,
-                        'binning': '(28, 20, 216)'
+                        'binning': '(50, 20, 300)'
                 },
                 {
                         'name': 'met_pt_%s_%s_%s%s'%(self.llFlav, self.suffix, self.extraString, self.systematicString),
                         'variable': "met_p4.Pt()",
                         'plot_cut': self.totalCut,
-                        'binning': '(50, 0, 450)'
+                        'binning': '(50, 0, 500)'
                 },
                 {
                         'name': 'ht_%s_%s_%s%s'%(self.llFlav, self.suffix, self.extraString, self.systematicString),
                         'variable': "HT",
                         'plot_cut': self.totalCut,
-                        'binning': '(50, 0, 1200)'
-                }
+                        'binning': '(50, 65, 1500)'
+                },
+                {
+                        'name': 'llmetjj_MT2_%s_%s_%s%s'%(self.llFlav, self.suffix, self.extraString, self.systematicString),
+                        'variable': self.baseObject+".MT2",
+                        'plot_cut': self.totalCut,
+                        'binning': '(50, 0, 500)'
+                },
+                {
+                        'name': 'llmetjj_M_%s_%s_%s%s'%(self.llFlav, self.suffix, self.extraString, self.systematicString),
+                        'variable': self.baseObject+".p4.M()",
+                        'plot_cut': self.totalCut,
+                        'binning': '(50, 100, 1500)'
+                },
+                {
+                        'name': 'cosThetaStar_%s_%s_%s%s'%(self.llFlav, self.suffix, self.extraString, self.systematicString),
+                        'variable': self.baseObject + ".cosThetaStar_CS",
+                        'plot_cut': self.totalCut,
+                        'binning': '(25, 0, 1)'
+                },
             ])
             
             self.csv_plot.extend([
@@ -577,61 +592,12 @@ class BasePlotter:
                 }
             ])
             
-            self.cleancut_plot.extend([
-                #{
-                #        'name': 'll_M_%s_%s_%s%s'%(self.llFlav, self.suffix, self.extraString, self.systematicString),
-                #        'variable': self.ll_str+".M()",
-                #        'plot_cut': self.totalCut,
-                #        'binning': '(50, 0, 250)'
-                #},
-                {
-                        'name': 'll_DR_l_l_%s_%s_%s%s'%(self.llFlav, self.suffix, self.extraString, self.systematicString),
-                        'variable': self.baseObject+".DR_l_l",
-                        'plot_cut': self.totalCut,
-                        'binning': '(50, 0, 6)'
-                },
-                {
-                        'name': 'jj_DR_j_j_%s_%s_%s%s'%(self.llFlav, self.suffix, self.extraString, self.systematicString),
-                        'variable': self.baseObject+".DR_j_j",
-                        'plot_cut': self.totalCut,
-                        'binning': '(50, 0, 6)'
-                },
-                {
-                        'name': 'llmetjj_DPhi_ll_jj_%s_%s_%s%s'%(self.llFlav, self.suffix, self.extraString, self.systematicString),
-                        'variable': "abs("+self.baseObject+".DPhi_ll_jj)",
-                        'plot_cut': self.totalCut,
-                        'binning': '(25, 0, 3.1416)'
-                }
-            ])
-            
-            self.drllcut_plot.append(
-                {
-                        'name': 'll_DR_l_l_%s_%s_%s%s'%(self.llFlav, self.suffix, self.extraString, self.systematicString),
-                        'variable': self.baseObject+".DR_l_l",
-                        'plot_cut': self.totalCut,
-                        'binning': '(50, 0, 6)'
-                })
-            self.drjjcut_plot.append(
-                {
-                        'name': 'jj_DR_j_j_%s_%s_%s%s'%(self.llFlav, self.suffix, self.extraString, self.systematicString),
-                        'variable': self.baseObject+".DR_j_j",
-                        'plot_cut': self.totalCut,
-                        'binning': '(50, 0, 6)'
-                })
-            self.dphilljjcut_plot.append(
-                {
-                        'name': 'llmetjj_DPhi_ll_jj_%s_%s_%s%s'%(self.llFlav, self.suffix, self.extraString, self.systematicString),
-                        'variable': "abs("+self.baseObject+".DPhi_ll_jj)",
-                        'plot_cut': self.totalCut,
-                        'binning': '(25, 0, 3.1416)'
-                })
-
-            self.bdtinput_plot.extend([
+            self.nn_inputs_plot.extend([
                 {
                         'name': 'll_M_%s_%s_%s%s'%(self.llFlav, self.suffix, self.extraString, self.systematicString),
                         'variable': self.ll_str+".M()",
                         'plot_cut': self.totalCut,
-                        'binning': '(50, 10, 250)'
+                        'binning': '(60, 12, 252)'
                 },
                 {
                         'name': 'll_DR_l_l_%s_%s_%s%s'%(self.llFlav, self.suffix, self.extraString, self.systematicString),
@@ -675,24 +641,6 @@ class BasePlotter:
                         'plot_cut': self.totalCut,
                         'binning': '(50, 0, 500)'
                 },
-                {
-                        'name': 'llmetjj_MT2_%s_%s_%s%s'%(self.llFlav, self.suffix, self.extraString, self.systematicString),
-                        'variable': self.baseObject+".MT2",
-                        'plot_cut': self.totalCut,
-                        'binning': '(50, 0, 500)'
-                },
-                {
-                        'name': 'llmetjj_M_%s_%s_%s%s'%(self.llFlav, self.suffix, self.extraString, self.systematicString),
-                        'variable': self.baseObject+".p4.M()",
-                        'plot_cut': self.totalCut,
-                        'binning': '(50, 100, 1500)'
-                },
-                {
-                        'name': 'cosThetaStar_%s_%s_%s%s'%(self.llFlav, self.suffix, self.extraString, self.systematicString),
-                        'variable': self.baseObject + ".cosThetaStar_CS",
-                        'plot_cut': self.totalCut,
-                        'binning': '(25, 0, 1)'
-                },
             ])
 
             self.dy_bdt_inputs_plot.extend([
@@ -712,7 +660,7 @@ class BasePlotter:
                         'name': 'll_eta_%s_%s_%s%s'%(self.llFlav, self.suffix, self.extraString, self.systematicString),
                         'variable': self.baseObject + ".ll_p4.Eta()",
                         'plot_cut': self.totalCut,
-                        'binning': '(50, -3, 3)'
+                        'binning': '(50, -5, 5)'
                 },
                 {
                         'name': 'llmetjj_DPhi_ll_met_%s_%s_%s%s'%(self.llFlav, self.suffix, self.extraString, self.systematicString),
@@ -1022,7 +970,7 @@ class BasePlotter:
                     'name': 'nJetsL_%s_%s_%s%s'%(self.llFlav, self.suffix, self.extraString, self.systematicString),
                     'variable': "hh_nJetsL",
                     'plot_cut': self.totalCut,
-                    'binning': '(10, 0, 10)'
+                    'binning': '(8, 2, 10)'
                 },
                 #{
                 #    'name': 'nBJetsL_%s_%s_%s%s'%(self.llFlav, self.suffix, self.extraString, self.systematicString),
@@ -1030,12 +978,12 @@ class BasePlotter:
                 #    'plot_cut': self.totalCut,
                 #    'binning': '(6, 0, 6)'
                 #},
-                {
-                    'name': 'nBJetsM_%s_%s_%s%s'%(self.llFlav, self.suffix, self.extraString, self.systematicString),
-                    'variable': "hh_nBJetsL",
-                    'plot_cut': self.totalCut,
-                    'binning': '(6, 0, 6)'
-                }
+                #{
+                #    'name': 'nBJetsM_%s_%s_%s%s'%(self.llFlav, self.suffix, self.extraString, self.systematicString),
+                #    'variable': "hh_nBJetsL",
+                #    'plot_cut': self.totalCut,
+                #    'binning': '(6, 0, 6)'
+                #}
                 ])
 #                {
 #                    'name': 'nLepAll_%s_jetID_%s_btag_%s%s'%(self.llFlav, self.jjIDCat, self.jjBtagCat, self.suffix),
@@ -1190,7 +1138,7 @@ class BasePlotter:
                         'plot_cut': self.totalCut,
                         'binning': '(40, 0, 40)'
                 })
-            self.ht_plot.append({
+            self.genht_plot.append({
                         'name': 'gen_ht_%s_%s_%s%s'%(self.llFlav, self.suffix, self.extraString, self.systematicString),
                         'variable': "event_ht",
                         'plot_cut': self.totalCut,
@@ -1256,52 +1204,30 @@ class BasePlotter:
                 },
             ])
             
+            forSkimmer_totalWeight = "event_weight * (%s) * (%s) * (%s)" % (available_weights["llidiso"], available_weights["pu"], available_weights["trigeff"])
             if "nobtag" in self.baseObject:
+                totalWeight = forSkimmer_totalWeight 
+                if "dy_nobtag_to_btagM_BDT" in weights:
+                    totalWeight = forSkimmer_totalWeight + " * " + available_weights["dy_nobtag_to_btagM_BDT"]
                 self.forSkimmer_plot.extend([
                     {
-                        'name': 'total_weight_%s_%s_%s%s'%(self.llFlav, self.suffix, self.extraString, self.systematicString),
-                        'variable': "event_weight * (%s) * (%s) * (%s)"%(available_weights["llidiso"], available_weights["pu"], available_weights["trigeff"]),
+                        'name': 'total_weight_%s_%s_%s%s' % (self.llFlav, self.suffix, self.extraString, self.systematicString),
+                        'variable': totalWeight,
                         'plot_cut': self.totalCut,
                         'binning': '(5, -2, 2)'
                     }
                 ])
             else:
+                totalWeight = forSkimmer_totalWeight + " * (%s) * (%s)" % (available_weights["jjbtag_heavy"], available_weights["jjbtag_light"])
                 self.forSkimmer_plot.extend([
                     {
-                        'name': 'total_weight_%s_%s_%s%s'%(self.llFlav, self.suffix, self.extraString, self.systematicString),
-                        'variable': "event_weight * (%s) * (%s) * (%s) * (%s) * (%s)"%(available_weights["jjbtag_heavy"], available_weights["jjbtag_light"], available_weights["llidiso"], available_weights["pu"], available_weights["trigeff"]),
+                        'name': 'total_weight_%s_%s_%s%s' % (self.llFlav, self.suffix, self.extraString, self.systematicString),
+                        'variable': totalWeight,
                         'plot_cut': self.totalCut,
                         'binning': '(5, -2, 2)'
                     }
                 ])
         
-
-            ## DY reweighting plots
-            dy_bdt_flat_binning = '(40, {-0.5139261638387755, -0.28898196567405476, -0.2476582749856528, -0.21996646493207206, -0.1991670200454712, -0.18167569032901326, -0.16599964930321504, -0.15156757188594833, -0.13818661103236354, -0.12567874006226315, -0.11381442895759973, -0.10263199524142008, -0.09196628930949025, -0.08190636298862279, -0.0722791277618637, -0.06310992276046588, -0.05426600234483494, -0.04569692655758403, -0.03740621352909089, -0.029288264245728928, -0.021465863317879297, -0.013527078590598906, -0.005835657418566017, 0.001713033791860969, 0.009345489580270679, 0.016925843221660714, 0.02461982942842052, 0.03227487210746482, 0.04026572735765449, 0.04846055203674637, 0.057014862886138835, 0.06595620832498035, 0.07527427505752232, 0.08502963174016062, 0.09567345692228932, 0.10739628516126071, 0.12074974301699766, 0.1368035706668398, 0.15707625645811507, 0.18698084196962542, 0.38725443171761686})'
-            self.dy_rwgt_bdt_plot.extend([
-                {
-                    'name': 'DY_BDT_flat_%s_%s_%s%s'%(self.llFlav, self.suffix, self.extraString, self.systematicString),
-                    'variable': 'dy_bdt.evaluate({})'.format(dy_bdt_variables_string),
-                    'plot_cut': self.totalCut,
-                    # 161220, bb_cc_vs_rest_10var:
-                    'binning': dy_bdt_flat_binning,
-                },
-                {
-                    'name': 'DY_BDT_%s_%s_%s%s'%(self.llFlav, self.suffix, self.extraString, self.systematicString),
-                    'variable': 'dy_bdt.evaluate({})'.format(dy_bdt_variables_string),
-                    'plot_cut': self.totalCut,
-                    'binning': '(50, -0.4, 0.3)',
-                },
-            ])
-            for flav1 in ["b", "c", "l"]:
-                for flav2 in ["b", "c", "l"]:
-                    flavour_cut = "({0}.gen_{2} && {1}.gen_{3})".format(self.jet1_str, self.jet2_str, flav1, flav2)
-                    self.dy_rwgt_bdt_flavour_plot.append({
-                            'name': 'DY_BDT_flav_%s%s_%s_%s_%s%s' % (flav1, flav2, self.llFlav, self.suffix, self.extraString, self.systematicString),
-                            'variable': 'dy_bdt.evaluate({})'.format(dy_bdt_variables_string),
-                            'plot_cut': self.joinCuts(self.totalCut, flavour_cut),
-                            'binning': dy_bdt_flat_binning,
-                        })
 
 
         plotsToReturn = []
@@ -1315,43 +1241,27 @@ class BasePlotter:
                 
                 scaleWeight = "event_scale_weights[%s]" % scaleIndex
                 
-                for plot in getattr(self, plotFamily+"_plot"):
+                for plot in getattr(self, plotFamily + "_plot"):
                     # Two different ways to normalise the variations
                     if "Uncorr" not in systematic:
+                        # The normalisation is never applied on data, so we're safe even when applying DY reweighting
                         plot["normalize-to"] = "scale_%s" % scaleIndex
-                    plot["name"] += "__" + systematic + scaleIndex
                     if not "Weight" in plotFamily:
-                        plot["weight"] = "event_weight" + " * " + scaleWeight
+                        # Be careful to use 1 for data when applying DY reweighting
+                        plot["weight"] = "event_weight" + " * (runOnMC ? " + scaleWeight + " : 1. )"
                         for weight in weights:
                             plot["weight"] += " * " + available_weights[weight]
                     else:
                         print "No other weight than event_weight for ", plotFamily 
+                    plotsToReturn.append(plot)
                 
-                #scaleIndices = ["0", "1", "2", "3", "4", "5"]
-                #
-                #for scaleIndice in scaleIndices:
-                #    
-                #    scaleWeight = "event_scale_weights[%s]" % scaleIndice
-                #    
-                #    for plot in getattr(self, plotFamily+"_plot"):
-                #        tempPlot = copy.deepcopy(plot)
-                #        # Two different ways to normalise the variations
-                #        if "Uncorr" not in systematic:
-                #            tempPlot["normalize-to"] = "scale_%s" % scaleIndice
-                #        tempPlot["name"] += "__" + systematic + scaleIndice
-                #        if not "Weight" in plotFamily:
-                #            tempPlot["weight"] = "event_weight" + " * " + scaleWeight
-                #            for weight in weights:
-                #                tempPlot["weight"] += " * " + available_weights[weight]
-                #        else:
-                #            print "No other weight than event_weight for ", plotFamily 
-                #        plotsToReturn.append(tempPlot)
-            
             elif "pdf" in systematic:
                 
-                for plot in getattr(self, plotFamily+"_plot"):
+                for plot in getattr(self, plotFamily + "_plot"):
                     if not "Weight" in plotFamily:
-                        plot["weight"] = "event_weight" + " * " + pdfWeight
+                        # Be careful to use 1 for data when applying DY reweighting
+                        plot["weight"] = "event_weight" + " * (runOnMC ? " + pdfWeight + " : 1.)"
+                        # The normalisation is never applied on data, so we're safe even when applying DY reweighting
                         plot["normalize-to"] = normalization
                         for weight in weights:
                             plot["weight"] += " * " + available_weights[weight]
@@ -1361,9 +1271,10 @@ class BasePlotter:
             
             else:
                 
-                for plot in getattr(self, plotFamily+"_plot"):
+                for plot in getattr(self, plotFamily + "_plot"):
                     if not "Weight" in plotFamily and "sample_weight" not in plot["name"]:
                         plot["weight"] = "event_weight"
+                        # The normalisation is never applied on data, so we're safe even when applying DY reweighting
                         plot["normalize-to"] = normalization
                         for weight in weights:
                             plot["weight"] += " * " + available_weights[weight]
@@ -1378,14 +1289,15 @@ class BasePlotter:
             for plot in plotsToReturn:
                 plot["allow-weighted-data"] = True
 
-        # Remove possible duplicates (same name)
+        # Remove possible duplicates (same name => they would be overwritten when saving the output file anyway)
         cleanedPlotList = []
         checkedNames = []
         for p in plotsToReturn:
             if p["name"] not in checkedNames:
                 checkedNames.append(p["name"])
                 cleanedPlotList.append(p)
-        print "Removed {} duplicates!".format(len(plotsToReturn) - len(cleanedPlotList))
+        if len(plotsToReturn) - len(cleanedPlotList) < 0:
+            print("Warning: removed {} duplicate plots!".format(-len(plotsToReturn) + len(cleanedPlotList)))
 
         return cleanedPlotList
 

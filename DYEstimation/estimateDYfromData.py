@@ -1,61 +1,54 @@
 #! /usr/bin/env python
 
-import argparse
-
 import ROOT
 ROOT.PyConfig.IgnoreCommandLineOptions = True
 ROOT.gROOT.Reset()
 from cp3_llbb.CommonTools.HistogramTools import getHistogramsFromFileRegex
 
+#import os, sys, inspect
+#scriptDir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+#sys.path.append(scriptDir)
+from subtractMCfromData import performSubtraction, addHistoDicos
+
+import argparse
+
 parser = argparse.ArgumentParser(description="Subtract MC from data for all histograms in a file.")
 parser.add_argument("-d", "--data", nargs='+', help="Input files for data", required=True)
+parser.add_argument("--dy", nargs='+', help="Input files for DY", required=True)
 parser.add_argument("-m", "--mc", nargs='+', help="Input files for MC", required=True)
 parser.add_argument("-o", "--output", help="Output file", required=True)
-parser.add_argument("-r", "--regexp", help="Regexp that must be matched by the histogram names to be considered", default=R".*_with_nobtag_to_btagM_reweighting$")
-parser.add_argument("-l", "--lumi", type=float, help="Scale MC by luminosity", default=36151.504)
-parser.add_argument("-v", "--verbose", action="store_true", help="Verbose")
 options = parser.parse_args()
 
-def addHistoDicos(dic1, dic2, alpha):
-    for item in dic1.items():
-        item[1].Add(dic2[item[0]], alpha)
+# Get SF histograms and perform the subtraction
+# For MuMu, use rescale lumi FIXME
+print "Subtracting MuMu histograms"
+histos_mumu = performSubtraction(options.data, options.mc, R".*MuMu.*_with_nobtag_to_btagM_reweighting$", 36809, False)
+print "Subtracting ElEl histograms"
+histos_ee = performSubtraction(options.data, options.mc, R".*ElEl.*_with_nobtag_to_btagM_reweighting$", 36809, False)
 
-# First get a list of histograms using the first data file
-if options.verbose: print "Reading histograms from {}...".format(options.data[0])
-histograms = getHistogramsFromFileRegex(options.data[0], options.regexp)
+# For OF, get histograms from MC
+print "Copying MuEl histograms"
+histos_emu = getHistogramsFromFileRegex(options.dy[0], R".*MuEl.*btagM.*")
+for file in options.dy[1:]:
+    this_histos = getHistogramsFromFileRegex(file, R".*MuEl.*btagM.*")
+    addHistoDicos(histos_emu, this_histos)
 
-if options.verbose:
-    print "{} histograms considered:".format(len(histograms.keys()))
-    for hist in sorted(histograms.keys()):
-        print hist
+## Rename to have the same name as the SF ones
+#for h in histos_emu.values():
+#    old_name = h.GetName()
+#    new_name = old_name.replace("btagM", "nobtag").replace("cut", "cut_with_nobtag_to_btagM_reweighting")
+#    h.SetName(new_name)
 
-# For each data (MC) file and each histogram, add (subtract) from the previous ones
-for d in options.data[1:]:
-    if options.verbose: print "Reading histograms from {}...".format(d)
-    
-    this_histos = getHistogramsFromFileRegex(d, options.regexp)
-    
-    if options.verbose: print "Found {} histograms.".format(len(this_histos.keys()))
-    
-    addHistoDicos(histograms, this_histos, 1)
+# Rename to have the same name as the other MC and data
+for h in histos_ee.values() + histos_mumu.values():
+    old_name = h.GetName()
+    new_name = old_name.replace("_with_nobtag_to_btagM_reweighting", "").replace("nobtag", "btagM")
+    h.SetName(new_name)
 
-# If we consider a luminosity, we have to divide the data by the lumi, since the MC is NOT scaled by it!
-# PlotIt will then rescale the DY contribution correctly
-if options.lumi:
-    for hist in histograms.values():
-        hist.Scale(1. / options.lumi)
-    
-for mc in options.mc:
-    if options.verbose: print "Reading histograms from {}...".format(mc)
-    
-    this_histos = getHistogramsFromFileRegex(mc, options.regexp)
-    
-    if options.verbose: print "Found {} histograms.".format(len(this_histos.keys()))
-    
-    addHistoDicos(histograms, this_histos, -1)
-
+print "Writing output"
 # Write output
 r_file = ROOT.TFile.Open(options.output, "recreate")
-for hist in histograms.values():
+for hist in histos_mumu.values() + histos_ee.values() + histos_emu.values():
     hist.Write()
 r_file.Close()
+

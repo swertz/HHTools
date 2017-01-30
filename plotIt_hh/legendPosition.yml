@@ -1,7 +1,6 @@
-position: [0.55, 0.7, 0.95, 0.93] # for DY comparison plots
-#position: [0.61, 0.61, 0.94, 0.89]
-#entries:
-#  -
-#    label: 'Signal (1 pb)'
-#    type: signal
-#    order: 1000  # Always on top
+position: [0.61, 0.61, 0.94, 0.89]
+entries:
+  -
+    label: 'Signal (5 pb)'
+    type: signal
+    order: 1000  # Always on top
