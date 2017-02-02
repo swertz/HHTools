@@ -157,12 +157,12 @@ double FWBTagEfficiencyOnBDT::get(const LorentzVector& jet1, const LorentzVector
 
     double nominal_weight = 0;
     for (const auto& flav1: flavors) {
-        auto jet1_btagging_eff = m_btagging_eff[flav1]["nominal"]->GetEfficiency(btag_bin_jet1);
+        double jet1_btagging_eff = m_btagging_eff[flav1]["nominal"]->GetEfficiency(btag_bin_jet1);
         for (const auto& flav2: flavors) {
-            auto jet2_btagging_eff = m_btagging_eff[flav2]["nominal"]->GetEfficiency(btag_bin_jet2);
+            double jet2_btagging_eff = m_btagging_eff[flav2]["nominal"]->GetEfficiency(btag_bin_jet2);
 
             const auto& fraction_eff = m_fractions[std::make_pair(flav1, flav2)]["nominal"];
-            auto fraction = fraction_eff->GetEfficiency(frac_bin);
+            double fraction = fraction_eff->GetEfficiency(frac_bin);
 
             nominal_weight += fraction * jet1_btagging_eff * jet2_btagging_eff * get_btag_sf(flav1, btag_sf_bin_jet1) * get_btag_sf(flav2, btag_sf_bin_jet2);
         }

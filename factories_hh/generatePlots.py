@@ -91,6 +91,7 @@ lljj_stages = get_cfg('lljj_stages', ['no_cut', 'mll_cut', 'inverted_mll_cut'])
 llbb_stages = get_cfg('llbb_stages', ['no_cut', 'mll_cut', 'inverted_mll_cut'])
 lljj_plot_families = get_cfg('lljj_plots', [])
 llbb_plot_families = get_cfg('llbb_plots', [])
+skim_MuEl_stages = get_cfg('skim_MuEl_stages', False) # MuEl category: do only "no_cut" for lljj, and only "mll_cut" for llbb
 
 # Ask Factories to regroup "similar" plots
 # Don't it for data (not supported by Factories to use weighted data)
@@ -132,7 +133,9 @@ weights_lljj = ['trigeff', 'llidiso', 'pu']
 
 plots_lljj = []
 if "basic" in lljj_plot_families:
-    plots_lljj += ["mjj", "basic", "cmva", "nn_inputs", "evt", "dy_bdt_inputs"]
+    plots_lljj += ["mjj"]#, "basic", "nn_inputs", "dy_bdt_inputs"]
+if "other" in lljj_plot_families:
+    plots_lljj += ["cmva", "evt"]
 if "dy_bdt" in lljj_plot_families:
     plots_lljj += ["dy_rwgt_bdt"]
 if "dy_bdt_flavour" in lljj_plot_families:
@@ -145,7 +148,9 @@ weights_llbb = ['trigeff', 'llidiso', 'pu', 'jjbtag_heavy', 'jjbtag_light']
 
 plots_llbb = []
 if "basic" in llbb_plot_families:
-    plots_llbb += ["mjj", "basic", "cmva", "nn_inputs", "evt", "dy_bdt_inputs"]
+    plots_llbb += ["mjj"]#, "basic", "cmva", "nn_inputs", "evt", "dy_bdt_inputs"]
+if "other" in llbb_plot_families:
+    plots_llbb += ["cmva", "evt"]
 if "dy_bdt" in llbb_plot_families:
     plots_llbb += ["dy_rwgt_bdt"]
 if "nn" in llbb_plot_families:
@@ -184,13 +189,42 @@ else:
                 "dyStatup", "dyStatdown"
                 ]
             }
-    
-    # Scale uncertainties: depends on what we're running on
     for i in range(6):
-        if not for_data:
-            systematics["SF"].append("scaleUncorr{}".format(i))
-        if not for_signal:
-            systematics["SF"].append("dyScaleUncorr{}".format(i))
+        systematics["SF"].append("scaleUncorr{}".format(i))
+        systematics["SF"].append("dyScaleUncorr{}".format(i))
+
+# Systematic uncertainties: depends on the stage on what we're running on...
+def allowed_systematics_llbb(syst):
+    if "dyStat" in syst:
+        return False
+    if "dyScaleUncorr" in syst:
+        return False
+    if for_data and syst != "nominal":
+        return False
+    return True
+
+def allowed_systematics_lljj(syst):
+    if "dyStat" in syst:
+        return False
+    if "dyScaleUncorr" in syst:
+        return False
+    if "jjbtag" in syst:
+        return False
+    if for_data and syst != "nominal":
+        return False
+    return True
+
+def allowed_systematics_lljj_dy_reweighting(syst):
+    # Both MC and Data: only a subset of systematics
+    for _s in ["nominal", "jec", "jer", "jjbtaglight", "jjbtagheavy", "pu", "dyStat", "dyScaleUncorr"]:
+        if _s in syst:
+            return True
+    # MC: also all others
+    if for_MC:
+        return True
+    # Data: nothing else
+    return False
+
 
 #### Generate plot list #####
 for systematicType in systematics.keys():
@@ -203,11 +237,16 @@ for systematicType in systematics.keys():
 
 
         ###### llbb stage ######
-        if "dyStat" not in systematic and "dyScale" not in systematic:
+        if allowed_systematics_llbb(systematic):
+            
             basePlotter_llbb = BasePlotter(baseObjectName = "hh_llmetjj_HWWleptons_btagM_cmva", btagWP_str = 'medium', objects = objects)
  
-        for stage in llbb_stages:
-            plots.extend(basePlotter_llbb.generatePlots(llbb_categories, stage, systematic=systematic, weights=weights_llbb, requested_plots=plots_llbb))
+            for stage in llbb_stages:
+                this_categories = llbb_categories[:]
+                if skim_MuEl_stages and stage != "mll_cut" and "MuEl" in this_categories:
+                    this_categories.remove("MuEl")
+                
+                plots.extend(basePlotter_llbb.generatePlots(this_categories, stage, systematic=systematic, weights=weights_llbb, requested_plots=plots_llbb))
 
         # Signal: only do llbb!
         if for_signal:
@@ -217,14 +256,25 @@ for systematicType in systematics.keys():
         ##### lljj stage ###### 
         basePlotter_lljj = BasePlotter(baseObjectName = "hh_llmetjj_HWWleptons_nobtag_cmva", btagWP_str = 'nobtag', objects = objects)
         
-        if "dyStat" not in systematic and "dyScale" not in systematic and "jjbtag" not in systematic:
+        if allowed_systematics_lljj(systematic):
+ 
             for stage in lljj_stages:
-                plots.extend(basePlotter_lljj.generatePlots(lljj_categories, stage, systematic=systematic, weights=weights_lljj, requested_plots=plots_lljj))
+                this_categories = lljj_categories[:]
+                if skim_MuEl_stages and stage != "no_cut" and "MuEl" in this_categories:
+                    this_categories.remove("MuEl")
+                
+                plots.extend(basePlotter_lljj.generatePlots(this_categories, stage, systematic=systematic, weights=weights_lljj, requested_plots=plots_lljj))
 
 
         ###### lljj stage + no btag -> btagM reweighting applied: use LLBB values! #####
-        for stage in llbb_stages:
-            plots.extend(basePlotter_lljj.generatePlots(llbb_categories, stage, systematic=systematic, weights=weights_lljj + ['dy_nobtag_to_btagM_BDT'], requested_plots=plots_llbb, extraString='_with_nobtag_to_btagM_reweighting'))
+        if allowed_systematics_lljj_dy_reweighting(systematic):
+            
+            for stage in llbb_stages:
+                this_categories = llbb_categories[:]
+                if skim_MuEl_stages and stage != "mll_cut" and "MuEl" in this_categories:
+                    this_categories.remove("MuEl")
+                
+                plots.extend(basePlotter_lljj.generatePlots(this_categories, stage, systematic=systematic, weights=weights_lljj + ['dy_nobtag_to_btagM_BDT'], requested_plots=plots_llbb, extraString='_with_nobtag_to_btagM_reweighting'))
         
 
 extra_branches = [
@@ -234,3 +284,5 @@ extra_branches = [
         "hh_leptons",
     ]
 
+#for plot in plots:
+#    print plot

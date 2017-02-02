@@ -64,6 +64,12 @@ def checkHistos(pas, total):
         if total.GetBinContent(i) < pas.GetBinContent(i):
             print "Warning: histogram {} inconsistent bin content for bin {}: {} > {}".format(total.GetName(), i, pas.GetBinContent(i), total.GetBinContent(i))
             pas.SetBinContent(i, total.GetBinContent(i))
+        if total.GetBinContent(i) < 0:
+            print "Warning: histogram {} inconsistent bin content for bin {}: {}".format(total.GetName(), i, total.GetBinContent(i))
+            total.SetBinContent(i, 0)
+        if pas.GetBinContent(i) < 0:
+            print "Warning: histogram {} inconsistent bin content for bin {}: {}".format(pas.GetName(), i, pas.GetBinContent(i))
+            pas.SetBinContent(i, 0)
 
 passHistos = {}
 totalHistos = {}

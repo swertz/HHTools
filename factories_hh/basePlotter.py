@@ -3,7 +3,7 @@ import copy, sys, os
 def default_code_before_loop():
     return r"""
         // Stuff for DY reweighting
-        FWBTagEfficiencyOnBDT fwBtagEff("/nfs/scratch/fynu/sbrochet/Framework/CMSSW_8_0_24_patch1_HH_Analysis/src/cp3_llbb/HHTools/DYEstimation/170125_btaggingEfficiencyOnCondor_new_prod_DY/condor/output/btagging_efficiency.root", "/home/fynu/swertz/scratch/CMSSW_8_0_25/src/cp3_llbb/HHTools/DYEstimation/170123_bb_cc_vs_rest_10var_dyFlavorFractions_systematics/flavour_fractions.root", "/home/fynu/swertz/scratch/CMSSW_8_0_25/src/cp3_llbb/HHTools/DYEstimation/170123_bb_cc_vs_rest_10var_dyFlavorFractions_systematics/btagging_scale_factors.root");
+        FWBTagEfficiencyOnBDT fwBtagEff("/nfs/scratch/fynu/sbrochet/Framework/CMSSW_8_0_24_patch1_HH_Analysis/src/cp3_llbb/HHTools/DYEstimation/170125_btaggingEfficiencyOnCondor_new_prod_DY/condor/output/btagging_efficiency.root", "/home/fynu/swertz/scratch/CMSSW_8_0_25/src/cp3_llbb/HHTools/DYEstimation/170201_bb_cc_vs_rest_10var_dyFlavorFractions_systematics/flavour_fractions.root", "/home/fynu/swertz/scratch/CMSSW_8_0_25/src/cp3_llbb/HHTools/DYEstimation/170123_bb_cc_vs_rest_10var_dyFlavorFractions_systematics/btagging_scale_factors.root");
 
         // DY BDT
         TMVAEvaluator dy_bdt_reader("/home/fynu/swertz/scratch/CMSSW_8_0_25/src/cp3_llbb/HHTools/DYEstimation/weights/2017_01_23_BDTDY_bb_cc_vs_rest_10var_kBDT.weights.xml", { "jet1_pt",  "jet1_eta", "jet2_pt", "jet2_eta", "jj_pt", "ll_pt", "ll_eta", "llmetjj_DPhi_ll_met", "ht", "nJetsL" });
@@ -414,7 +414,8 @@ class BasePlotter:
                         'name': 'mjj_vs_NN_resonant_M%d_%s_%s_%s%s' % (m, self.llFlav, self.suffix, self.extraString, self.systematicString),
                         'variable': self.jj_str + '.M() ::: resonant_nn_evaluator.evaluate(%s)' % (keras_resonant_input_variables % m),
                         'plot_cut': self.totalCut,
-                        'binning': '(3, { 0, 75, 140, 13000 }, 25, 0, 1)'
+                        'binning': '(3, { 0, 75, 140, 13000 }, 12, { 0, 0.02, 0.05, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1 } )'
+                        #'binning': '(3, { 0, 75, 140, 13000 }, 25, 0, 1)'
                 })
             for point in nonresonant_signal_grid:
                 kl = point[0]
@@ -433,11 +434,12 @@ class BasePlotter:
                         'name': 'mjj_vs_NN_nonresonant_%s_%s_%s_%s%s' % (point_str, self.llFlav, self.suffix, self.extraString, self.systematicString),
                         'variable': self.jj_str + '.M() ::: nonresonant_nn_evaluator.evaluate(%s)' % (keras_nonresonant_input_variables % (kl, kt)),
                         'plot_cut': self.totalCut,
-                        'binning': '(3, { 0, 75, 140, 13000 }, 25, 0, 1)'
+                        'binning': '(3, { 0, 75, 140, 13000 }, 12, { 0, 0.02, 0.05, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1 } )'
+                        #'binning': '(3, { 0, 75, 140, 13000 }, 25, 0, 1)'
                 })
             
             # DY reweighting plots
-            dy_bdt_flat_binning = '(40, {-0.5139261638387755, -0.28898196567405476, -0.2476582749856528, -0.21996646493207206, -0.1991670200454712, -0.18167569032901326, -0.16599964930321504, -0.15156757188594833, -0.13818661103236354, -0.12567874006226315, -0.11381442895759973, -0.10263199524142008, -0.09196628930949025, -0.08190636298862279, -0.0722791277618637, -0.06310992276046588, -0.05426600234483494, -0.04569692655758403, -0.03740621352909089, -0.029288264245728928, -0.021465863317879297, -0.013527078590598906, -0.005835657418566017, 0.001713033791860969, 0.009345489580270679, 0.016925843221660714, 0.02461982942842052, 0.03227487210746482, 0.04026572735765449, 0.04846055203674637, 0.057014862886138835, 0.06595620832498035, 0.07527427505752232, 0.08502963174016062, 0.09567345692228932, 0.10739628516126071, 0.12074974301699766, 0.1368035706668398, 0.15707625645811507, 0.18698084196962542, 0.237, 0.287, 0.337, 0.38725443171761686})'
+            dy_bdt_flat_binning = '(44, {-0.5139261638387755, -0.28898196567405476, -0.2476582749856528, -0.21996646493207206, -0.1991670200454712, -0.18167569032901326, -0.16599964930321504, -0.15156757188594833, -0.13818661103236354, -0.12567874006226315, -0.11381442895759973, -0.10263199524142008, -0.09196628930949025, -0.08190636298862279, -0.0722791277618637, -0.06310992276046588, -0.05426600234483494, -0.04569692655758403, -0.03740621352909089, -0.029288264245728928, -0.021465863317879297, -0.013527078590598906, -0.005835657418566017, 0.001713033791860969, 0.009345489580270679, 0.016925843221660714, 0.02461982942842052, 0.03227487210746482, 0.04026572735765449, 0.04846055203674637, 0.057014862886138835, 0.06595620832498035, 0.07527427505752232, 0.08502963174016062, 0.09567345692228932, 0.10739628516126071, 0.12074974301699766, 0.1368035706668398, 0.15707625645811507, 0.18, 0.2, 0.23, 0.27, 0.30, 0.4})'
             self.dy_rwgt_bdt_plot.extend([
                 {
                     'name': 'DY_BDT_flat_%s_%s_%s%s'%(self.llFlav, self.suffix, self.extraString, self.systematicString),

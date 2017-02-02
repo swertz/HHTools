@@ -51,12 +51,14 @@ def get_sample(iSample):
     resultset = dbstore.find(Sample, Sample.sample_id == iSample)
     return resultset.one()
 
+# Configure number of files processed by each condor job
+# `sample` is DB name
 def get_sample_splitting(sample):
     if "TTTo2L2Nu" in sample:
-        return 10
+        return 5
     if "DYToLL_2J" in sample:
         return 10
-    return 20
+    return 10
 
 workflows = {}
 
@@ -134,7 +136,7 @@ PlotsForDYFractions = Configuration('generatePlots.py', workflow='plot_dy_bdt', 
             'sample_type': 'MC',
             'syst': True,
             'lljj_categories': ['SF'],
-            'lljj_plots': ['dy_bdt', 'by_bdt_flavour'],
+            'lljj_plots': ['dy_bdt', 'dy_bdt_flavour'],
         })
 
 # General plots
@@ -149,18 +151,21 @@ MainPlots_ForMC = Configuration('generatePlots.py', workflow='plot_main', mode='
             'sample_type': 'MC',
             'lljj_plots': ['basic', 'dy_bdt'],
             'llbb_plots': ['basic', 'dy_bdt', 'nn'],
-            #'syst': True,
+            'syst': True,
+            'skim_MuEl_stages': True,
         })
 MainPlots_ForData = Configuration('generatePlots.py', workflow='plot_main', suffix='_for_data', mode='plots', samples=['Data'], generation_args={
             'sample_type': 'Data',
             'lljj_plots': ['basic', 'dy_bdt'],
             'llbb_plots': ['basic', 'dy_bdt', 'nn'],
-            #'syst': True,
+            'syst': True,
+            'skim_MuEl_stages': True,
         })
 MainPlots_ForSignal = Configuration('generatePlots.py', workflow='plot_main', suffix='_for_signal', mode='plots', samples=['Signal_Resonant', 'Signal_NonResonant'], generation_args={
             'sample_type': 'Signal',
             'llbb_plots': ['basic', 'dy_bdt', 'nn'],
-            #'syst': True,
+            'syst': True,
+            'skim_MuEl_stages': True,
         })
 
 # Plots for 2D limits
@@ -175,36 +180,36 @@ NN2DPlots_ForMC = Configuration('generatePlots.py', workflow='plot_nn_2d', mode=
             'sample_type': 'MC',
             'llbb_stages': ['mll_cut'],
             'llbb_plots': ['mjj_vs_nn'],
-            #'syst': True,
+            'syst': True,
         })
 NN2DPlots_ForData = Configuration('generatePlots.py', workflow='plot_nn_2d', suffix='_for_data', mode='plots', samples=['Data'], generation_args={
             'sample_type': 'Data',
             'llbb_stages': ['mll_cut'],
             'llbb_plots': ['mjj_vs_nn'],
-            #'syst': True,
+            'syst': True,
         })
 NN2DPlots_ForSignal = Configuration('generatePlots.py', workflow='plot_nn_2d', suffix='_for_signal', mode='plots', samples=['Signal_Resonant', 'Signal_NonResonant'], generation_args={
             'sample_type': 'Signal',
             'llbb_stages': ['mll_cut'],
             'llbb_plots': ['mjj_vs_nn'],
-            #'syst': True,
+            'syst': True,
         })
 
 # Testing area
 TestPlots_ForMC = Configuration('generatePlots.py', workflow='test', mode='plots', samples=["DY_NLO"], generation_args={
             'sample_type': 'MC',
-            'llbb_stages': ['no_cut'],
-            'llbb_categories': ['SF'],
             'syst': True,
-            'llbb_plots': ['dy_bdt'],
+            'llbb_plots': ['basic'],
+            'llbb_stages': ['mll_cut'],
             #'llbb_plots': ['basic', 'dy_bdt', 'nn'],
         })
-#TestPlots_ForData = Configuration('generatePlots.py', workflow='test', suffix='_for_data', mode='plots', samples=['Data'], generation_args={
-#            'sample_type': 'Data',
-#            'syst': False,
-#            'lljj_plots': ['basic'],
-#            #'llbb_plots': ['basic', 'dy_bdt', 'nn'],
-#        })
+TestPlots_ForData = Configuration('generatePlots.py', workflow='test', suffix='_for_data', mode='plots', samples=['Data'], generation_args={
+            'sample_type': 'Data',
+            'syst': True,
+            'llbb_plots': ['basic'],
+            'llbb_stages': ['mll_cut'],
+            #'llbb_plots': ['basic', 'dy_bdt', 'nn'],
+        })
 #TestPlots_ForSignal = Configuration('generatePlots.py', workflow='test', suffix='_for_signal', mode='plots', samples=['Signal_Resonant', 'Signal_NonResonant'], generation_args={
 #            'sample_type': 'Signal',
 #            'syst': False,
