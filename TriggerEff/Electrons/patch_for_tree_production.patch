@@ -1,0 +1,450 @@
+commit 1b8be43909f9dd963a5c961e2390c84ac365b8bf
+Author: Sébastien Brochet <sebastien.brochet@cern.ch>
+Date:   Wed Feb 8 18:19:09 2017 +0100
+
+    HH specific changes
+
+diff --git a/PhysicsTools/TagAndProbe/crab/makeTree.py b/PhysicsTools/TagAndProbe/crab/makeTree.py
+index 14869895e2a..56e2977ca27 100644
+--- a/PhysicsTools/TagAndProbe/crab/makeTree.py
++++ b/PhysicsTools/TagAndProbe/crab/makeTree.py
+@@ -139,9 +139,7 @@ if varOptions.GT != "auto" :
+ ## Inputs for test
+ ###################################################################
+ filesMC =  cms.untracked.vstring(
+-    '/store/mc/RunIISpring16MiniAODv2/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/MINIAODSIM/PUSpring16RAWAODSIM_reHLT_80X_mcRun2_asymptotic_v14_ext1-v1/20000/00071E92-6F55-E611-B68C-0025905A6066.root',
+-    '/store/mc/RunIISpring16MiniAODv2/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/MINIAODSIM/PUSpring16RAWAODSIM_reHLT_80X_mcRun2_asymptotic_v14_ext1-v1/20000/00384BBA-D455-E611-B32C-0CC47A4D7600.root',
+-       '/store/mc/RunIISpring16MiniAODv2/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/MINIAODSIM/PUSpring16RAWAODSIM_reHLT_80X_mcRun2_asymptotic_v14_ext1-v1/20000/00684732-3155-E611-B794-0CC47A4D7640.root',
++        '/store/mc/RunIISummer16MiniAODv2/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/MINIAODSIM/PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext1-v2/120000/02A210D6-F5C3-E611-B570-008CFA197BD4.root'
+     )
+ 
+ filesData =  cms.untracked.vstring( 
+@@ -314,7 +312,8 @@ process.GsfElectronToEleID = cms.EDAnalyzer("TagProbeFitTreeProducer",
+                                             tnpVars.mcTruthCommonStuff, tnpVars.CommonStuffForGsfElectronProbe,
+                                             tagProbePairs = cms.InputTag("tagTightEleID"),
+                                             arbitration   = cms.string("HighestPt"),
+-                                            flags         = cms.PSet(passingVeto    = cms.InputTag("goodElectronsPROBECutBasedVeto"  ),
++                                            flags         = cms.PSet(
++                                                                     passingVeto    = cms.InputTag("goodElectronsPROBECutBasedVeto"  ),
+                                                                      passingLoose   = cms.InputTag("goodElectronsPROBECutBasedLoose" ),
+                                                                      passingMedium  = cms.InputTag("goodElectronsPROBECutBasedMedium"),
+                                                                      passingTight   = cms.InputTag("goodElectronsPROBECutBasedTight" ),
+@@ -325,6 +324,15 @@ process.GsfElectronToEleID = cms.EDAnalyzer("TagProbeFitTreeProducer",
+                                                                      passingMVA80Xwp90 = cms.InputTag("goodElectronsPROBEMVA80Xwp90" ),
+                                                                      passingMVA80Xwp80 = cms.InputTag("goodElectronsPROBEMVA80Xwp80" ),
+                                                                      passingHLTsafe = cms.InputTag("goodElectronsPROBEHLTsafe"),
++
++                                                                     pass_Ele23Ele12NonDZ = cms.InputTag('goodElectronsPassEle23Ele12NonDZ'),
++                                                                     pass_Ele23Ele12DZ    = cms.InputTag('goodElectronsPassEle23Ele12DZ'),
++
++                                                                     pass_Ele23Ele12_IsoEle23 = cms.InputTag('goodElectronsPassEle23Ele12IsoEle23'),
++                                                                     pass_Ele23Ele12_IsoEle12 = cms.InputTag('goodElectronsPassEle23Ele12IsoEle12'),
++
++                                                                     pass_IsoEle23  = cms.InputTag('goodElectronsPassIsoEle23'),
++                                                                     pass_IsoEle12  = cms.InputTag('goodElectronsPassIsoEle12')
+                                                                      ),                                               
+                                             allProbes     = cms.InputTag("goodElectronsProbeHLT"),
+                                             )
+diff --git a/PhysicsTools/TagAndProbe/crab/tnpCrabSubmitMiniAOD.py b/PhysicsTools/TagAndProbe/crab/tnpCrabSubmitMiniAOD.py
+index db3bc7761b7..f056c2afae6 100644
+--- a/PhysicsTools/TagAndProbe/crab/tnpCrabSubmitMiniAOD.py
++++ b/PhysicsTools/TagAndProbe/crab/tnpCrabSubmitMiniAOD.py
+@@ -4,11 +4,11 @@ config = config()
+ 
+ submitVersion = "Moriond17_v1"
+ doEleTree = 'doEleID=True'
+-doPhoTree = 'doPhoID=True'
++doPhoTree = 'doPhoID=False'
+ doHLTTree = 'doTrigger=False'
+ calibEn   = 'useCalibEn=False'
+ 
+-mainOutputDir = '/store/group/phys_egamma/tnp/80X/PhoEleIDs/%s' % submitVersion
++mainOutputDir = '/store/user/%s/tnp/Electrons/%s' % (getUsernameFromSiteDB(), submitVersion)
+ 
+ config.General.transferLogs = False
+ 
+@@ -24,8 +24,7 @@ config.Data.publication = False
+ 
+ #config.Data.publishDataName = 
+ 
+-config.Site.storageSite = 'T2_CH_CERN'
+-
++config.Site.storageSite = 'T2_BE_UCL'
+ 
+ 
+ if __name__ == '__main__':
+@@ -47,25 +46,24 @@ if __name__ == '__main__':
+             print "Failed submitting task: %s" % (cle)
+ 
+ 
+-    ##### submit MC
++    # ##### submit MC
+     config.Data.outLFNDirBase = '%s/%s/' % (mainOutputDir,'mc')
+     config.Data.splitting     = 'FileBased'
+     config.Data.unitsPerJob   = 8
+-    config.JobType.pyCfgParams  = ['isMC=True',doEleTree,doPhoTree,doHLTTree,calibEn,'HLTname=HLT2','GT=80X_mcRun2_asymptotic_2016_miniAODv2_v1']
++    config.JobType.pyCfgParams  = ['isMC=True',doEleTree,doPhoTree,doHLTTree,calibEn, 'GT=80X_mcRun2_asymptotic_2016_TrancheIV_v8']
+ 
+     
+-    config.General.requestName  = 'DYToLL_mcAtNLO'
+-    config.Data.inputDataset    = '/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/MINIAODSIM'
+- #   submit(config)
++    # config.General.requestName  = 'DYToLL_mcAtNLO_Moriond17'
++    # config.Data.inputDataset    = '/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/RunIISummer16MiniAODv2-PUMoriond17_HCALDebug_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/MINIAODSIM'
++    # submit(config)
+ 
+-    config.General.requestName  = 'DYToLL_madgraph_Spring16_reHLT'
+-#    config.Data.inputDataset    = '/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1/MINIAODSIM'
+-    config.Data.inputDataset    = '/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISpring16MiniAODv2-PUSpring16RAWAODSIM_reHLT_80X_mcRun2_asymptotic_v14_ext1-v1/MINIAODSIM'
++    config.General.requestName  = 'DYToLL_madgraph_Moriond17'
++    config.Data.inputDataset    = '/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext1-v2/MINIAODSIM'
+     submit(config)
+ 
+-    config.General.requestName  = 'WJets_madgraph'
+-    config.Data.inputDataset    = '/WJetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISpring16MiniAODv1-PUSpring16_80X_mcRun2_asymptotic_2016_v3-v2/MINIAODSIM'
+-#    submit(config)
++    # config.General.requestName  = 'WJets_madgraph_Moriond17'
++    # config.Data.inputDataset    = '/WJetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/MINIAODSIM'
++    # submit(config)
+ 
+ 
+  #   config.General.requestName  = 'ttbar_madgraph'
+@@ -77,36 +75,36 @@ if __name__ == '__main__':
+     ##### now submit DATA
+     config.Data.outLFNDirBase = '%s/%s/' % (mainOutputDir,'data')
+     config.Data.splitting     = 'LumiBased'
+-    config.Data.lumiMask      = '/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions16/13TeV/ReReco/Final/Cert_271036-284044_13TeV_23Sep2016ReReco_Collisions16_JSON.txt'
++    config.Data.lumiMask      = 'https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions16/13TeV/ReReco/Final/Cert_271036-284044_13TeV_23Sep2016ReReco_Collisions16_JSON.txt'
+     config.Data.unitsPerJob   = 100
+     config.JobType.pyCfgParams  = ['isMC=False',doEleTree,doPhoTree,doHLTTree,calibEn,'GT=80X_dataRun2_2016SeptRepro_v4']
+  
+     config.General.requestName  = '2016rereco_RunB'
+     config.Data.inputDataset    = '/SingleElectron/Run2016B-23Sep2016-v3/MINIAOD'
+     submit(config)
+-    config.General.requestName  = '2016rereco_RunC'
+-    config.Data.inputDataset    = '/SingleElectron/Run2016C-23Sep2016-v1/MINIAOD'
+-    submit(config)
+-    config.General.requestName  = '2016rereco_RunD'
+-    config.Data.inputDataset    = '/SingleElectron/Run2016D-23Sep2016-v1/MINIAOD'
+-    submit(config)
+-    config.General.requestName  = '2016rereco_RunE'
+-    config.Data.inputDataset    = '/SingleElectron/Run2016E-23Sep2016-v1/MINIAOD'
+-    submit(config)
+-    config.General.requestName  = '2016rereco_RunF'
+-    config.Data.inputDataset    = '/SingleElectron/Run2016F-23Sep2016-v1/MINIAOD'
+-    submit(config)
+-    config.General.requestName  = '2016rereco_RunG'
+-    config.Data.inputDataset    = '/SingleElectron/Run2016G-23Sep2016-v1/MINIAOD'
+-    submit(config)
+-    config.General.requestName  = '2016prompt_RunHv1'
+-    config.Data.inputDataset    = '/SingleElectron/Run2016H-PromptReco-v1/MINIAOD'
+-    submit(config)
+-    config.General.requestName  = '2016prompt_RunHv2'
+-    config.Data.inputDataset    = '/SingleElectron/Run2016H-PromptReco-v2/MINIAOD'
+-    submit(config)
+-    config.General.requestName  = '2016prompt_RunHv3'
+-    config.Data.inputDataset    = '/SingleElectron/Run2016H-PromptReco-v3/MINIAOD'
+-    submit(config)
++    # config.General.requestName  = '2016rereco_RunC'
++    # config.Data.inputDataset    = '/SingleElectron/Run2016C-23Sep2016-v1/MINIAOD'
++    # submit(config)
++    # config.General.requestName  = '2016rereco_RunD'
++    # config.Data.inputDataset    = '/SingleElectron/Run2016D-23Sep2016-v1/MINIAOD'
++    # submit(config)
++    # config.General.requestName  = '2016rereco_RunE'
++    # config.Data.inputDataset    = '/SingleElectron/Run2016E-23Sep2016-v1/MINIAOD'
++    # submit(config)
++    # config.General.requestName  = '2016rereco_RunF'
++    # config.Data.inputDataset    = '/SingleElectron/Run2016F-23Sep2016-v1/MINIAOD'
++    # submit(config)
++    # config.General.requestName  = '2016rereco_RunG'
++    # config.Data.inputDataset    = '/SingleElectron/Run2016G-23Sep2016-v1/MINIAOD'
++    # submit(config)
++    # # config.General.requestName  = '2016prompt_RunHv1'
++    # # config.Data.inputDataset    = '/SingleElectron/Run2016H-PromptReco-v1/MINIAOD'
++    # # submit(config)
++    # config.General.requestName  = '2016prompt_RunHv2'
++    # config.Data.inputDataset    = '/SingleElectron/Run2016H-PromptReco-v2/MINIAOD'
++    # submit(config)
++    # config.General.requestName  = '2016prompt_RunHv3'
++    # config.Data.inputDataset    = '/SingleElectron/Run2016H-PromptReco-v3/MINIAOD'
++    # submit(config)
+ 
+ 
+diff --git a/PhysicsTools/TagAndProbe/plugins/MiniAODTriggerPathCandProducer.cc b/PhysicsTools/TagAndProbe/plugins/MiniAODTriggerPathCandProducer.cc
+new file mode 100644
+index 00000000000..5016c0a72d1
+--- /dev/null
++++ b/PhysicsTools/TagAndProbe/plugins/MiniAODTriggerPathCandProducer.cc
+@@ -0,0 +1,18 @@
++#include "MiniAODTriggerPathCandProducer.h"
++  
++#include "DataFormats/EgammaCandidates/interface/GsfElectron.h"
++#include "DataFormats/PatCandidates/interface/Electron.h"
++#include "DataFormats/PatCandidates/interface/Photon.h"
++#include "DataFormats/RecoCandidate/interface/RecoEcalCandidate.h"
++#include "DataFormats/RecoCandidate/interface/RecoEcalCandidateFwd.h"
++#include "DataFormats/RecoCandidate/interface/RecoChargedCandidate.h"
++#include "DataFormats/RecoCandidate/interface/RecoChargedCandidateFwd.h"
++
++typedef MiniAODTriggerPathCandProducer<pat::Electron, pat::TriggerObjectStandAlone> PatElectronTriggerPathCandProducer;
++DEFINE_FWK_MODULE(PatElectronTriggerPathCandProducer);
++
++typedef MiniAODTriggerPathCandProducer<pat::Photon, pat::TriggerObjectStandAlone> PatPhotonTriggerPathCandProducer;
++DEFINE_FWK_MODULE(PatPhotonTriggerPathCandProducer);
++
++typedef MiniAODTriggerPathCandProducer<reco::RecoEcalCandidate, pat::TriggerObjectStandAlone> RecoEcalCandidateTriggerPathCandProducer;
++DEFINE_FWK_MODULE(RecoEcalCandidateTriggerPathCandProducer);
+diff --git a/PhysicsTools/TagAndProbe/plugins/MiniAODTriggerPathCandProducer.h b/PhysicsTools/TagAndProbe/plugins/MiniAODTriggerPathCandProducer.h
+new file mode 100644
+index 00000000000..000c8b4d900
+--- /dev/null
++++ b/PhysicsTools/TagAndProbe/plugins/MiniAODTriggerPathCandProducer.h
+@@ -0,0 +1,121 @@
++#ifndef _MINIADOTRIGGERCANDPRODUCER_H_
++#define _MINIADOTRIGGERCANDPRODUCER_H_
++
++#include "FWCore/Framework/interface/Frameworkfwd.h"
++#include "FWCore/Framework/interface/Event.h"
++#include "FWCore/Framework/interface/MakerMacros.h"
++#include "FWCore/ParameterSet/interface/ParameterSet.h"
++#include "FWCore/Framework/interface/EDProducer.h"
++
++#include "FWCore/Common/interface/TriggerNames.h"
++#include "DataFormats/Common/interface/TriggerResults.h"
++#include "DataFormats/HLTReco/interface/TriggerObject.h"
++#include "DataFormats/HLTReco/interface/TriggerEvent.h"
++#include "DataFormats/HLTReco/interface/TriggerTypeDefs.h"
++
++#include "DataFormats/PatCandidates/interface/TriggerObjectStandAlone.h"
++#include "DataFormats/PatCandidates/interface/PackedTriggerPrescales.h"
++#include "HLTrigger/HLTcore/interface/HLTConfigProvider.h"
++
++#include <DataFormats/Math/interface/deltaR.h>
++
++#include "FWCore/MessageLogger/interface/MessageLogger.h"
++
++#include <string>
++#include <vector>
++
++template <class T, class U>
++class MiniAODTriggerPathCandProducer : public edm::EDProducer {
++
++    typedef std::vector<T> TCollection;
++    typedef edm::Ref<TCollection> TRef;
++    typedef edm::RefVector<TCollection> TRefVector;
++
++    typedef std::vector<U> UCollection;
++
++    public:
++    MiniAODTriggerPathCandProducer(const edm::ParameterSet&);
++    ~MiniAODTriggerPathCandProducer();
++
++    void init(const edm::TriggerResults &result, const edm::TriggerNames & triggerNames);
++
++    private:
++    virtual void produce(edm::Event&, const edm::EventSetup&) override;
++
++    std::vector<std::string> pathNames_;
++    edm::EDGetTokenT<TRefVector> inputs_;
++    edm::EDGetTokenT<edm::TriggerResults> triggerBits_;
++
++    bool isAND_;
++    edm::ParameterSetID triggerNamesID_;
++    std::map<std::string, unsigned int> trigger_indices;
++};
++
++template <class T, class U>
++MiniAODTriggerPathCandProducer<T, U>::MiniAODTriggerPathCandProducer(const edm::ParameterSet& iConfig ):
++    pathNames_(iConfig.getParameter<std::vector<std::string> >("paths")),
++    inputs_(consumes<TRefVector>(iConfig.getParameter<edm::InputTag>("inputs"))),
++    triggerBits_(consumes<edm::TriggerResults>(iConfig.getParameter<edm::InputTag>("bits"))),
++    isAND_(iConfig.getParameter<bool>("isAND")) {
++        produces<TRefVector>();
++    }
++
++    template <class T, class U>
++MiniAODTriggerPathCandProducer<T, U>::~MiniAODTriggerPathCandProducer()
++{}
++
++template <class T, class U>
++void MiniAODTriggerPathCandProducer<T, U>::init(const edm::TriggerResults &result, const edm::TriggerNames & triggerNames) {
++
++    trigger_indices.clear();
++    for (unsigned int i=0; i<triggerNames.triggerNames().size(); i++) {    
++        std::string trimmedName = HLTConfigProvider::removeVersion(triggerNames.triggerName(i));
++        trigger_indices[trimmedName] = triggerNames.triggerIndex(triggerNames.triggerName(i));    
++    }
++}
++
++template <class T, class U>
++void MiniAODTriggerPathCandProducer<T, U>::produce(edm::Event &iEvent, const edm::EventSetup &eventSetup) {
++    edm::Handle<edm::TriggerResults> triggerBits;
++    edm::Handle<TRefVector> inputs;
++
++    iEvent.getByToken(triggerBits_, triggerBits);
++    iEvent.getByToken(inputs_, inputs);
++
++    // Create the output collection
++    std::auto_ptr<TRefVector> outColRef(new TRefVector);
++
++    if (!triggerBits.isValid()) {
++        LogDebug("") << "TriggerResults product not found - returning result=false!";
++        return;
++    }
++
++    const edm::TriggerNames & triggerNames = iEvent.triggerNames(*triggerBits);
++    if (triggerNamesID_ != triggerNames.parameterSetID()) {
++        triggerNamesID_ = triggerNames.parameterSetID();
++        init(*triggerBits, triggerNames);
++    } 
++
++    // Loop over all paths
++    bool passHLT = false;
++    for (unsigned int i = 0, n = triggerBits->size(); i < n; ++i) {
++        std::string name = triggerNames.triggerName(i);
++        if (triggerBits->accept(i)) {
++            // Check if this path is in the list or not
++            for (const auto& userPath: pathNames_) {
++                passHLT |= (name.find(userPath) != std::string::npos);
++            }
++        }
++    }
++
++    if (passHLT) {
++        for (size_t i=0; i<inputs->size(); i++) {
++            TRef ref = (*inputs)[i];
++            outColRef->push_back(ref);
++        }
++    }
++
++    iEvent.put(outColRef);
++}
++
++#endif
+diff --git a/PhysicsTools/TagAndProbe/python/pileupConfiguration_cfi.py b/PhysicsTools/TagAndProbe/python/pileupConfiguration_cfi.py
+index 239015bcc6b..659d282b4e7 100644
+--- a/PhysicsTools/TagAndProbe/python/pileupConfiguration_cfi.py
++++ b/PhysicsTools/TagAndProbe/python/pileupConfiguration_cfi.py
+@@ -7,16 +7,20 @@ from SimGeneral.MixingModule.mix_2015_25ns_FallMC_matchData_PoissonOOTPU_cfi imp
+ 
+ from SimGeneral.MixingModule.mix_2016_25ns_SpringMC_PUScenarioV1_PoissonOOTPU_cfi import mix as mix_2016_25ns
+ 
++from SimGeneral.MixingModule.mix_2016_25ns_Moriond17MC_PoissonOOTPU_cfi import mix as mix_Moriond17
++
+ pu_distribs = { "74X_mcRun2_asymptotic_v2"  : mix_2015_25ns.input.nbPileupEvents.probValue,
+                 "76X_mcRun2_asymptotic_v12" : mix_2015_25ns_realistScenario.input.nbPileupEvents.probValue,
+                 "80X_mcRun2_asymptotic_v1"  : mix_2016_25ns.input.nbPileupEvents.probValue,
++                "80X_Moriond17": mix_Moriond17.input.nbPileupEvents.probValue,
+                 }
+ 
+ #### DATA PU DISTRIBUTIONS
+ data_pu_distribs = { "Jamboree_golden_JSON" : [5.12e+04,3.66e+05,5.04e+05,4.99e+05,7.5e+05,1.1e+06,2.53e+06,9.84e+06,4.4e+07,1.14e+08,1.94e+08,2.63e+08,2.96e+08,2.74e+08,2.06e+08,1.26e+08,6.38e+07,2.73e+07,1.1e+07,5.2e+06,3.12e+06,1.87e+06,9.35e+05,3.64e+05,1.1e+05,2.64e+04,5.76e+03,1.53e+03,594,278,131,59.8,26,10.8,4.29,1.62,0.587,0.203,0.0669,0.0211,0.00633,0.00182,0.000498,0.00013,3.26e-05,7.77e-06,1.77e-06,3.85e-07,7.99e-08,1.58e-08,3e-09,5.43e-10],
+                      "ICHEP2016_JSON_4.0fb_xSec71.3mb" : [1.78e+03,2.69e+04,1.78e+05,4.71e+05,7.61e+05,1.02e+06,1.48e+06,7.35e+06,2.3e+07,3.75e+07,6.01e+07,9.32e+07,1.41e+08,2.09e+08,2.88e+08,3.53e+08,3.93e+08,4.09e+08,4e+08,3.69e+08,3.23e+08,2.69e+08,2.12e+08,1.57e+08,1.09e+08,6.96e+07,4.09e+07,2.19e+07,1.07e+07,4.8e+06,1.99e+06,7.76e+05,2.9e+05,1.07e+05,4.22e+04,1.95e+04,1.16e+04,8.73e+03,7.5e+03,6.85e+03,6.44e+03,6.16e+03,5.96e+03,5.81e+03,5.67e+03,5.53e+03,5.38e+03,5.21e+03,5.01e+03,4.78e+03],
+                      "ICHEP2016_JSON_5.7fb_xSec69.0mb" : [2.34e+03,7.7e+04,3.71e+05,7.77e+05,1.17e+06,1.64e+06,2.75e+06,1.34e+07,3.91e+07,8e+07,1.38e+08,1.94e+08,2.57e+08,3.41e+08,4.32e+08,5.08e+08,5.53e+08,5.63e+08,5.42e+08,4.98e+08,4.35e+08,3.6e+08,2.79e+08,2.01e+08,1.33e+08,8.23e+07,4.75e+07,2.58e+07,1.33e+07,6.59e+06,3.16e+06,1.47e+06,6.65e+05,2.91e+05,1.24e+05,5.3e+04,2.4e+04,1.28e+04,8.59e+03,7.04e+03,6.42e+03,6.13e+03,5.95e+03,5.79e+03,5.64e+03,5.47e+03,5.27e+03,5.04e+03,4.79e+03,4.51e+03],
+-                     "ICHEP2016_JSON_12.9fb_xSec63.0mb": [5.05e+03,2.41e+05,7.83e+05,1.74e+06,2.37e+06,3.41e+06,6.12e+06,2.43e+07,6.78e+07,1.45e+08,2.57e+08,4.06e+08,5.63e+08,7.06e+08,8.41e+08,9.54e+08,1.03e+09,1.06e+09,1.06e+09,1.02e+09,9.47e+08,8.51e+08,7.41e+08,6.19e+08,4.93e+08,3.72e+08,2.67e+08,1.82e+08,1.18e+08,7.18e+07,4.13e+07,2.24e+07,1.15e+07,5.57e+06,2.56e+06,1.12e+06,4.7e+05,1.92e+05,7.78e+04,3.3e+04,1.61e+04,9.87e+03,7.67e+03,6.92e+03,6.66e+03,6.56e+03,6.49e+03,6.4e+03,6.28e+03,6.12e+03]
++                     "ICHEP2016_JSON_12.9fb_xSec63.0mb": [5.05e+03,2.41e+05,7.83e+05,1.74e+06,2.37e+06,3.41e+06,6.12e+06,2.43e+07,6.78e+07,1.45e+08,2.57e+08,4.06e+08,5.63e+08,7.06e+08,8.41e+08,9.54e+08,1.03e+09,1.06e+09,1.06e+09,1.02e+09,9.47e+08,8.51e+08,7.41e+08,6.19e+08,4.93e+08,3.72e+08,2.67e+08,1.82e+08,1.18e+08,7.18e+07,4.13e+07,2.24e+07,1.15e+07,5.57e+06,2.56e+06,1.12e+06,4.7e+05,1.92e+05,7.78e+04,3.3e+04,1.61e+04,9.87e+03,7.67e+03,6.92e+03,6.66e+03,6.56e+03,6.49e+03,6.4e+03,6.28e+03,6.12e+03],
++                     "Moriond17": [2.39e+05,8.37e+05,2.3e+06,3.12e+06,4.47e+06,5.98e+06,6.99e+06,1.29e+07,3.52e+07,7.86e+07,1.77e+08,3.6e+08,6.02e+08,8.76e+08,1.17e+09,1.49e+09,1.76e+09,1.94e+09,2.04e+09,2.1e+09,2.13e+09,2.14e+09,2.13e+09,2.06e+09,1.96e+09,1.84e+09,1.7e+09,1.55e+09,1.4e+09,1.24e+09,1.09e+09,9.37e+08,7.92e+08,6.57e+08,5.34e+08,4.27e+08,3.35e+08,2.58e+08,1.94e+08,1.42e+08,1.01e+08,6.9e+07,4.55e+07,2.88e+07,1.75e+07,1.02e+07,5.64e+06,2.99e+06,1.51e+06,7.32e+05,3.4e+05,1.53e+05,6.74e+04,3.05e+04,1.52e+04,8.98e+03,6.5e+03,5.43e+03,4.89e+03,4.52e+03,4.21e+03,3.91e+03,3.61e+03,3.32e+03,3.03e+03,2.75e+03,2.47e+03,2.21e+03,1.97e+03,1.74e+03,1.52e+03,1.32e+03,1.14e+03,983,839,711,598,500,415,342]
+ ,
+  }
+ 
+@@ -24,6 +28,6 @@ data_pu_distribs = { "Jamboree_golden_JSON" : [5.12e+04,3.66e+05,5.04e+05,4.99e+
+ pileupProducer = cms.EDProducer("PileupWeightProducer",
+                                 #hardcodedWeights = cms.untracked.bool(True),
+                                 pileupInfoTag    = cms.InputTag("slimmedAddPileupInfo"),
+-                                PileupMC = cms.vdouble(pu_distribs["80X_mcRun2_asymptotic_v1"]),
+-                                PileupData = cms.vdouble(data_pu_distribs["ICHEP2016_JSON_12.9fb_xSec63.0mb"]),
++                                PileupMC = cms.vdouble(pu_distribs["80X_Moriond17"]),
++                                PileupData = cms.vdouble(data_pu_distribs["Moriond17"]),
+                                 )
+diff --git a/PhysicsTools/TagAndProbe/python/treeContent_cfi.py b/PhysicsTools/TagAndProbe/python/treeContent_cfi.py
+index 4f792d68515..696a9befd38 100644
+--- a/PhysicsTools/TagAndProbe/python/treeContent_cfi.py
++++ b/PhysicsTools/TagAndProbe/python/treeContent_cfi.py
+@@ -133,6 +133,7 @@ TagVariablesToStore = cms.PSet(
+     Ele_dxy           = cms.InputTag("eleVarHelper:dxy"),
+     Ele_nonTrigMVA    = cms.InputTag("electronMVAValueMapProducer:ElectronMVAEstimatorRun2Spring15NonTrig25nsV1Values"),
+     Ele_trigMVA       = cms.InputTag("electronMVAValueMapProducer:ElectronMVAEstimatorRun2Spring15Trig25nsV1Values"),
++    Ele_nonTrigMVA80X = cms.InputTag("electronMVAValueMapProducer:ElectronMVAEstimatorRun2Spring16GeneralPurposeV1Values"),
+ 
+     )
+ 
+diff --git a/PhysicsTools/TagAndProbe/python/treeMakerOptions_cfi.py b/PhysicsTools/TagAndProbe/python/treeMakerOptions_cfi.py
+index 6af8b54287e..e7199565f16 100644
+--- a/PhysicsTools/TagAndProbe/python/treeMakerOptions_cfi.py
++++ b/PhysicsTools/TagAndProbe/python/treeMakerOptions_cfi.py
+@@ -138,6 +138,59 @@ def setModules(process, options):
+                                                      dR          = cms.double(0.3),
+                                                      isAND       = cms.bool(False)
+                                                      )
++
++    # HH HLTs
++    process.goodElectronsPassEle23Ele12NonDZ = cms.EDProducer("PatElectronTriggerPathCandProducer",
++                                                     paths       = cms.vstring('HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_v'),
++                                                     inputs      = cms.InputTag("goodElectronsProbeHLT"),
++                                                     bits        = cms.InputTag('TriggerResults::' + options['HLTProcessName'] ),
++                                                     isAND       = cms.bool(False)
++                                                     )
++
++    process.goodElectronsPassEle23Ele12DZ    = cms.EDProducer("PatElectronTriggerPathCandProducer",
++                                                     paths       = cms.vstring('HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v'),
++                                                     inputs      = cms.InputTag("goodElectronsProbeHLT"),
++                                                     bits        = cms.InputTag('TriggerResults::' + options['HLTProcessName'] ),
++                                                     isAND       = cms.bool(False)
++                                                     )
++
++    process.goodElectronsPassEle23Ele12IsoEle23 = cms.EDProducer("PatElectronTriggerCandProducer",
++                                                     filterNames = cms.vstring('hltEle23Ele12CaloIdLTrackIdLIsoVLTrackIsoLeg1Filter'),
++                                                     inputs      = cms.InputTag("goodElectronsProbeHLT"),
++                                                     bits        = cms.InputTag('TriggerResults::' + options['HLTProcessName'] ),
++                                                     objects     = cms.InputTag('selectedPatTrigger'),
++                                                     dR          = cms.double(0.3),
++                                                     isAND       = cms.bool(False)
++                                                     )
++
++    process.goodElectronsPassEle23Ele12IsoEle12 = cms.EDProducer("PatElectronTriggerCandProducer",
++                                                     filterNames = cms.vstring('hltEle23Ele12CaloIdLTrackIdLIsoVLTrackIsoLeg2Filter'),
++                                                     inputs      = cms.InputTag("goodElectronsProbeHLT"),
++                                                     bits        = cms.InputTag('TriggerResults::' + options['HLTProcessName'] ),
++                                                     objects     = cms.InputTag('selectedPatTrigger'),
++                                                     dR          = cms.double(0.3),
++                                                     isAND       = cms.bool(False)
++                                                     )
++
++    process.goodElectronsPassIsoEle23 = cms.EDProducer("PatElectronTriggerCandProducer",
++                                                     filterNames = cms.vstring('hltEle23CaloIdLTrackIdLIsoVLTrackIsoFilter'),
++                                                     inputs      = cms.InputTag("goodElectronsProbeHLT"),
++                                                     bits        = cms.InputTag('TriggerResults::' + options['HLTProcessName'] ),
++                                                     objects     = cms.InputTag('selectedPatTrigger'),
++                                                     dR          = cms.double(0.3),
++                                                     isAND       = cms.bool(False)
++                                                     )
++
++    process.goodElectronsPassIsoEle12 = cms.EDProducer("PatElectronTriggerCandProducer",
++                                                     filterNames = cms.vstring('hltEle12CaloIdLTrackIdLIsoVLTrackIsoFilter'),
++                                                     inputs      = cms.InputTag("goodElectronsProbeHLT"),
++                                                     bits        = cms.InputTag('TriggerResults::' + options['HLTProcessName'] ),
++                                                     objects     = cms.InputTag('selectedPatTrigger'),
++                                                     dR          = cms.double(0.3),
++                                                     isAND       = cms.bool(False)
++                                                     )
++
++    # -------- #
+     
+     process.goodPhotonsProbeHLT = cms.EDProducer("PatPhotonTriggerCandProducer",
+                                                  filterNames = options['TnPHLTProbeFilters'],
+@@ -224,7 +277,13 @@ def setSequences(process, options):
+         process.goodElectronsPROBECutBasedTight80X  +
+         process.goodElectronsPROBEMVA80Xwp90        +
+         process.goodElectronsPROBEMVA80Xwp80        +
+-        process.goodElectronsProbeHLT
++        process.goodElectronsProbeHLT               +
++        process.goodElectronsPassEle23Ele12NonDZ    +
++        process.goodElectronsPassEle23Ele12DZ       +
++        process.goodElectronsPassEle23Ele12IsoEle23 +
++        process.goodElectronsPassEle23Ele12IsoEle12 +
++        process.goodElectronsPassIsoEle23  +
++        process.goodElectronsPassIsoEle12
+         )
+ 
+     process.hlt_sequence = cms.Sequence(
