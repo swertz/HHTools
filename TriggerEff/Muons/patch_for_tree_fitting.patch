@@ -1,0 +1,219 @@
+commit 229e1cfe0de6d71448a811aaf0c30f3724b56239
+Author: Sébastien Brochet <sebastien.brochet@cern.ch>
+Date:   Wed Feb 8 18:32:52 2017 +0100
+
+    HH specific changes
+
+diff --git a/PhysicsTools/TagAndProbe/interface/TagProbeFitter.h b/PhysicsTools/TagAndProbe/interface/TagProbeFitter.h
+index 7d3015e45ec..428b860ce19 100644
+--- a/PhysicsTools/TagAndProbe/interface/TagProbeFitter.h
++++ b/PhysicsTools/TagAndProbe/interface/TagProbeFitter.h
+@@ -61,6 +61,9 @@ class TagProbeFitter {
+ 
+   protected:
+   ///pointer to the input TTree Chain of data
++  std::vector<std::string> inputFiles;
++  std::string inputTreeName;
++
+   TChain* inputTree;
+ 
+   ///pointer to the output file
+diff --git a/PhysicsTools/TagAndProbe/src/TagProbeFitter.cc b/PhysicsTools/TagAndProbe/src/TagProbeFitter.cc
+index 8e14c30b0f8..68b7d288155 100644
+--- a/PhysicsTools/TagAndProbe/src/TagProbeFitter.cc
++++ b/PhysicsTools/TagAndProbe/src/TagProbeFitter.cc
+@@ -49,10 +49,10 @@ using namespace std;
+ using namespace RooFit;
+ 
+ TagProbeFitter::TagProbeFitter(const std::vector<std::string>& inputFileNames, string inputDirectoryName, string inputTreeName, string outputFileName, int numCPU_, bool saveWorkspace_, bool floatShapeParameters_, const std::vector<std::string>& fixVars_){
+-  inputTree = new TChain((inputDirectoryName+"/"+inputTreeName).c_str());
+-  for(size_t i=0; i<inputFileNames.size(); i++){
+-    inputTree->Add(inputFileNames[i].c_str());
+-  }
++
++  inputFiles = inputFileNames;
++  this->inputTreeName = inputDirectoryName + "/" +inputTreeName;
++ 
+   outputFile = new TFile(outputFileName.c_str(),"recreate");
+   outputDirectory = outputFile->mkdir(inputDirectoryName.c_str());
+   numCPU = numCPU_;
+@@ -138,6 +138,16 @@ void TagProbeFitter::setWeightVar(const std::string &var) {
+ }
+ 
+ string TagProbeFitter::calculateEfficiency(string dirName,const std::vector<string>& effCats,const std::vector<string>& effStates, vector<string>& unbinnedVariables, map<string, vector<double> >& binnedReals, map<string, std::vector<string> >& binnedCategories, vector<string>& binToPDFmap){
++
++  gROOT->cd();
++  inputTree = new TChain(inputTreeName.c_str());
++  for(size_t i=0; i<inputFiles.size(); i++){
++    std::cout << "Input file: " << inputFiles[i] << std::endl;
++    inputTree->Add(inputFiles[i].c_str());
++  }
++  //inputTree->SetDirectory(0);
++  inputTree->SetBranchStatus("*",0);
++
+   //cout << "MCBS: in TagProbeFitter::calculateEfficiency" << endl;
+   //go to home directory
+   outputDirectory->cd();
+@@ -145,8 +155,6 @@ string TagProbeFitter::calculateEfficiency(string dirName,const std::vector<stri
+   gDirectory->mkdir(dirName.c_str())->cd();
+ 
+   //MM: disable reading of all variables, not needed per default
+-  inputTree->SetBranchStatus("*",0);
+-
+   RooArgSet dataVars;
+   RooArgSet unbinnedVars;
+   //collect unbinned variables
+@@ -242,9 +250,28 @@ string TagProbeFitter::calculateEfficiency(string dirName,const std::vector<stri
+ 
+ 
+   //Skimming the tree, no need to get everything =================
+-  TTree* skimmedTree=inputTree->CopyTree("");
++  TDirectory* currentDir = gDirectory;
++  //gROOT->cd();
++
++  std::cout << "Copying tree..." << std::endl;
++
++  TTree* skimmedTree = inputTree->CopyTree("");
++  //skimmedTree->SetDirectory(0);
++
+   delete inputTree;
+-  
++  inputTree = nullptr;
++
++  currentDir->cd();
++
++  std::cout << "Done..." << std::endl;
++
++  //for (const auto& cut: strCategs) {
++    //std::cout << cut << ": " << skimmedTree->GetEntries(cut.c_str()) << std::endl;
++  //}
++
++
++  // Crash
++  //inputTree->GetEntries();
+ 
+   //prepare the expressions, dynamic categories, etc. that will be used later =====
+ 
+@@ -316,14 +343,30 @@ string TagProbeFitter::calculateEfficiency(string dirName,const std::vector<stri
+     if(catName.Contains("NotMapped")) continue;
+     icateg++;
+     //if(icateg!=1) continue;
++
++    std::cout << "Category: " << catName << std::endl;
++
++    std::cout << "Creating dataset..." << std::endl;
+     
+     //and now create the dataset!!!!
+     ostringstream os; os<<icateg;
+     TString id("");//(os.str());
+     RooArgSet dataVarsTmp; dataVarsTmp.addClone(dataVars);
++
++    //TDirectory* savedDir = gDirectory;
++    //gROOT->cd();
++    //TTree* localSkimmedTree = skimmedTree->CopyTree(strCategs[icateg].c_str());
++    //localSkimmedTree->SetDirectory(0);
++    //std::cout << "Skimmed entries: " << localSkimmedTree->GetEntries() << std::endl;
++    //savedDir->cd();
++
+     RooDataSet* data=new RooDataSet("data", "data",
+-				    skimmedTree->CopyTree(strCategs[icateg].c_str()), 
+-				    dataVarsTmp,"",
++					//localSkimmedTree, 
++                    skimmedTree->CopyTree(strCategs[icateg].c_str()),
++                    //skimmedTree,
++				    dataVarsTmp,
++                    //strCategs[icateg].c_str(),
++                    "",
+ 				    (weightVar.empty() ? 0 : weightVar.c_str()));
+  
+     //add the missing variables, expressions, and categories ========
+@@ -368,12 +411,42 @@ string TagProbeFitter::calculateEfficiency(string dirName,const std::vector<stri
+     data->addColumn( *efficiencyCategory );
+     //setup the pdf category
+     data->addColumn( pdfCategory );
++
++    std::cout << "Done..." << std::endl;
+     
+     //now everything is ready! ==============================================
++    std::cout << "Cut: " << strCategs[icateg] << std::endl;
++    std::cout << "Data size: " << data->numEntries() << std::endl;
++    //pdfCategory.Print("all");
++
+     size_t rowIndex(0);
+     const RooArgSet* row = data->get(rowIndex); 
+     while (((RooMultiCategory*)row->find("allCats"))->getIndex()!=t->getVal()) {
++        //std::cout << "Index: " << rowIndex + 1 << std::endl;
+       row = data->get(++rowIndex);
++
++      //if (! row) {
++        //std::cout << "ROW IS NULL, I'll crash" << std::endl;
++        //TIterator* it2 = allCats.typeIterator();
++        //for(RooCatType* t = (RooCatType*)it2->Next(); t!=0; t = (RooCatType*)it2->Next() ) {
++            //std::cout << "Cat " << t->getVal() << " : " << t->GetName() << std::endl;
++        //}
++
++        //const RooArgSet* vars ;
++        //for (int i = 0; i < data->numEntries(); i++) {
++            //vars = data->get(i);
++            //std::cout << i << " : " << ((RooMultiCategory*) vars->find("allCats"))->getIndex() << std::endl;
++        //}
++      //}
++
++      if (! row)
++          break;
++    }
++
++    if (! row) {
++        delete data;
++        //delete localSkimmedTree;
++        continue;
+     }
+ 
+     TString pdfName(((RooCategory*)row->find("_pdfCategory_"))->getLabel());
+@@ -386,6 +459,8 @@ string TagProbeFitter::calculateEfficiency(string dirName,const std::vector<stri
+     }
+   
+     cout  <<  "TagProbeFitter: Fitting bin :  " << dirName << endl;
++
++    //currentDir->cd();
+     //make a directory for each bin
+     gDirectory->mkdir(dirName)->cd();
+ 
+@@ -395,7 +470,8 @@ string TagProbeFitter::calculateEfficiency(string dirName,const std::vector<stri
+     sprintf(currentCut,"allCats==%d",t->getVal());
+     //import the data
+     RooDataHist* data_binHist;
+-    size_t DataNumEntries=skimmedTree->GetEntries(strCategs[icateg].c_str());
++    //size_t DataNumEntries = localSkimmedTree->GetEntries();
++    size_t DataNumEntries = data->numEntries(); //localSkimmedTree->GetEntries();
+   
+     if(binnedFit || DataNumEntries>50000) { // || DataNumEntries>50000
+       RooArgSet* obs = new RooArgSet;
+@@ -462,7 +538,10 @@ string TagProbeFitter::calculateEfficiency(string dirName,const std::vector<stri
+     //get back to the initial directory
+     gDirectory->cd("..");
+ 
++    //gROOT->cd();
++
+     delete data;
++    //delete localSkimmedTree;
+   } // end of loop over bins using allCats
+   
+   //save the efficiency data
+@@ -540,6 +619,7 @@ void TagProbeFitter::doFitEfficiency(RooWorkspace* w, string pdfName, RooRealVar
+   RooMinuit minuit(*simNLL);
+   minuit.setStrategy(1);
+   minuit.setProfile(true);
++  minuit.setPrintLevel(-1);
+   RooProfileLL profileLL("simPdfNLL","",*simNLL,*w->var("efficiency"));
+ 
+   //cout << "MCBS:After constructing RooMinuit" << endl;  
+@@ -607,7 +687,7 @@ void TagProbeFitter::doFitEfficiency(RooWorkspace* w, string pdfName, RooRealVar
+     RooMinimizer* profMinuit = profileLL.minimizer();
+     profMinuit->setProfile(true);
+     profMinuit->setStrategy(2);     
+-    profMinuit->setPrintLevel(1);
++    profMinuit->setPrintLevel(-1);
+     profMinuit->minos(*w->var("efficiency"));
+     res.reset( profMinuit->save() );
+     //res = w->pdf("simPdf")->fitTo(*data, Save(true), Extended(true), NumCPU(numCPU), Strategy(2),
