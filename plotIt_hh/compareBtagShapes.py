@@ -11,7 +11,6 @@ import argparse
 parser = argparse.ArgumentParser(description='Facility to produce the yml with plots information.')
 parser.add_argument('--yields', help='If you just want to produce the yields and systematics.', action="store_true")
 parser.add_argument('-d', '--directory', dest='directory', required=True, help='Directory of the input rootfiles.')
-parser.add_argument('--blinded', dest='unblinded', help='If you want to produce blinded plots', action="store_false")
 args = parser.parse_args()
 
 if not os.path.exists(args.directory):
@@ -56,7 +55,7 @@ with open('centralConfig.yml.tpl') as tpl_handle:
 # Dictionary containing all the plots
 plots = {}
 
-logY = False
+logY = "both"
 if args.yields:
     logY = False
 defaultStyle = {
@@ -103,15 +102,15 @@ for key in keys:
         if "MuEl" in key_name:
             continue
         
-        if not 'no_cut' in key_name:
-            continue
+        #if not 'no_cut' in key_name:
+        #    continue
 
         if not 'btagM' in key_name:
             continue
 
         if 'with_nobtag_to_btagM' in key_name:
             continue
-
+        
         ## Update all the plots with title, ...
 
         alreadyIn.append(key_name)
@@ -286,7 +285,7 @@ for key in keys:
         
         elif "DY_BDT" in key_name:
             plot['x-axis'] = "DY reweighting BDT"
-            plot['legend-position'] = [0.2, 0.65, 0.4, 0.88]
+            plot['legend-position'] = [0.2, 0.6, 0.4, 0.83]
             plot['for-yields'] = True #### Do the yields here
             plot.update(defaultStyle_events)
         

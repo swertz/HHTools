@@ -55,9 +55,11 @@ def get_sample(iSample):
 # `sample` is DB name
 def get_sample_splitting(sample):
     if "TTTo2L2Nu" in sample:
-        return 5
+        return 4
     if "DYToLL_2J" in sample:
-        return 10
+        return 4
+    if "WZ" in sample or "ZZ" in sample:
+        return 3
     return 10
 
 workflows = {}
@@ -150,23 +152,31 @@ MainPlots_ForMC = Configuration('generatePlots.py', workflow='plot_main', mode='
         ], generation_args={
             'sample_type': 'MC',
             'lljj_plots': ['basic', 'dy_bdt'],
-            'llbb_plots': ['basic', 'dy_bdt', 'nn'],
+            'llbb_plots': ['basic', 'dy_bdt'],
             'syst': True,
             'skim_MuEl_stages': True,
+            'llbb_stages': ['mll_peak', 'mll_above_peak'],
+            'lljj_stages': ['mll_peak', 'mll_above_peak'],
+            'llbb_categories': ['ElEl', 'MuMu'],
+            'lljj_categories': ['ElEl', 'MuMu'],
         })
 MainPlots_ForData = Configuration('generatePlots.py', workflow='plot_main', suffix='_for_data', mode='plots', samples=['Data'], generation_args={
             'sample_type': 'Data',
             'lljj_plots': ['basic', 'dy_bdt'],
-            'llbb_plots': ['basic', 'dy_bdt', 'nn'],
+            'llbb_plots': ['basic', 'dy_bdt'],
             'syst': True,
             'skim_MuEl_stages': True,
+            'llbb_stages': ['mll_peak', 'mll_above_peak'],
+            'lljj_stages': ['mll_peak', 'mll_above_peak'],
+            'llbb_categories': ['ElEl', 'MuMu'],
+            'lljj_categories': ['ElEl', 'MuMu'],
         })
-MainPlots_ForSignal = Configuration('generatePlots.py', workflow='plot_main', suffix='_for_signal', mode='plots', samples=['Signal_Resonant', 'Signal_NonResonant'], generation_args={
-            'sample_type': 'Signal',
-            'llbb_plots': ['basic', 'dy_bdt', 'nn'],
-            'syst': True,
-            'skim_MuEl_stages': True,
-        })
+#MainPlots_ForSignal = Configuration('generatePlots.py', workflow='plot_main', suffix='_for_signal', mode='plots', samples=['Signal_Resonant', 'Signal_NonResonant'], generation_args={
+#            'sample_type': 'Signal',
+#            'llbb_plots': ['basic', 'dy_bdt', 'nn'],
+#            'syst': True,
+#            'skim_MuEl_stages': True,
+#        })
 
 # Plots for 2D limits
 NN2DPlots_ForMC = Configuration('generatePlots.py', workflow='plot_nn_2d', mode='plots', samples=[

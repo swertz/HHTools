@@ -20,13 +20,14 @@ parser.add_argument("-o", "--output", help="Output file", required=True)
 parser.add_argument("-s", "--syst", help="Take care of systematics", action="store_true")
 options = parser.parse_args()
 
-LUMI = 36809
+# FIXME
+LUMI = 0.9 * 36809
 
 # Get SF histograms and perform the subtraction
 print "Subtracting MuMu histograms"
-histos_mumu = performSubtraction(options.data, options.mc, R".*MuMu.*_with_nobtag_to_btagM_reweighting$", LUMI)
+histos_mumu = performSubtraction(options.data, options.mc, R".*MuMu.*_with_nobtag_to_btagM_reweighting$", LUMI).values()
 print "Subtracting ElEl histograms"
-histos_ee = performSubtraction(options.data, options.mc, R".*ElEl.*_with_nobtag_to_btagM_reweighting$", LUMI)
+histos_ee = performSubtraction(options.data, options.mc, R".*ElEl.*_with_nobtag_to_btagM_reweighting$", LUMI).values()
 
 if options.syst:
     def build_syst(_list):
@@ -34,20 +35,27 @@ if options.syst:
         for _s in _list:
             _ret.append(_s + "up")
             _ret.append(_s + "down")
+        return _ret
     def build_scale(_s):
         return [ _s + str(i) for i in range(6) ]
 
     # Systematics applied on both Data and MC
     systematics = ["jec", "jer", "jjbtaglight", "jjbtagheavy", "pu", "dyStat"]
+    
     for _s in build_syst(systematics) + build_scale("dyScaleUncorr"):
-        histos_mumu.append(performSubtraction(options.data, options.mc, R".*MuMu.*_with_nobtag_to_btagM_reweighting__" + _s + "$" , LUMI)
-        histos_e.append(performSubtraction(options.data, options.mc, R".*ElEl.*_with_nobtag_to_btagM_reweighting__" + _s + "$" , LUMI)
+        print "Handling systematics {}".format(_s)
+        
+        histos_mumu += performSubtraction(options.data, options.mc, R".*MuMu.*_with_nobtag_to_btagM_reweighting__" + _s + "$" , LUMI).values()
+        histos_ee += performSubtraction(options.data, options.mc, R".*ElEl.*_with_nobtag_to_btagM_reweighting__" + _s + "$" , LUMI).values()
 
-    # Systematics for which only MC is affected, not the reweighting
+    # Systematics for which only MC is affected, not the reweighting => take nominal histos in Data
     systematics = ["elidiso", "muid", "muiso", "trigeff", "pdf"]
-    for _s in build_syst(systematic) + build_scale("scaleUncorr"):
-        histos_mumu.append(performSubtraction(options.data, options.mc, R".*MuMu.*_with_nobtag_to_btagM_reweighting$" , LUMI, mc_regexp=R".*MuMu.*_with_nobtag_to_btagM_reweighting__" + _s + "$", translation=(R"$", R"__" + _s)))
-        histos_ee.append(performSubtraction(options.data, options.mc, R".*ElEl.*_with_nobtag_to_btagM_reweighting$" , LUMI, mc_regexp=R".*ElEl.*_with_nobtag_to_btagM_reweighting__" + _s + "$", translation=(R"$", R"__" + _s)))
+    
+    for _s in build_syst(systematics) + build_scale("scaleUncorr"):
+        print "Handling systematics {}".format(_s)
+        
+        histos_mumu += performSubtraction(options.data, options.mc, R".*MuMu.*_with_nobtag_to_btagM_reweighting$", LUMI, mc_regexp=R".*MuMu.*_with_nobtag_to_btagM_reweighting__" + _s + "$", translation=(R"$", R"__" + _s)).values()
+        histos_ee += performSubtraction(options.data, options.mc, R".*ElEl.*_with_nobtag_to_btagM_reweighting$", LUMI, mc_regexp=R".*ElEl.*_with_nobtag_to_btagM_reweighting__" + _s + "$", translation=(R"$", R"__" + _s)).values()
         
 
 # For MuE, get histograms from MC
@@ -57,14 +65,8 @@ for file in options.dy[1:]:
     this_histos = getHistogramsFromFileRegex(file, R".*MuEl.*btagM.*")
     addHistoDicos(histos_emu, this_histos)
 
-## Rename to have the same name as the SF ones
-#for h in histos_emu.values():
-#    old_name = h.GetName()
-#    new_name = old_name.replace("btagM", "nobtag").replace("cut", "cut_with_nobtag_to_btagM_reweighting")
-#    h.SetName(new_name)
-
 # Rename to have the same name as the other MC and data
-for h in histos_ee.values() + histos_mumu.values():
+for h in histos_ee + histos_mumu:
     old_name = h.GetName()
     new_name = old_name.replace("_with_nobtag_to_btagM_reweighting", "").replace("nobtag", "btagM")
     h.SetName(new_name)
@@ -72,7 +74,7 @@ for h in histos_ee.values() + histos_mumu.values():
 print "Writing output"
 # Write output
 r_file = ROOT.TFile.Open(options.output, "recreate")
-for hist in histos_mumu.values() + histos_ee.values() + histos_emu.values():
+for hist in histos_mumu + histos_ee + histos_emu.values():
     hist.Write()
 r_file.Close()
 

@@ -5,6 +5,9 @@
 #  type: mc
 #  group: no_btag
 #  stack-index: 1
+  #rename:
+  #  - from: "btagM"
+  #    to: "nobtag"
 
 # llbb
 - file: 'DY*13TeV-amcatnloFXFX-pythia8_*_histos.root'

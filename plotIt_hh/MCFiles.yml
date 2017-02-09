@@ -168,15 +168,15 @@
   group: VV         
   order: 3          
                     
-'WZTo2L2Q_13TeV_amcatnloFXFX_madspin_pythia8_*_histos.root':
-  type: mc          
-  group: VV         
-  order: 3          
+#'WZTo2L2Q_13TeV_amcatnloFXFX_madspin_pythia8_*_histos.root':
+#  type: mc          
+#  group: VV         
+#  order: 3          
                     
-'WZTo3LNu_TuneCUETP8M1_13TeV-powheg-pythia8_*_histos.root':
-  type: mc          
-  group: VV         
-  order: 3          
+#'WZTo3LNu_TuneCUETP8M1_13TeV-powheg-pythia8_*_histos.root':
+#  type: mc          
+#  group: VV         
+#  order: 3          
                     
 'WWTo2L2Nu_13TeV-powheg_*_histos.root':
   type: mc          
@@ -259,7 +259,7 @@
 'TTTo2L2Nu_13TeV-powheg_*_histos.root':
   type: mc          
   group: tt         
-  order: 20         
+  scale: 1.1
 
 ## QCD and W+jets
 #

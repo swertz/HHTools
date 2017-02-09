@@ -18,6 +18,17 @@ def default_code_before_loop():
         // Non-resonant
         KerasModelEvaluator nonresonant_nn("/home/fynu/sbrochet/scratch/Framework/CMSSW_8_0_24_patch1_HH_Analysis/src/cp3_llbb/HHTools/mvaTraining/hh_nonresonant_trained_models/2017-01-24_dy_estimation_from_BDT_new_prod_deeper_lr_scheduler_st_0p005_100epochs/hh_nonresonant_trained_model.h5");
         MVAEvaluatorCache<KerasModelEvaluator> nonresonant_nn_evaluator(nonresonant_nn);
+
+        auto nn_reshaper = [](double nn) -> double {
+            static double alpha = 0.05;
+            static double beta = 0.2;
+            static double a = (alpha - beta) / (alpha * alpha * (1 - alpha));
+            static double b = (2 * beta - alpha - alpha * beta) / (alpha * (1 - alpha));
+            if (nn < alpha)
+                return a * nn * nn + b * nn;
+            else
+                return (1 - beta) / (1 - alpha) * (nn - alpha) + beta;
+        };
 """
 
 def default_code_in_loop():
@@ -180,16 +191,18 @@ class BasePlotter:
 
         # Possible stages (selection)
         # FIXME: Move to constructor
-        mll_cut = "((91 - {0}.M()) > 15)".format(self.ll_str)
-        inverted_mll_cut = "((91 - {0}.M()) <= 15)".format(self.ll_str)
-        high_mll_cut = "(({0}.M() - 91) > 15)".format(self.ll_str)
+        mll_cut = "({0}.M() < 91 - 15)".format(self.ll_str)
+        inverted_mll_cut = "({0}.M() >= 91 - 15)".format(self.ll_str)
+        mll_peak = "(std::abs({0}.M() - 91) < 15)".format(self.ll_str)
+        mll_above_peak = "({0}.M() >= 91 + 15)".format(self.ll_str)
         mjj_blind = "({0}.M() < 75 || {0}.M() > 140)".format(self.jj_str)
 
         dict_stage_cut = {
                "no_cut": "", 
                "mll_cut": mll_cut,
                "inverted_mll_cut": inverted_mll_cut,
-               "high_mll_cut": high_mll_cut,
+               "mll_peak": mll_peak,
+               "mll_above_peak": mll_above_peak,
                "mjj_blind": self.joinCuts(mjj_blind, mll_cut),
                }
 
@@ -272,7 +285,7 @@ class BasePlotter:
             jjBtag_heavyjet_sf = "(common::combineScaleFactors<2>({{ {{ {{ jet{0}_sf_cmvav2_heavyjet_{1}[{2}][0] , jet{0}_sf_cmvav2_heavyjet_{1}[{2}]{3} }}, {{ jet{0}_sf_cmvav2_heavyjet_{1}[{4}][0], jet{0}_sf_cmvav2_heavyjet_{1}[{4}]{3} }} }} }}, common::Variation::{5}) )".format(sys_fwk, self.btagWP_str, self.jet1_fwkIdx, jjBtag_heavy_sfIdx, self.jet2_fwkIdx, jjBtag_heavy_strCommon)
 
             ## FIXME WARNING MINIMUM SET AT 0.8 / +-0.07
-            jjBtag_lightjet_sf = "(common::combineScaleFactors<2>({{ {{ {{ std::max((float)0.8, (float)jet{0}_sf_cmvav2_lightjet_{1}[{2}][0]), std::max((float)0.07, (float)jet{0}_sf_cmvav2_lightjet_{1}[{2}]{3}) }}, {{ std::max((float)0.8, (float)jet{0}_sf_cmvav2_lightjet_{1}[{4}][0]), std::max((float)0.07, (float)jet{0}_sf_cmvav2_lightjet_{1}[{4}]{3}) }} }} }}, common::Variation::{5}) )".format(sys_fwk, self.btagWP_str, self.jet1_fwkIdx, jjBtag_light_sfIdx, self.jet2_fwkIdx, jjBtag_light_strCommon)
+            jjBtag_lightjet_sf = "(common::combineScaleFactors<2>({{ {{ {{ std::max((float)0.8, (float)jet{0}_sf_cmvav2_lightjet_{1}[{2}][0]), std::max((float)0.0, (float)jet{0}_sf_cmvav2_lightjet_{1}[{2}]{3}) }}, {{ std::max((float)0.8, (float)jet{0}_sf_cmvav2_lightjet_{1}[{4}][0]), std::max((float)0., (float)jet{0}_sf_cmvav2_lightjet_{1}[{4}]{3}) }} }} }}, common::Variation::{5}) )".format(sys_fwk, self.btagWP_str, self.jet1_fwkIdx, jjBtag_light_sfIdx, self.jet2_fwkIdx, jjBtag_light_strCommon)
             #jjBtag_lightjet_sf = "(common::combineScaleFactors<2>({{ {{ {{ jet{0}_sf_cmvav2_lightjet_{1}[{2}][0] , jet{0}_sf_cmvav2_lightjet_{1}[{2}]{3} }},{{ jet{0}_sf_cmvav2_lightjet_{1}[{4}][0], jet{0}_sf_cmvav2_lightjet_{1}[{4}]{3} }} }} }}, common::Variation::{5}) )".format(sys_fwk, self.btagWP_str, self.jet1_fwkIdx, jjBtag_light_sfIdx, self.jet2_fwkIdx, jjBtag_light_strCommon)
 
         else:
@@ -304,7 +317,7 @@ class BasePlotter:
             trigEff = "({0}.trigger_efficiency_downVariated)".format(self.baseObject)
         # Include dZ filter efficiency for ee (not for mumu since we no longer use the DZ version of the trigger)
         # FIXME
-        trigEff += "*(({0}.isElEl && runOnMC) ? 0.995 : 1)".format(self.baseObject)
+        #trigEff += "*(({0}.isElEl && runOnMC) ? 1 : 1)".format(self.baseObject)
 
         # Append the proper extension to the name plot if needed
         self.systematicString = ""
@@ -406,16 +419,16 @@ class BasePlotter:
                 if m in restricted_resonant_signals:
                     self.resonant_nnoutput_plot.append({
                             'name': 'NN_resonant_M%d_%s_%s_%s%s' % (m, self.llFlav, self.suffix, self.extraString, self.systematicString),
-                            'variable': 'resonant_nn_evaluator.evaluate(%s)' % (keras_resonant_input_variables % m),
+                            'variable': 'nn_reshaper(resonant_nn_evaluator.evaluate(%s))' % (keras_resonant_input_variables % m),
                             'plot_cut': self.totalCut,
                             'binning': '(50, {}, {})'.format(0, 1)
                     })
                 self.mjj_vs_resonant_nnoutput_plot.append({
                         'name': 'mjj_vs_NN_resonant_M%d_%s_%s_%s%s' % (m, self.llFlav, self.suffix, self.extraString, self.systematicString),
-                        'variable': self.jj_str + '.M() ::: resonant_nn_evaluator.evaluate(%s)' % (keras_resonant_input_variables % m),
+                        'variable': self.jj_str + '.M() ::: nn_reshaper(resonant_nn_evaluator.evaluate(%s))' % (keras_resonant_input_variables % m),
                         'plot_cut': self.totalCut,
-                        'binning': '(3, { 0, 75, 140, 13000 }, 12, { 0, 0.02, 0.05, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1 } )'
-                        #'binning': '(3, { 0, 75, 140, 13000 }, 25, 0, 1)'
+                        #'binning': '(3, { 0, 75, 140, 13000 }, 12, { 0, 0.02, 0.05, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1 } )'
+                        'binning': '(3, { 0, 75, 140, 13000 }, 20, 0, 1)'
                 })
             for point in nonresonant_signal_grid:
                 kl = point[0]
@@ -426,16 +439,16 @@ class BasePlotter:
                 if point in restricted_nonresonant_signals:
                     self.nonresonant_nnoutput_plot.append({
                             'name': 'NN_nonresonant_%s_%s_%s_%s%s' % (point_str, self.llFlav, self.suffix, self.extraString, self.systematicString),
-                            'variable': 'nonresonant_nn_evaluator.evaluate(%s)' % (keras_nonresonant_input_variables % (kl, kt)),
+                            'variable': 'nn_reshaper(nonresonant_nn_evaluator.evaluate(%s))' % (keras_nonresonant_input_variables % (kl, kt)),
                             'plot_cut': self.totalCut,
                             'binning': '(50, {}, {})'.format(0, 1)
                     })
                 self.mjj_vs_nonresonant_nnoutput_plot.append({
                         'name': 'mjj_vs_NN_nonresonant_%s_%s_%s_%s%s' % (point_str, self.llFlav, self.suffix, self.extraString, self.systematicString),
-                        'variable': self.jj_str + '.M() ::: nonresonant_nn_evaluator.evaluate(%s)' % (keras_nonresonant_input_variables % (kl, kt)),
+                        'variable': self.jj_str + '.M() ::: nn_reshaper(nonresonant_nn_evaluator.evaluate(%s))' % (keras_nonresonant_input_variables % (kl, kt)),
                         'plot_cut': self.totalCut,
-                        'binning': '(3, { 0, 75, 140, 13000 }, 12, { 0, 0.02, 0.05, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1 } )'
-                        #'binning': '(3, { 0, 75, 140, 13000 }, 25, 0, 1)'
+                        #'binning': '(3, { 0, 75, 140, 13000 }, 12, { 0, 0.02, 0.05, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1 } )'
+                        'binning': '(3, { 0, 75, 140, 13000 }, 20, 0, 1)'
                 })
             
             # DY reweighting plots
@@ -561,6 +574,12 @@ class BasePlotter:
                         'variable': self.baseObject + ".cosThetaStar_CS",
                         'plot_cut': self.totalCut,
                         'binning': '(25, 0, 1)'
+                },
+                {
+                        'name': 'llbb_M_%s_%s_%s%s'%(self.llFlav, self.suffix, self.extraString, self.systematicString),
+                        'variable': "(" + self.ll_str + "+" + self.jj_str + ").M()",
+                        'plot_cut': self.totalCut,
+                        'binning': '(50, 200, 350)'
                 },
             ])
             

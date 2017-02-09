@@ -120,20 +120,16 @@ for key in keys:
         
         # skip 2D histos
         if "_vs_" in key_name and "flat" not in key_name: continue
+        
+        if "All" in key_name: continue
 
-        if "All" in key_name:
-            continue
-
-        if args.lljj and 'btagM' in key_name:
-            continue
-        if args.llbb and 'btagM' not in key_name:
-            continue
+        if args.lljj and 'btagM' in key_name: continue
+        if args.llbb and 'btagM' not in key_name: continue
 
         #if not "no_cut" in key_name:
         #    continue
 
-        if "nobtag_to_btagM_reweighting" in key_name:
-            continue
+        if "nobtag_to_btagM_reweighting" in key_name: continue
 
         ## Update all the plots with title, ...
 
@@ -293,7 +289,7 @@ for key in keys:
         
         elif "DY_BDT" in key_name:
             plot['x-axis'] = "DY reweighting BDT"
-            plot['legend-position'] = [0.2, 0.65, 0.4, 0.88]
+            plot['legend-position'] = [0.2, 0.6, 0.4, 0.83]
             plot.update(defaultStyle_events)
         
         elif "MT2" in key_name:
@@ -326,7 +322,7 @@ for key in keys:
                 stage = ", inverted mll cut"
             elif "mll_cut" in key_name:
                 stage = ", mll cut"
-            plot['yields-title'] = flav + ", " + btag_stage + stage
+            plot['yields-title'] = get_flavour(key_name) + ", " + btag_stage + stage
             if args.yields:
                 plots['override'] = True
         

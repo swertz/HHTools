@@ -1,3 +1,5 @@
+import re
+
 import ROOT
 ROOT.PyConfig.IgnoreCommandLineOptions = True
 ROOT.gROOT.Reset()
@@ -10,7 +12,7 @@ def addHistoDicos(dic1, dic2, alpha=1):
         dic1[key].Add(dic2[key], alpha)
 
 def performSubtraction(data, mc, regexp, lumi, verbose=False, mc_regexp=None, translation=None):
-    if regexp != mc_regexp and translation is None:
+    if mc_regexp is not None and regexp != mc_regexp and translation is None:
         raise Exception("Invalid input")
 
     # First get a list of histograms using the first data file
@@ -40,12 +42,12 @@ def performSubtraction(data, mc, regexp, lumi, verbose=False, mc_regexp=None, tr
         mc_regexp = regexp
     
     if verbose: print "Reading histograms from {}...".format(mc[0])
-    mc_histograms = getHistogramsFromFileRegex(mc[0], regexp)
+    mc_histograms = getHistogramsFromFileRegex(mc[0], mc_regexp)
     if verbose: print "Found {} histograms.".format(len(mc_histograms.keys()))
     
     for mc in mc[1:]:
         if verbose: print "Reading histograms from {}...".format(mc)
-        this_histos = getHistogramsFromFileRegex(mc, regexp)
+        this_histos = getHistogramsFromFileRegex(mc, mc_regexp)
         if verbose: print "Found {} histograms.".format(len(this_histos.keys()))
         addHistoDicos(mc_histograms, this_histos)
 
@@ -59,16 +61,16 @@ def performSubtraction(data, mc, regexp, lumi, verbose=False, mc_regexp=None, tr
     # Replacements to do
     # First rename the MC histograms with the replacement
     if verbose: print("Performing replacement on histogram names!")
-    new_histograms = []
+    new_histograms = {}
     for h in histograms.items():
-        new_name = re.sub(translation[0], translation[1], h.GetName())
+        new_name = re.sub(translation[0], translation[1], h[1].GetName())
         h[1].SetName(new_name)
         new_histograms[new_name] = h[1]
-    
+
     if verbose: print("Performing subtraction on histograms!")
     addHistoDicos(new_histograms, mc_histograms, -1)
 
-    return histograms
+    return new_histograms
 
 
 
