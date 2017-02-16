@@ -22,7 +22,7 @@ import ROOT
 ROOT.PyConfig.IgnoreCommandLineOptions = True
 ROOT.gROOT.Reset()
 
-parser = argparse.ArgumentParser(description='Count number of selected events passing HLT filter')
+parser = argparse.ArgumentParser(description='Count number of selected events passing HLT paths')
 parser.add_argument('--begin', type=int, help='First run to consider (included)', default=0)
 parser.add_argument('--end', type=int, help='Last run to consider (included)', default=1000000)
 parser.add_argument('--path', type=str, help='Regexp for the paths to consider', required=True)

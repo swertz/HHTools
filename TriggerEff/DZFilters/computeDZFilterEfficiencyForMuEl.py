@@ -22,7 +22,7 @@ import ROOT
 ROOT.PyConfig.IgnoreCommandLineOptions = True
 ROOT.gROOT.Reset()
 
-parser = argparse.ArgumentParser(description='Compute efficiency of DZ filter on MuonEG data samples')
+parser = argparse.ArgumentParser(description='Compute efficiency of DZ filter on MuonEG data samples, by running on events where both versions are present: AND/noDZ gives efficiency')
 parser.add_argument('-i', '--id', nargs='+', type=int, metavar='ID', help='Sample ID', required=True)
 
 options = parser.parse_args()
@@ -74,6 +74,7 @@ total_entries = chain.GetEntries()
 count = 0
 
 for event in chain:
+    # DZ versions not present before this run
     if event.event_run < 278273:
         continue
 
