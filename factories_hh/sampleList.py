@@ -1,7 +1,8 @@
 ####### Warning: put most recent tags first! ###### 
 analysis_tags = [
-        'v4.3.0+80X_HHAnalysis_2017-01-26.v0', # Fixed Muon triggers in data -> DoubleMuon, MuonEG
-        'v4.2.0+80X_HHAnalysis_2017-01-18.v0' # DoubleEG + Summer16 MC
+        'v4.4.2+80X_HHAnalysis_2017-02-13.v2', # mini-prod with new SF and corrections
+        #'v4.3.0+80X_HHAnalysis_2017-01-26.v0', # Fixed Muon triggers in data -> DoubleMuon, MuonEG
+        #'v4.2.0+80X_HHAnalysis_2017-01-18.v0' # DoubleEG + Summer16 MC
         ]
 
 samples_dict = {}
@@ -23,11 +24,10 @@ samples_dict["Main_Training"] = [
 
 # DY NLO
 samples_dict["DY_NLO"] = [
-    'DYJetsToLL_M-10to50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8',
-    #'DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8',
     'DYToLL_0J_13TeV-amcatnloFXFX-pythia8_extended_ext0_plus_ext1',
-    'DYToLL_1J_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8',
-    'DYToLL_2J_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8',
+    'DYToLL_1J_13TeV-amcatnloFXFX-pythia8_extended_ext0_plus_ext1',
+    'DYToLL_2J_13TeV-amcatnloFXFX-pythia8_extended_ext0_plus_ext1',
+    'DYJetsToLL_M-10to50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_extended_ext0_plus_ext1',
 ]
 
 # DY LO
@@ -62,7 +62,7 @@ samples_dict["VV_VVV"] = [
     'WZTo2L2Q_13TeV_amcatnloFXFX_madspin_pythia8', # WZ(2L2Q)
 
     'ZZTo4L_13TeV_powheg_pythia8', # ZZ(4L)
-    #'ZZTo2L2Nu_13TeV_powheg_pythia8', # ZZ(2L2Nu) # FIXME
+    'ZZTo2L2Nu_13TeV_powheg_pythia8', # ZZ(2L2Nu)
     'ZZTo2L2Q_13TeV_amcatnloFXFX_madspin_pythia8', # ZZ(2L2Q)
 
     'WZZ_TuneCUETP8M1_13TeV-amcatnlo-pythia8', # WZZ
@@ -144,7 +144,13 @@ samples_dict["WJets"] = [
 
 # Resonant signal
 samples_dict["Signal_Resonant"] = [
-    'GluGluToRadionToHHTo2B2VTo2L2Nu_M'
+    'GluGluToRadionToHHTo2B2VTo2L2Nu_M',
+    #'GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M'
+]
+samples_dict["Signal_BM_Resonant"] = [
+    'GluGluToRadionToHHTo2B2VTo2L2Nu_M-400',
+    'GluGluToRadionToHHTo2B2VTo2L2Nu_M-650',
+    'GluGluToRadionToHHTo2B2VTo2L2Nu_M-900',
 ]
 
 # Non-resonant signal
@@ -152,5 +158,5 @@ samples_dict["Signal_NonResonant"] = [
     'GluGluToHHTo2B2VTo2L2Nu_node_'
 ]
 # Number of samples used as basis for the reweighting
-number_of_bases = 11
+number_of_bases = 14
 

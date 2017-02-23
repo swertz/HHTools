@@ -4,65 +4,51 @@
 #'DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_extended_ext0_plus_ext1_*_histos.root':
 #  type: mc         
 #  group: DY        
-#  order: 7         
 #                   
 #'DYJetsToLL_M-50_HT-100to200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_*_histos.root':
 #  type: mc         
 #  group: DY        
-#  order: 7         
 #                   
 #'DYJetsToLL_M-50_HT-200to400_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_*_histos.root':
 #  type: mc         
 #  group: DY        
-#  order: 7         
 #                   
 #'DYJetsToLL_M-50_HT-400to600_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_extended_ext0_plus_ext1_*_histos.root':
 #  type: mc         
 #  group: DY        
-#  order: 7         
 #                   
 #'DYJetsToLL_M-50_HT-600toInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_extended_ext0_plus_ext1_*_histos.root':
 #  type: mc
 #  group: DY
-#  order: 7
 #
 ##'DYJetsToLL_M-5to50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_*_histos.root':
 ##  type: mc
-##  group: DY
-##  order: 7
 #
 #'DYJetsToLL_M-5to50_HT-100to200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_extended_ext0_plus_ext1_*_histos.root':
 #  type: mc
 #  group: DY
-#  order: 7
 #
 #'DYJetsToLL_M-5to50_HT-200to400_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_*_histos.root':
 #  type: mc
 #  group: DY
-#  order: 7
 #
 #'DYJetsToLL_M-5to50_HT-400to600_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_*_histos.root':
 #  type: mc
 #  group: DY
-#  order: 7
 #
 #'DYJetsToLL_M-5to50_HT-600toInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_extended_ext0_plus_ext1_*_histos.root':
 #  type: mc
 #  group: DY
-#  order: 7
   
 # NLO
 'DYJetsToLL_M-10to50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_*_histos.root':
   type: mc
   group: DY
-  order: 7
 
-'DYToLL_*_13TeV-amcatnloFXFX-pythia8_*_histos.root':
+'DYToLL_?J_13TeV-amcatnloFXFX-pythia8_*_histos.root':
   type: mc
   group: DY
-  order: 7
 
 #'DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_*_histos.root':
 #  type: mc
 #  group: DY
-#  order: 7

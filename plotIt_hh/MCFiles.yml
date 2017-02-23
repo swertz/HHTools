@@ -1,349 +1,273 @@
-# HIGGS
-
-'VBFHToBB_M-125_13TeV_powheg_pythia8_weightfix_*_histos.root':
-  type: mc
-  group: Higgs
-  order: 1
-  yields-group: 'Higgs VBF'
-
-'VBFHToWWTo2L2Nu_M125_13TeV_powheg_JHUgen_pythia8_*_histos.root':
-  type: mc
-  group: Higgs
-  order: 1
-  yields-group: 'Higgs VBF'
-
-'GluGluHToBB_M125_13TeV_powheg_pythia8_*_histos.root':
-  type: mc
-  group: Higgs
-  order: 1
-  yields-group: 'Higgs GF'
-
-'GluGluHToWWTo2L2Nu_M125_13TeV_powheg_JHUgen_pythia8_*_histos.root':
-  type: mc
-  group: Higgs
-  order: 1
-  yields-group: 'Higgs GF'
-
-'GluGluZH_HToWWTo2L2Nu_ZTo2L_M125_13TeV_powheg_pythia8_*_histos.root':
-  type: mc
-  group: Higgs
-  order: 1
-  yields-group: 'Higgs ZH'
-
-'ggZH_HToBB_ZToLL_M125_13TeV_powheg_pythia8_*_histos.root':
-  type: mc
-  group: Higgs
-  order: 1
-  yields-group: 'Higgs ZH'
-
-'ggZH_HToBB_ZToNuNu_M125_13TeV_powheg_pythia8_*_histos.root':
-  type: mc
-  group: Higgs
-  order: 1
-  yields-group: 'Higgs ZH'
-
-'ZH_HToBB_ZToLL_M125_13TeV_powheg_pythia8_*_histos.root':
-  type: mc
-  group: Higgs
-  order: 1
-  yields-group: 'Higgs ZH'
-
-'HWminusJ_HToWW_M125_13TeV_powheg_pythia8_*_histos.root':
-  type: mc
-  group: Higgs
-  order: 1
-  yields-group: 'Higgs WH'
-
-'WminusH_HToBB_WToLNu_M125_13TeV_powheg_pythia8_*_histos.root':
-  type: mc
-  group: Higgs
-  order: 1
-  yields-group: 'Higgs WH'
-
-'WplusH_HToBB_WToLNu_M125_13TeV_powheg_pythia8_*_histos.root':
-  type: mc
-  group: Higgs
-  order: 1
-  yields-group: 'Higgs WH'
-                    
-'HWplusJ_HToWW_M125_13TeV_powheg_pythia8_*_histos.root':
-  type: mc          
-  group: Higgs      
-  order: 1          
-  yields-group: 'Higgs WH'
-                    
-'HZJ_HToWW_M125_13TeV_powheg_pythia8_*_histos.root':
-  type: mc          
-  group: Higgs      
-  order: 1          
-  yields-group: 'Higgs ZH'
-                    
-'bbHToBB_M-125_4FS_yb2_13TeV_amcatnlo_*_histos.root':
-  type: mc          
-  group: Higgs      
-  order: 1          
-  yields-group: 'Higgs bbH'
-                    
-'bbHToBB_M-125_4FS_ybyt_13TeV_amcatnlo_*_histos.root':
-  type: mc          
-  group: Higgs      
-  order: 1          
-  yields-group: 'Higgs bbH'
-                    
-#'bbHToWWTo2L2Nu_M-125_4FS_yb2_13TeV_amcatnlo_*_histos.root':
-#  type: mc         
-#  group: Higgs     
-#  order: 1         
-#  yields-group: 'Higgs bbH'
-#                   
-#'bbHToWWTo2L2Nu_M-125_4FS_ybyt_13TeV_amcatnlo_*_histos.root':
-#  type: mc         
-#  group: Higgs     
-#  order: 1         
-#  yields-group: 'Higgs bbH'
-                    
-'ttHToNonbb_M125_*13TeV_powheg_pythia8_*_histos.root':
-  type: mc          
-  group: Higgs      
-  order: 1          
-  yields-group: 'Higgs ttH'
-                    
-'ttHTobb_M125_*13TeV_powheg_pythia8_*_histos.root':
-  type: mc          
-  group: Higgs      
-  order: 1          
-  yields-group: 'Higgs ttH'
-                    
-## TTV              
-                    
-'TTWJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-madspin-pythia8_*_histos.root':
-  type: mc          
-  group: ttV        
-  order: 2          
-                    
-'TTWJetsToQQ_TuneCUETP8M1_13TeV-amcatnloFXFX-madspin-pythia8_*_histos.root':
-  type: mc          
-  group: ttV        
-  order: 2          
-                    
-'TTZToLLNuNu_M-10_TuneCUETP8M1_13TeV-amcatnlo-pythia8_*_histos.root':
-  type: mc          
-  group: ttV        
-  order: 2          
-                    
-'TTZToQQ_TuneCUETP8M1_13TeV-amcatnlo-pythia8_*_histos.root':
-  type: mc          
-  group: ttV        
-  order: 2          
-                    
-## VV, VVV          
-                    
-##'VVTo2L2Nu_13TeV_amcatnloFXFX_madspin_pythia8_*_histos.root':
-##  type: mc        
-##  group: VV       
-##  order: 3        
-##                  
-'ZZTo2L2Q_13TeV_amcatnloFXFX_madspin_pythia8_*_histos.root':
-  type: mc          
-  group: VV         
-  order: 3          
-                    
-#'ZZTo2L2Nu_13TeV_powheg_pythia8_*_histos.root':
-#  type: mc         
-#  group: VV        
-#  order: 3         
-                    
-'ZZTo4L_13TeV_powheg_pythia8_*_histos.root':
-  type: mc          
-  group: VV         
-  order: 3          
-                    
-'WZTo1L3Nu_13TeV_amcatnloFXFX_madspin_pythia8_*_histos.root':
-  type: mc          
-  group: VV         
-  order: 3          
-                    
-'WZTo1L1Nu2Q_13TeV_amcatnloFXFX_madspin_pythia8_*_histos.root':
-  type: mc          
-  group: VV         
-  order: 3          
-                    
-#'WZTo2L2Q_13TeV_amcatnloFXFX_madspin_pythia8_*_histos.root':
-#  type: mc          
-#  group: VV         
-#  order: 3          
-                    
-#'WZTo3LNu_TuneCUETP8M1_13TeV-powheg-pythia8_*_histos.root':
-#  type: mc          
-#  group: VV         
-#  order: 3          
-                    
-'WWTo2L2Nu_13TeV-powheg_*_histos.root':
-  type: mc          
-  group: VV         
-  order: 3          
-                    
-'WWToLNuQQ_13TeV-powheg_*_histos.root':
-  type: mc          
-  group: VV         
-  order: 3          
-                    
-'WZZ_*_histos.root':
-  type: mc          
-  group: VV         
-  order: 3          
-                    
-'WWW_*_histos.root':
-  type: mc          
-  group: VV         
-  order: 3          
-                    
-'WWZ_*_histos.root':
-  type: mc          
-  group: VV         
-  order: 3          
-                    
-'ZZZ_*_histos.root':
-  type: mc          
-  group: VV         
-  order: 3          
-                    
-## Single top       
-                    
-'ST_s-channel_4f_leptonDecays_13TeV-amcatnlo_*_histos.root':
-  type: mc          
-  group: t          
-  order: 5          
-                    
-'ST_t-channel_*4f_*_13TeV*_histos.root':
-  type: mc          
-  group: t          
-  order: 5          
-                    
+## HIGGS
+#
+#'VBFHToBB_M-125_13TeV_powheg_pythia8_weightfix_*_histos.root':
+#  type: mc
+#  group: Higgs
+#  yields-group: 'Higgs VBF'
+#
+#'VBFHToWWTo2L2Nu_M125_13TeV_powheg_JHUgen_pythia8_*_histos.root':
+#  type: mc
+#  group: Higgs
+#  yields-group: 'Higgs VBF'
+#
+#'GluGluHToBB_M125_13TeV_powheg_pythia8_*_histos.root':
+#  type: mc
+#  group: Higgs
+#  yields-group: 'Higgs GF'
+#
+#'GluGluHToWWTo2L2Nu_M125_13TeV_powheg_JHUgen_pythia8_*_histos.root':
+#  type: mc
+#  group: Higgs
+#    yields-group: 'Higgs GF'
+#
+#'GluGluZH_HToWWTo2L2Nu_ZTo2L_M125_13TeV_powheg_pythia8_*_histos.root':
+#  type: mc
+#  group: Higgs
+#    yields-group: 'Higgs ZH'
+#
+#'ggZH_HToBB_ZToLL_M125_13TeV_powheg_pythia8_*_histos.root':
+#  type: mc
+#  group: Higgs
+#    yields-group: 'Higgs ZH'
+#
+#'ggZH_HToBB_ZToNuNu_M125_13TeV_powheg_pythia8_*_histos.root':
+#  type: mc
+#  group: Higgs
+#    yields-group: 'Higgs ZH'
+#
+#'ZH_HToBB_ZToLL_M125_13TeV_powheg_pythia8_*_histos.root':
+#  type: mc
+#  group: Higgs
+#    yields-group: 'Higgs ZH'
+#
+#'HWminusJ_HToWW_M125_13TeV_powheg_pythia8_*_histos.root':
+#  type: mc
+#  group: Higgs
+#    yields-group: 'Higgs WH'
+#
+#'WminusH_HToBB_WToLNu_M125_13TeV_powheg_pythia8_*_histos.root':
+#  type: mc
+#  group: Higgs
+#    yields-group: 'Higgs WH'
+#
+#'WplusH_HToBB_WToLNu_M125_13TeV_powheg_pythia8_*_histos.root':
+#  type: mc
+#  group: Higgs
+#    yields-group: 'Higgs WH'
+#
+#'HWplusJ_HToWW_M125_13TeV_powheg_pythia8_*_histos.root':
+#  type: mc
+#  group: Higgs
+#    yields-group: 'Higgs WH'
+#
+#'HZJ_HToWW_M125_13TeV_powheg_pythia8_*_histos.root':
+#  type: mc
+#  group: Higgs
+#    yields-group: 'Higgs ZH'
+#
+#'bbHToBB_M-125_4FS_yb2_13TeV_amcatnlo_*_histos.root':
+#  type: mc
+#  group: Higgs
+#    yields-group: 'Higgs bbH'
+#
+#'bbHToBB_M-125_4FS_ybyt_13TeV_amcatnlo_*_histos.root':
+#  type: mc
+#  group: Higgs
+#    yields-group: 'Higgs bbH'
+#
+##'bbHToWWTo2L2Nu_M-125_4FS_yb2_13TeV_amcatnlo_*_histos.root':
+##  type: mc
+##  group: Higgs
+##  #  yields-group: 'Higgs bbH'
+##
+##'bbHToWWTo2L2Nu_M-125_4FS_ybyt_13TeV_amcatnlo_*_histos.root':
+##  type: mc
+##  group: Higgs
+##  #  yields-group: 'Higgs bbH'
+#
+#'ttHToNonbb_M125_*13TeV_powheg_pythia8_*_histos.root':
+#  type: mc
+#  group: Higgs
+#    yields-group: 'Higgs ttH'
+#
+#'ttHTobb_M125_*13TeV_powheg_pythia8_*_histos.root':
+#  type: mc
+#  group: Higgs
+#    yields-group: 'Higgs ttH'
+#
+### TTV
+#
+#'TTWJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-madspin-pythia8_*_histos.root':
+#  type: mc
+#  group: ttV
+#  
+#'TTWJetsToQQ_TuneCUETP8M1_13TeV-amcatnloFXFX-madspin-pythia8_*_histos.root':
+#  type: mc
+#  group: ttV
+#  
+#'TTZToLLNuNu_M-10_TuneCUETP8M1_13TeV-amcatnlo-pythia8_*_histos.root':
+#  type: mc
+#  group: ttV
+#  
+#'TTZToQQ_TuneCUETP8M1_13TeV-amcatnlo-pythia8_*_histos.root':
+#  type: mc
+#  group: ttV
+#  
+### VV, VVV
+#
+###'VVTo2L2Nu_13TeV_amcatnloFXFX_madspin_pythia8_*_histos.root':
+###  type: mc
+###  group: VV
+###  ##
+#'ZZTo2L2Q_13TeV_amcatnloFXFX_madspin_pythia8_*_histos.root':
+#  type: mc
+#  group: VV
+#  
+##'ZZTo2L2Nu_13TeV_powheg_pythia8_*_histos.root':
+##  type: mc
+##  group: VV
+##  
+#'ZZTo4L_13TeV_powheg_pythia8_*_histos.root':
+#  type: mc
+#  group: VV
+#  
+#'WZTo1L3Nu_13TeV_amcatnloFXFX_madspin_pythia8_*_histos.root':
+#  type: mc
+#  group: VV
+#  
+#'WZTo1L1Nu2Q_13TeV_amcatnloFXFX_madspin_pythia8_*_histos.root':
+#  type: mc
+#  group: VV
+#  
+##'WZTo2L2Q_13TeV_amcatnloFXFX_madspin_pythia8_*_histos.root':
+##  type: mc
+##  group: VV
+##  
+##'WZTo3LNu_TuneCUETP8M1_13TeV-powheg-pythia8_*_histos.root':
+##  type: mc
+##  group: VV
+##  
+#'WWTo2L2Nu_13TeV-powheg_*_histos.root':
+#  type: mc
+#  group: VV
+#  
+#'WWToLNuQQ_13TeV-powheg_*_histos.root':
+#  type: mc
+#  group: VV
+#  
+#'WZZ_*_histos.root':
+#  type: mc
+#  group: VV
+#  
+#'WWW_*_histos.root':
+#  type: mc
+#  group: VV
+#  
+#'WWZ_*_histos.root':
+#  type: mc
+#  group: VV
+#  
+#'ZZZ_*_histos.root':
+#  type: mc
+#  group: VV
+#  
+### Single top
+#
+#'ST_s-channel_4f_leptonDecays_13TeV-amcatnlo_*_histos.root':
+#  type: mc
+#  group: t
+#  
+#'ST_t-channel_*4f_*_13TeV*_histos.root':
+#  type: mc
+#  group: t
+  
 'ST_tW_antitop_5f_*_13TeV-powheg_*_histos.root':
-  type: mc          
-  group: t          
-  order: 5          
-                    
+  type: mc
+  group: t
+  
 'ST_tW_top_5f_*_13TeV-powheg_*_histos.root':
-  type: mc          
-  group: t          
-  order: 6          
-                    
-# TT                
-                    
+  type: mc
+  group: t
+  
+# TT
+
 #'TTJets_TuneCUETP8M1_amcatnloFXFX_25ns_*_histos.root':
-#  type: mc         
+#  type: mc
 #  legend: ' t#bar{t} aMC'
-#  group: tt        
-#  order: 8         
-                    
+#  group: tt
+#  
 #'TT_TuneCUETP8M1_13TeV-powheg-pythia8_*_histos.root':
-  #type: mc         
-  #group: tt        
-  #order: 20        
-                    
+  #type: mc
+  #group: tt
+  #order: 20
+
 #'TT_FL_TuneCUETP8M1_13TeV-powheg-pythia8_*_histos.root':
-  #type: mc         
-  #group: tt        
-  #order: 8         
-#'TT_SL_TuneCUETP8M1_13TeV-powheg-pythia8_*_histos.root':
-  #type: mc         
-  #group: tt        
-  #order: 8         
-#'TT_FH_TuneCUETP8M1_13TeV-powheg-pythia8_*_histos.root':
-  #type: mc         
-  #group: tt        
-  #order: 8         
-                    
+  #type: mc
+  #group: tt
+  ##'TT_SL_TuneCUETP8M1_13TeV-powheg-pythia8_*_histos.root':
+  #type: mc
+  #group: tt
+  ##'TT_FH_TuneCUETP8M1_13TeV-powheg-pythia8_*_histos.root':
+  #type: mc
+  #group: tt
+
 'TTTo2L2Nu_13TeV-powheg_*_histos.root':
-  type: mc          
-  group: tt         
-  scale: 1.1
+  type: mc
+  group: tt
 
 ## QCD and W+jets
 #
 ##'QCD_Pt-20toInf_MuEnrichedPt15_TuneCUETP8M1_13TeV_pythia8_*_histos.root':
 ##  type: mc
 ##  group: Other
-##  order: 0
-#
-#'QCD_Pt-15to20_EMEnriched_TuneCUETP8M1_13TeV_pythia8_*_histos.root':
+###'QCD_Pt-15to20_EMEnriched_TuneCUETP8M1_13TeV_pythia8_*_histos.root':
 #  type: mc
 #  group: Other
-#  order: 0
-#
-#'QCD_Pt-20to30_EMEnriched_TuneCUETP8M1_13TeV_pythia8_*_histos.root':
+##'QCD_Pt-20to30_EMEnriched_TuneCUETP8M1_13TeV_pythia8_*_histos.root':
 #  type: mc
 #  group: Other
-#  order: 0
-#
-##'QCD_Pt-30to50_EMEnriched_TuneCUETP8M1_13TeV_pythia8_*_histos.root':
+###'QCD_Pt-30to50_EMEnriched_TuneCUETP8M1_13TeV_pythia8_*_histos.root':
 ##  type: mc
 ##  group: Other
-##  order: 0
-#
-#'QCD_Pt-50to80_EMEnriched_TuneCUETP8M1_13TeV_pythia8_*_histos.root':
+###'QCD_Pt-50to80_EMEnriched_TuneCUETP8M1_13TeV_pythia8_*_histos.root':
 #  type: mc
 #  group: Other
-#  order: 0
-#
-#'QCD_Pt-80to120_EMEnriched_TuneCUETP8M1_13TeV_pythia8_*_histos.root':
+##'QCD_Pt-80to120_EMEnriched_TuneCUETP8M1_13TeV_pythia8_*_histos.root':
 #  type: mc
 #  group: Other
-#  order: 0
-#
-#'QCD_Pt-120to170_EMEnriched_TuneCUETP8M1_13TeV_pythia8_*_histos.root':
+##'QCD_Pt-120to170_EMEnriched_TuneCUETP8M1_13TeV_pythia8_*_histos.root':
 #  type: mc
 #  group: Other
-#  order: 0
-#
-#'QCD_Pt-170to300_EMEnriched_TuneCUETP8M1_13TeV_pythia8_*_histos.root':
+##'QCD_Pt-170to300_EMEnriched_TuneCUETP8M1_13TeV_pythia8_*_histos.root':
 #  type: mc
 #  group: Other
-#  order: 0
-#
-#'QCD_Pt-300toInf_EMEnriched_TuneCUETP8M1_13TeV_pythia8_*_histos.root':
+##'QCD_Pt-300toInf_EMEnriched_TuneCUETP8M1_13TeV_pythia8_*_histos.root':
 #  type: mc
 #  group: Other
-#  order: 0
-
+#  
 #'WJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_*_histos.root':
 #  type: mc
 #  group: Other
-#  order: 0
-
+#  
 #'WJetsToLNu_HT-100To200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_*_histos.root':
   #type: mc
   #group: Other
-  #order: 0
-
 #'WJetsToLNu_HT-200To400_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_*_histos.root':
   #type: mc
   #group: Other
-  #order: 0
-
 #'WJetsToLNu_HT-400To600_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_*_histos.root':
   #type: mc
   #group: Other
-  #order: 0
-
 #'WJetsToLNu_HT-600To800_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_*_histos.root':
   #type: mc
   #group: Other
-  #order: 0
-
 #'WJetsToLNu_HT-800To1200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_*_histos.root':
   #type: mc
   #group: Other
-  #order: 0
-
 #'WJetsToLNu_HT-1200To2500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_*_histos.root':
   #type: mc
   #group: Other
-  #order: 0
-
 #'WJetsToLNu_HT-2500ToInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_*_histos.root':
   #type: mc
   #group: Other
-  #order: 0
+
