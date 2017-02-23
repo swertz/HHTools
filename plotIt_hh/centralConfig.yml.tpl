@@ -6,7 +6,7 @@ extra-label: "Preliminary"
 
 root: '{root}'
 
-luminosity: 36809  # according to brilcalc (some sub-percent difference between channels)
+luminosity: 35867  # according to brilcalc (some sub-percent difference between channels)
 luminosity-error: 0.
 blinded-range-fill-color: "16" #"#29556270"
 blinded-range-fill-style: 3004

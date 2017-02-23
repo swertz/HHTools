@@ -14,8 +14,9 @@ legend:
   {legend}
 
 systematics:
-  - lumi: 1.062
+  - lumi: 1.026
   - pu
+  - elreco
   - elidiso
   - muiso
   - muid
@@ -23,7 +24,11 @@ systematics:
   - jec
   - jer 
   - trigeff
-  #- scaleUncorr
+  - scaleUncorr
   - pdf
   - dyStat
   - dyScaleUncorr
+  - hdamp
+  #- pdfqq
+  #- pdfgg
+  #- pdfqg
