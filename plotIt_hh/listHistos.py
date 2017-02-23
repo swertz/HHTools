@@ -32,7 +32,7 @@ if len(root_files) == 0:
 
 fileName = ""
 for file in root_files:
-    if "DY" not in file and "HHTo2B2VTo2L2Nu" not in file:
+    if "dy" not in os.path.basename(file).lower() and "HHTo2B2VTo2L2Nu" not in file:
         fileName = file
         break
 
@@ -98,7 +98,7 @@ def should_be_blind(name):
         return False
     if "nobtag" in name:
         return False
-    if "inverted_mll_cut" in name or "no_cut" in name:
+    if not "mll_cut" in name or "inverted" in name:
         return False
     return True
 
@@ -121,7 +121,7 @@ for key in keys:
         # skip 2D histos
         if "_vs_" in key_name and "flat" not in key_name: continue
         
-        if "All" in key_name: continue
+        #if "All" in key_name: continue
 
         if args.lljj and 'btagM' in key_name: continue
         if args.llbb and 'btagM' not in key_name: continue
@@ -307,8 +307,12 @@ for key in keys:
         elif "ll_M_" in key_name:
             plot['x-axis'] = "m_{ll} (GeV)"
             plot.update(defaultStyle_events_per_gev)
-            if "mll_cut" in key_name:
-                plot['x-axis-range'] = [12, 76]
+            #if "inverted_mll_cut" in key_name:
+            #    plot['x-axis-range'] = [76, 252]
+            #elif "mll_cut" in key_name:
+            #    plot['x-axis-range'] = [12, 76]
+            #elif "mll_peak" in key_name:
+            #    plot['x-axis-range'] = [76, 106]
             
             #### Do the yields here
             plot['for-yields'] = True
@@ -322,6 +326,8 @@ for key in keys:
                 stage = ", inverted mll cut"
             elif "mll_cut" in key_name:
                 stage = ", mll cut"
+            elif "mll_peak" in key_name:
+                stage = ", mll peak"
             plot['yields-title'] = get_flavour(key_name) + ", " + btag_stage + stage
             if args.yields:
                 plots['override'] = True

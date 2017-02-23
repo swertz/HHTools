@@ -81,17 +81,17 @@ tree["branches"] = []
 basePlotter = None
 
 if do_lljj:
-    basePlotter = BasePlotter(baseObjectName="hh_llmetjj_HWWleptons_nobtag_cmva", btagWP_str="nobtag", objects="nominal")
+    basePlotter = BasePlotter(btag=False)
     
     if do_llbb:
-        llbb_temp = BasePlotter(baseObjectName="hh_llmetjj_HWWleptons_btagM_cmva", btagWP_str="medium", objects="nominal")
+        llbb_temp = BasePlotter(btag=True)
         tree["branches"].append({
             'name': 'is_llbb',
             'variable': llbb_temp.joinCuts(llbb_temp.sanityCheck, llbb_temp.dict_cat_cut[flavour])
             })
 
-elif basePlotter is None:
-    basePlotter = BasePlotter(baseObjectName="hh_llmetjj_HWWleptons_btagM_cmva", btagWP_str="medium", objects="nominal")
+else:
+    basePlotter = BasePlotter(btag=True)
 
 tree["cut"] = basePlotter.joinCuts(basePlotter.sanityCheck, basePlotter.dict_cat_cut[flavour])
 

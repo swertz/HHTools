@@ -102,8 +102,8 @@ for key in keys:
         if "MuEl" in key_name:
             continue
         
-        #if not 'no_cut' in key_name:
-        #    continue
+        if not 'no_cut' in key_name:
+            continue
 
         if not 'btagM' in key_name:
             continue
@@ -116,7 +116,7 @@ for key in keys:
         alreadyIn.append(key_name)
         plot = {
                 'x-axis': key_name,
-                #'normalized': True,
+                'normalized': True,
                 'rename': [
                     {'from': '(.*)(_log.)?\.(.*)', 'to': '\\1_DY_btag_comparison\\2.\\3'},
                     {'from': '_nobtag', 'to': ''}

@@ -84,6 +84,8 @@ for_signal = (config['sample_type'] == 'Signal')
 check_overlap([for_data, for_MC, for_signal])
 
 use_syst = get_cfg('syst')
+syst_split_jec = get_cfg('syst_split_jec', False)
+syst_split_pdf = get_cfg('syst_split_pdf', False)
 
 lljj_categories = get_cfg('lljj_categories', ['MuMu', 'MuEl', 'ElEl'])
 llbb_categories = get_cfg('llbb_categories', ['MuMu', 'MuEl', 'ElEl'])
@@ -91,7 +93,7 @@ lljj_stages = get_cfg('lljj_stages', ['no_cut', 'mll_cut'])
 llbb_stages = get_cfg('llbb_stages', ['no_cut', 'mll_cut'])
 lljj_plot_families = get_cfg('lljj_plots', [])
 llbb_plot_families = get_cfg('llbb_plots', [])
-skim_MuEl_stages = get_cfg('skim_MuEl_stages', False) # MuEl category: do only "no_cut" for lljj, and only "mll_cut" for llbb
+skim_MuEl_stages = get_cfg('skim_MuEl_stages', False) # MuEl category: do only only "mll_cut" for llbb
 
 # Ask Factories to regroup "similar" plots
 optimize_plots = True
@@ -133,11 +135,13 @@ plots_lljj = []
 if "basic" in lljj_plot_families:
     plots_lljj += ["mjj", "basic", "nn_inputs", "dy_bdt_inputs"]
 if "other" in lljj_plot_families:
-    plots_lljj += ["cmva", "evt"]
+    plots_lljj += ["other"]
 if "dy_bdt" in lljj_plot_families:
     plots_lljj += ["dy_rwgt_bdt"]
 if "dy_bdt_flavour" in lljj_plot_families:
     plots_lljj += ["dy_rwgt_bdt_flavour"]
+if "btag_efficiencies" in lljj_plot_families:
+    plots_lljj += ["btag_efficiency_2d"]
 if "weights" in lljj_plot_families:
     plots_lljj += ["llidisoWeight", "trigeffWeight", "puWeight", "DYNobtagToBTagMWeight"]
 
@@ -146,9 +150,9 @@ weights_llbb = ['trigeff', 'llidiso', 'pu', 'jjbtag_heavy', 'jjbtag_light']
 
 plots_llbb = []
 if "basic" in llbb_plot_families:
-    plots_llbb += ["mjj", "basic", "cmva", "nn_inputs", "evt", "dy_bdt_inputs"]
+    plots_llbb += ["mjj", "basic", "nn_inputs", "dy_bdt_inputs"]
 if "other" in llbb_plot_families:
-    plots_llbb += ["cmva", "evt"]
+    plots_llbb += ["other"]
 if "dy_bdt" in llbb_plot_families:
     plots_llbb += ["dy_rwgt_bdt"]
 if "nn" in llbb_plot_families:
@@ -168,7 +172,7 @@ if not use_syst:
     # No systematics
     systematics = { "modifObjects": ["nominal"] }
 else:
-    # All systematics
+    # Main systematics
     systematics = { 
             "modifObjects": [
                 "nominal",
@@ -177,6 +181,7 @@ else:
                 ], 
             "SF": [
                 "elidisoup", "elidisodown",
+                #"elrecoup", "elrecodown",
                 "muidup", "muiddown",
                 "muisoup", "muisodown",
                 "jjbtaglightup", "jjbtaglightdown",
@@ -184,12 +189,59 @@ else:
                 "puup", "pudown",
                 "trigeffup", "trigeffdown",
                 "pdfup", "pdfdown",
+                #"hdampup", "hdampdown",
                 "dyStatup", "dyStatdown"
                 ]
             }
+    # Scale uncertainties
     for i in range(6):
         systematics["SF"].append("scaleUncorr{}".format(i))
         systematics["SF"].append("dyScaleUncorr{}".format(i))
+
+    # All JEC sources, if asked
+    if syst_split_jec:
+        #systematics["modifObjects"].remove("jecup")
+        #systematics["modifObjects"].remove("jecdown")
+        split_jec_sources = [
+                "AbsoluteFlavMap",
+                "AbsoluteMPFBias",
+                "AbsoluteScale",
+                "AbsoluteStat",
+                "FlavorQCD",
+                "Fragmentation",
+                "PileUpDataMC",
+                "PileUpPtBB",
+                "PileUpPtEC1",
+                "PileUpPtEC2",
+                "PileUpPtHF",
+                "PileUpPtRef",
+                "RelativeBal",
+                "RelativeFSR",
+                "RelativeJEREC1",
+                "RelativeJEREC2",
+                "RelativeJERHF",
+                "RelativePtBB",
+                "RelativePtEC1",
+                "RelativePtEC2",
+                "RelativePtHF",
+                "RelativeStatEC",
+                "RelativeStatFSR",
+                "RelativeStatHF",
+                "SinglePionECAL",
+                "SinglePionHCAL",
+                "TimePtEta"]
+        for _s in split_jec_sources:
+            systematics["modifObjects"].append("jec" + _s.lower() + "up")
+            systematics["modifObjects"].append("jec" + _s.lower() + "down")
+
+    # PDF split by initial state, if asked
+    if syst_split_pdf:
+        #systematics["SF"].remove("pdfup")
+        #systematics["SF"].remove("pdfdown")
+        for _s in ["qq", "gg", "qg"]:
+            systematics["SF"].append("pdf" + _s + "up")
+            systematics["SF"].append("pdf" + _s + "down")
+
 
 # Systematic uncertainties: depends on the stage on what we're running on...
 def allowed_systematics_llbb(syst):
@@ -243,7 +295,7 @@ for systematicType in systematics.keys():
         ###### llbb stage ######
         if allowed_systematics_llbb(systematic):
             
-            basePlotter_llbb = BasePlotter(baseObjectName = "hh_llmetjj_HWWleptons_btagM_cmva", btagWP_str = 'medium', objects = objects)
+            basePlotter_llbb = BasePlotter(btag=True, objects=objects)
  
             for stage in llbb_stages:
                 this_categories = llbb_categories[:]
@@ -258,14 +310,12 @@ for systematicType in systematics.keys():
 
 
         ##### lljj stage ###### 
-        basePlotter_lljj = BasePlotter(baseObjectName = "hh_llmetjj_HWWleptons_nobtag_cmva", btagWP_str = 'nobtag', objects = objects)
+        basePlotter_lljj = BasePlotter(btag=False, objects=objects)
         
         if allowed_systematics_lljj(systematic):
  
             for stage in lljj_stages:
                 this_categories = lljj_categories[:]
-                if skim_MuEl_stages and stage != "no_cut" and "MuEl" in this_categories:
-                    this_categories.remove("MuEl")
                 
                 plots.extend(basePlotter_lljj.generatePlots(this_categories, stage, systematic=systematic, weights=weights_lljj, requested_plots=plots_lljj))
 
@@ -280,13 +330,6 @@ for systematicType in systematics.keys():
                 
                 plots.extend(basePlotter_lljj.generatePlots(this_categories, stage, systematic=systematic, weights=weights_lljj + ['dy_nobtag_to_btagM_BDT'], requested_plots=plots_llbb, extraString='_with_nobtag_to_btagM_reweighting', allowWeightedData=True))
         
-
-extra_branches = [
-        # Needed for the computation of HT,
-        # In case the branches are not already read
-        "hh_jets",
-        "hh_leptons",
-    ]
 
 #for plot in plots:
 #    print plot

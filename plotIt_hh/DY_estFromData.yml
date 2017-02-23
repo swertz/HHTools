@@ -1,19 +1,5 @@
 # Estimated from Data (other background MC subtracted)
-#'dyEstimation.root':
-#  type: mc
-#  group: DY
-  #rename:
-  #  - from: "btagM"
-  #    to: "nobtag"
-  #  - from: "cut"
-  #    to: "cut_with_nobtag_to_btagM_reweighting"
-
-# Estimated from Data (other background MC subtracted) -- with systematics
 'dyEstimation.root':
   type: mc
   group: DY
-  #rename:
-  #  - from: "btagM"
-  #    to: "nobtag"
-  #  - from: "cut"
-  #    to: "cut_with_nobtag_to_btagM_reweighting"
+  #scale: 0.85
