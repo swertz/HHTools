@@ -18,21 +18,54 @@ sys.path.append(os.path.join(CMSSW_BASE, 'src', 'cp3_llbb', 'CommonTools', 'tool
 from drawCanvas import drawTGraph
 
 
-totalName = "DY_BDT_flat_All_hh_llmetjj_HWWleptons_nobtag_cmva_no_cut"
-passNameTemplate = "DY_BDT_flav_{}{}_All_hh_llmetjj_HWWleptons_nobtag_cmva_no_cut"
+totalName = "DY_BDT_flat_SF_hh_llmetjj_HWWleptons_nobtag_cmva_no_cut"
+passNameTemplate = "DY_BDT_flav_{}{}_SF_hh_llmetjj_HWWleptons_nobtag_cmva_no_cut"
 
 parser = argparse.ArgumentParser(description='Compute different flavour fractions from histograms', formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
 parser.add_argument('-i', '--input', nargs='+', help='Input ROOT files (plotter output AFTER hadd)', required=True)
 parser.add_argument('-o', '--output', help='Output', required=True)
-parser.add_argument('-s', '--scale', action='store_true', help='Scale by process XS/sum(weights). Is most likely already done if it comes from the plotter')
 parser.add_argument('-t', '--total', default=totalName, help='Name of the histogram for all events (inclusive)')
 parser.add_argument('-p', '--passed', default=passNameTemplate, help='Name of the "pass" histogram for the flavour fractions (with two "{}" being replaced by the flavours)')
 parser.add_argument('-c', '--compare', help="If specified, create comparison plots of the efficiencies in the given folder")
 
 options = parser.parse_args()
 
-baseSystematics = ["elidiso", "muid", "muiso", "pu", "trigeff", "pdf", "jec", "jer"]
+baseSystematics = ["pu", "pdf", "jec", "jer"]
+#baseSystematics = ["elidiso", "muid", "muiso", "pu", "trigeff", "pdf", "jec", "jer"]
+for _s in ["qq", "gg", "qg"]:
+    baseSystematics.append("pdf" + _s)
+split_jec_sources = [
+                "AbsoluteFlavMap",
+                "AbsoluteMPFBias",
+                "AbsoluteScale",
+                "AbsoluteStat",
+                "FlavorQCD",
+                "Fragmentation",
+                "PileUpDataMC",
+                "PileUpPtBB",
+                "PileUpPtEC1",
+                "PileUpPtEC2",
+                "PileUpPtHF",
+                "PileUpPtRef",
+                "RelativeBal",
+                "RelativeFSR",
+                "RelativeJEREC1",
+                "RelativeJEREC2",
+                "RelativeJERHF",
+                "RelativePtBB",
+                "RelativePtEC1",
+                "RelativePtEC2",
+                "RelativePtHF",
+                "RelativeStatEC",
+                "RelativeStatFSR",
+                "RelativeStatHF",
+                "SinglePionECAL",
+                "SinglePionHCAL",
+                "TimePtEta"]
+for _s in split_jec_sources:
+    baseSystematics.append("jec" + _s.lower())
+
 systematics = ["nominal"]
 for syst in baseSystematics:
     systematics.append(syst + "up")
@@ -90,21 +123,10 @@ for file in options.input:
     for syst in systematics:
         systString = getSystString(syst)
             
-        xs = 1.
-        wgt_sum = 1.
-        if options.scale:
-            try:
-                xs = r_file.Get("cross_section").GetVal()
-            except:
-                print "Did not find cross section, will use 1."
-            try:
-                wgt_sum = r_file.Get("event_weight_sum").GetVal()
-            except:
-                print "Did not find event weight sum, will use 1."
-            
         totalHist = r_file.Get(options.total + systString)
+        if not totalHist or not totalHist.InheritsFrom("TH1"):
+            continue
         totalHist.SetDirectory(0)
-        #totalHist.Scale(xs / wgt_sum)
         totalHistos["total_" + systString].append(totalHist)
         
         for flav1 in flavours:
@@ -112,7 +134,6 @@ for file in options.input:
                 name = "{}{}_frac{}".format(flav1, flav2, systString)
                 
                 passHist = r_file.Get(options.passed.format(flav1, flav2) + systString)
-                #passHist.Scale(xs / wgt_sum)
                 passHist.SetDirectory(0)
 
                 passHistos[name].append(passHist)
@@ -157,7 +178,7 @@ if options.compare is not None:
             
             for syst in baseSystematics:    
                 graphs = {}
-                if "scale" in syst:
+                if "scaleUncorr" in syst or "dyScale" in syst:
                     graphs["nominal"] = flavourFractions[name].CreateGraph()
                     for i in range(6):
                         graphs[str(i)] = flavourFractions[name + "__" + syst + str(i)].CreateGraph()

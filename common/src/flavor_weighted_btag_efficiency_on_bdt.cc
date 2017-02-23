@@ -21,11 +21,7 @@ FWBTagEfficiencyOnBDT::FWBTagEfficiencyOnBDT(const std::string& btag_efficiencie
     for (const auto& flav: flavors) {
         for (const auto& syst: systematics_btag) {
             std::string name;
-            if (flav == 0) {
-                name = "mistagging_eff_on_light";
-            } else {
-                name = "btagging_eff_on_" + flavors_to_string[flav];
-            }
+            name = "btagging_eff_on_" + flavors_to_string[flav];
             if (syst != "nominal")
                 name += "__" + syst;
 

@@ -39,6 +39,8 @@ def drawEfficiency(obj):
     h.GetYaxis().SetTitle("|#eta|")
 
     c.SetLogx()
+    if "eff_on_q" in obj.GetName() or "eff_on_l" in obj.GetName() or "eff_on_g" in obj.GetName() or "eff_on_n" in obj.GetName():
+        c.SetLogz()
     h.SetContour(100)
     h.Draw("colz text err")
     c.SaveAs(obj.GetName() + ".pdf")

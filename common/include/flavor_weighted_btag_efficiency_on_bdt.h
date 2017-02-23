@@ -23,6 +23,7 @@
 #define BETA_PRIOR_ALPHA 1.0
 #define BETA_PRIOR_BETA 1.0
 #define DIRI_PRIOR_ALPHA 1.0
+//#define N_FLAV 5
 #define N_FLAV 3
 
 struct CacheKey {
@@ -133,19 +134,51 @@ class FWBTagEfficiencyOnBDT {
         
         std::unordered_map<CacheKey, double> m_cache;
 
+        // Regular
         std::vector<uint8_t> flavors {0, 4, 5};
-
         std::map<uint8_t, std::string> flavors_to_string {{0, "l"}, {4, "c"}, {5, "b"}};
+
+        // Split light
+        //std::vector<uint8_t> flavors {0, 1, 21, 4, 5};
+        //std::map<uint8_t, std::string> flavors_to_string {{0, "n"}, {1, "q"}, {21, "g"}, {4, "c"}, {5, "b"}};
 
         //std::vector<std::string> systematics { "nominal" };
         std::vector<std::string> systematics_btag { "nominal", 
             "puup", "pdfup", "jecup", "jerup",
             "pudown", "pdfdown", "jecdown", "jerdown",
-            "scaleUncorr0", "scaleUncorr1", "scaleUncorr2", "scaleUncorr3", "scaleUncorr4", "scaleUncorr5" };
-        std::vector<std::string> systematics_fractions { "nominal", 
-            "puup", "pdfup", "jecup", "jerup",
-            "pudown", "pdfdown", "jecdown", "jerdown",
-            "scaleUncorr0", "scaleUncorr1", "scaleUncorr2", "scaleUncorr3", "scaleUncorr4", "scaleUncorr5" };
+            "scaleUncorr0", "scaleUncorr1", "scaleUncorr2", "scaleUncorr3", "scaleUncorr4", "scaleUncorr5",
+            "jecabsoluteflavmapup", "jecabsoluteflavmapdown",
+            "jecabsolutempfbiasup", "jecabsolutempfbiasdown",
+            "jecabsolutescaleup",   "jecabsolutescaledown",
+            "jecabsolutestatup",    "jecabsolutestatdown",
+            "jecflavorqcdup",       "jecflavorqcddown",
+            "jecfragmentationup",   "jecfragmentationdown",
+            "jecpileupdatamcup",    "jecpileupdatamcdown",
+            "jecpileupptbbup",      "jecpileupptbbdown",
+            "jecpileupptec1up",     "jecpileupptec1down",
+            "jecpileupptec2up",     "jecpileupptec2down",
+            "jecpileuppthfup",      "jecpileuppthfdown",
+            "jecpileupptrefup",     "jecpileupptrefdown",
+            "jecrelativebalup",     "jecrelativebaldown",
+            "jecrelativefsrup",     "jecrelativefsrdown",
+            "jecrelativejerec1up",  "jecrelativejerec1down",
+            "jecrelativejerec2up",  "jecrelativejerec2down",
+            "jecrelativejerhfup",   "jecrelativejerhfdown",
+            "jecrelativeptbbup",    "jecrelativeptbbdown",
+            "jecrelativeptec1up",   "jecrelativeptec1down",
+            "jecrelativeptec2up",   "jecrelativeptec2down",
+            "jecrelativepthfup",    "jecrelativepthfdown",
+            "jecrelativestatecup",  "jecrelativestatecdown",
+            "jecrelativestatfsrup", "jecrelativestatfsrdown",
+            "jecrelativestathfup",  "jecrelativestathfdown",
+            "jecsinglepionecalup",  "jecsinglepionecaldown",
+            "jecsinglepionhcalup",  "jecsinglepionhcaldown",
+            "jectimeptetaup",       "jectimeptetadown",
+            "pdfqqup", "pdfqqdown",
+            "pdfggup", "pdfggdown",
+            "pdfqgup", "pdfqgdown"
+        };
+        std::vector<std::string> systematics_fractions = systematics_btag; 
 
         // Indexed as [pair(flav1, flav2)][syst]
         std::map<std::pair<uint8_t, uint8_t>, std::map<std::string, std::unique_ptr<TEfficiency>>> m_fractions;

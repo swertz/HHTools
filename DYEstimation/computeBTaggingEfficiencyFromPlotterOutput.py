@@ -18,21 +18,22 @@ sys.path.append(os.path.join(CMSSW_BASE, 'src', 'cp3_llbb', 'CommonTools', 'tool
 from drawCanvas import drawTGraph
 
 
-totalNameTemplate = "btag_efficiency_jet_{}_all_flav_{}_All_hh_llmetjj_HWWleptons_nobtag_cmva_no_cut"
-passNameTemplate = "btag_efficiency_jet_{}_tagged_flav_{}_All_hh_llmetjj_HWWleptons_nobtag_cmva_no_cut"
+totalNameTemplate = "btag_efficiency_jet_{}_all_flav_{}_SF_hh_llmetjj_HWWleptons_nobtag_cmva_no_cut"
+passNameTemplate = "btag_efficiency_jet_{}_tagged_flav_{}_SF_hh_llmetjj_HWWleptons_nobtag_cmva_no_cut"
 
 parser = argparse.ArgumentParser(description='Compute different flavour fractions from histograms', formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
 parser.add_argument('-i', '--input', nargs='+', help='Input ROOT files (plotter output AFTER hadd)', required=True)
 parser.add_argument('-o', '--output', help='Output', required=True)
-parser.add_argument('-t', '--total', default=totalName, help='Name of the histograms for untagged jets (with two "{}" being replaced by the jet number and the jet flavour')
-parser.add_argument('-t', '--tagged', default=passNameTemplate, help='Name of the histograms for tagged jets (with two "{}" being replaced by the jet number and the jet flavour)')
-parser.add_argument('-n', '--njets', default=4, help='Max. index of jet')
+parser.add_argument('-t', '--total', default=totalNameTemplate, help='Name of the histograms for untagged jets (with two "{}" being replaced by the jet number and the jet flavour')
+parser.add_argument('-p', '--passed', default=passNameTemplate, help='Name of the histograms for tagged jets (with two "{}" being replaced by the jet number and the jet flavour)')
+parser.add_argument('-n', '--njets', default=5, help='Max. number of jets')
 
 options = parser.parse_args()
 
 
-baseSystematics = ["elidiso", "muid", "muiso", "pu", "trigeff", "pdf", "jec", "jer"]
+#baseSystematics = ["elidiso", "muid", "muiso", "pu", "trigeff", "pdf", "jec", "jer"]
+baseSystematics = ["pu", "pdf", "jec", "jer"]
 for _s in ["qq", "gg", "qg"]:
     baseSystematics.append("pdf" + _s)
 split_jec_sources = [
@@ -126,17 +127,16 @@ for file in options.input:
     for syst in systematics:
         for flav in flavours:
             name = flav + getSystString(syst)
-            systString = getSystString(syst)
-                
-            totalHist = r_file.Get(options.total + systString)
-            if not totalHist or not totalHist.InheritsFrom("TH2"):
-                continue
-            totalHist.SetDirectory(0)
-            totalHistos[name].append(totalHist)
-        
-            passHist = r_file.Get(options.passed.format(flav1, flav2) + systString)
-            passHist.SetDirectory(0)
-            passHistos[name].append(passHist)
+            for ijet in range(options.njets):
+                totalHist = r_file.Get(options.total.format(ijet, flav) + getSystString(syst))
+                if not totalHist or not totalHist.InheritsFrom("TH2"):
+                    continue
+                totalHist.SetDirectory(0)
+                totalHistos[name].append(totalHist)
+            
+                passHist = r_file.Get(options.passed.format(ijet, flav) + getSystString(syst))
+                passHist.SetDirectory(0)
+                passHistos[name].append(passHist)
 
     r_file.Close()
 
@@ -144,14 +144,10 @@ r_file = R.TFile.Open(options.output, "recreate")
 if not r_file.IsOpen():
     raise Exception("Could not read from file {}".format(options.output))
 
-efficiencies = {}
-
 for syst in systematics:
-    systString = getSystString(syst)
-    
     for flav in flavours:
         name = flav + getSystString(syst)
-        
+
         addHistos(totalHistos[name])
         addHistos(passHistos[name])
         
@@ -162,7 +158,6 @@ for syst in systematics:
         thisEff = R.TEfficiency(passHisto, totalHisto)
         thisEff.SetName("btagging_eff_on_" + name)
         thisEff.SetStatisticOption(R.TEfficiency.kBUniform)
-        flavourFractions[name] = thisEff
         thisEff.Write()
 
 r_file.Close()

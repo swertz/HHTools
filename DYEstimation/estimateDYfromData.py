@@ -21,13 +21,43 @@ parser.add_argument("-s", "--syst", help="Take care of systematics", action="sto
 options = parser.parse_args()
 
 # FIXME
-LUMI = 0.9 * 36809
+LUMI_mumu = 1. * 35860
+LUMI_ee = 1. * 35860
+
+split_jec_sources = [
+                "AbsoluteFlavMap",
+                "AbsoluteMPFBias",
+                "AbsoluteScale",
+                "AbsoluteStat",
+                "FlavorQCD",
+                "Fragmentation",
+                "PileUpDataMC",
+                "PileUpPtBB",
+                "PileUpPtEC1",
+                "PileUpPtEC2",
+                "PileUpPtHF",
+                "PileUpPtRef",
+                "RelativeBal",
+                "RelativeFSR",
+                "RelativeJEREC1",
+                "RelativeJEREC2",
+                "RelativeJERHF",
+                "RelativePtBB",
+                "RelativePtEC1",
+                "RelativePtEC2",
+                "RelativePtHF",
+                "RelativeStatEC",
+                "RelativeStatFSR",
+                "RelativeStatHF",
+                "SinglePionECAL",
+                "SinglePionHCAL",
+                "TimePtEta"]
 
 # Get SF histograms and perform the subtraction
 print "Subtracting MuMu histograms"
-histos_mumu = performSubtraction(options.data, options.mc, R".*MuMu.*_with_nobtag_to_btagM_reweighting$", LUMI).values()
+histos_mumu = performSubtraction(options.data, options.mc, R".*MuMu.*_with_nobtag_to_btagM_reweighting$", LUMI_mumu).values()
 print "Subtracting ElEl histograms"
-histos_ee = performSubtraction(options.data, options.mc, R".*ElEl.*_with_nobtag_to_btagM_reweighting$", LUMI).values()
+histos_ee = performSubtraction(options.data, options.mc, R".*ElEl.*_with_nobtag_to_btagM_reweighting$", LUMI_ee).values()
 
 if options.syst:
     def build_syst(_list):
@@ -41,21 +71,23 @@ if options.syst:
 
     # Systematics applied on both Data and MC
     systematics = ["jec", "jer", "jjbtaglight", "jjbtagheavy", "pu", "dyStat"]
+    for _s in split_jec_sources:
+        systematics.append("jec" + _s.lower())
     
     for _s in build_syst(systematics) + build_scale("dyScaleUncorr"):
         print "Handling systematics {}".format(_s)
         
-        histos_mumu += performSubtraction(options.data, options.mc, R".*MuMu.*_with_nobtag_to_btagM_reweighting__" + _s + "$" , LUMI).values()
-        histos_ee += performSubtraction(options.data, options.mc, R".*ElEl.*_with_nobtag_to_btagM_reweighting__" + _s + "$" , LUMI).values()
+        histos_mumu += performSubtraction(options.data, options.mc, R".*MuMu.*_with_nobtag_to_btagM_reweighting__" + _s + "$" , LUMI_mumu).values()
+        histos_ee += performSubtraction(options.data, options.mc, R".*ElEl.*_with_nobtag_to_btagM_reweighting__" + _s + "$" , LUMI_ee).values()
 
     # Systematics for which only MC is affected, not the reweighting => take nominal histos in Data
-    systematics = ["elidiso", "muid", "muiso", "trigeff", "pdf"]
+    systematics = ["elreco", "elidiso", "muid", "muiso", "trigeff", "pdf", "pdfqq", "pdfgg", "pdfqg", "hdamp"]
     
     for _s in build_syst(systematics) + build_scale("scaleUncorr"):
         print "Handling systematics {}".format(_s)
         
-        histos_mumu += performSubtraction(options.data, options.mc, R".*MuMu.*_with_nobtag_to_btagM_reweighting$", LUMI, mc_regexp=R".*MuMu.*_with_nobtag_to_btagM_reweighting__" + _s + "$", translation=(R"$", R"__" + _s)).values()
-        histos_ee += performSubtraction(options.data, options.mc, R".*ElEl.*_with_nobtag_to_btagM_reweighting$", LUMI, mc_regexp=R".*ElEl.*_with_nobtag_to_btagM_reweighting__" + _s + "$", translation=(R"$", R"__" + _s)).values()
+        histos_mumu += performSubtraction(options.data, options.mc, R".*MuMu.*_with_nobtag_to_btagM_reweighting$", LUMI_mumu, mc_regexp=R".*MuMu.*_with_nobtag_to_btagM_reweighting__" + _s + "$", translation=(R"$", R"__" + _s)).values()
+        histos_ee += performSubtraction(options.data, options.mc, R".*ElEl.*_with_nobtag_to_btagM_reweighting$", LUMI_ee, mc_regexp=R".*ElEl.*_with_nobtag_to_btagM_reweighting__" + _s + "$", translation=(R"$", R"__" + _s)).values()
         
 
 # For MuE, get histograms from MC
