@@ -2,6 +2,26 @@
 
 #include "utils.h"
 
+template<typename Evaluator>
+double MVAEvaluatorCache<Evaluator>::evaluate(const std::vector<double>& values) {
+    auto it = m_cache.find(values);
+    if (it == m_cache.end()) {
+        double result = m_evaluator.evaluate(values);
+        m_cache.emplace(values, result);
+        return result;
+    } else {
+        return it->second;
+    }
+}
+
+template<typename Evaluator>
+void MVAEvaluatorCache<Evaluator>::clear() {
+    m_cache.clear();
+}
+
+template class MVAEvaluatorCache<KerasModelEvaluator>;
+template class MVAEvaluatorCache<TMVAEvaluator>;
+
 double Lerp(double v0, double v1, double t) {
     return (1 - t) * v0 + t * v1;
 }

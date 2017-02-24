@@ -67,9 +67,15 @@ def default_headers():
             ]
 
 def default_include_directories(scriptDir):
-    return [
+    paths = [
             os.path.join(scriptDir, "..", "common", "include"),
             ]
+
+    # We need numpy headers for Keras NN evaluator
+    import numpy as np
+    paths.append(np.get_include())
+
+    return paths
 
 def default_sources(scriptDir):
     files = [
