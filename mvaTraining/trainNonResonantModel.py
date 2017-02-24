@@ -3,12 +3,14 @@ import os
 import pickle
 import gzip
 import datetime
+from timeit import default_timer as timer
 
 import plotTools
 
 from common import *
 
 import keras
+
 from keras import backend as K
 
 class KerasDebugMonitor(keras.callbacks.Callback):
@@ -34,6 +36,21 @@ class KerasDebugMonitor(keras.callbacks.Callback):
     def on_epoch_end(self, epoch, logs=None):
         pass
 
+def lr_scheduler(epoch):
+    default_lr = 0.005
+    drop = 0.1
+    epochs_drop = 50.0
+    lr = default_lr * math.pow(drop, min(1, math.floor((1 + epoch) / epochs_drop)))
+
+    return lr
+
+def lr_scheduler_dedicated(epoch):
+    default_lr = 0.001
+    drop = 0.5
+    epochs_drop = 15.0
+    lr = default_lr * math.pow(drop, min(1, math.floor((1 + epoch) / epochs_drop)))
+
+    return lr
 
 
 inputs = [
@@ -50,27 +67,22 @@ inputs = [
 
 cut = "(91 - ll_M) > 15"
 
-# FIXME: Put b-tagging SFs back once they are correct
-weight = {
-            # '__base__': "event_weight * trigeff * jjbtag_heavy * jjbtag_light * llidiso * pu",
-            '__base__': "event_weight * trigeff * llidiso * pu",
-            'DYJetsToLL_M.*': "dy_nobtag_to_btagM_weight",
-            'GluGluToHHTo2B2VTo2L2Nu_base': 'sample_weight'
-}
+# parameters_list = nonresonant_parameters
+# add_parameters_columns = True
 
-parameters_list = [(kl, kt) for kl in [-15, -5, -1, 0.0001, 1, 5, 15] for kt in [0.5, 1, 1.75, 2.5]]
-# parameters_list = [(5, 0.5)]
+parameters_list = [(-20, 0.5)]
+add_parameters_columns = False
 
-suffix = "dy_estimation_from_BDT"
+# suffix = "dy_estimation_from_BDT_new_prod_deeper_lr_scheduler_120epochs"
+suffix = "dy_estimation_from_BDT_new_prod_deeper_lr_scheduler_st_0p005_only-20_0p5_100epochs"
+
 output_suffix = '{:%Y-%m-%d}_{}'.format(datetime.date.today(), suffix)
 output_folder = os.path.join('hh_nonresonant_trained_models', output_suffix)
 
 if not os.path.exists(output_folder):
     os.makedirs(output_folder)
 
-add_parameters_columns = True
-
-dataset = DatasetManager(inputs, weight, cut)
+dataset = DatasetManager(inputs, nonresonant_weights, cut)
 dataset.load_nonresonant_signal(parameters_list=parameters_list, add_parameters_columns=add_parameters_columns, fraction=1)
 dataset.load_backgrounds(add_parameters_columns=add_parameters_columns)
 dataset.split()
@@ -90,15 +102,16 @@ output_model_filename = 'hh_nonresonant_trained_model.h5'
 output_model_filename = os.path.join(output_folder, output_model_filename)
 
 callbacks.append(keras.callbacks.ModelCheckpoint(output_model_filename, monitor='val_loss', verbose=False, save_best_only=True, mode='auto'))
+# callbacks.append(keras.callbacks.ModelCheckpoint(output_model_filename, monitor='loss', verbose=False, save_best_only=True, mode='auto'))
 
 output_logs_folder = os.path.join('hh_nonresonant_trained_models', 'logs', output_suffix)
-callbacks.append(keras.callbacks.TensorBoard(log_dir=output_logs_folder, histogram_freq=1, write_graph=True, write_images=False))
+# callbacks.append(keras.callbacks.TensorBoard(log_dir=output_logs_folder, histogram_freq=1, write_graph=True, write_images=False))
 
-# callbacks.append(KerasDebugMonitor())
-# reduce_lr = keras.callbacks.ReduceLROnPlateau(monitor='val_loss', factor=0.5, patience=5, min_lr=0.0001, verbose=1)
-# callbacks.append(reduce_lr)
+callbacks.append(keras.callbacks.LearningRateScheduler(lr_scheduler))
+# callbacks.append(keras.callbacks.LearningRateScheduler(lr_scheduler_dedicated))
 
 training = True
+training_time = None
 
 # Load model
 if training:
@@ -107,11 +120,30 @@ if training:
         n_inputs += 2
     model = create_nonresonant_model(n_inputs)
 
-    history = model.fit(training_dataset, training_targets, sample_weight=training_weights, batch_size=5000,
-            nb_epoch=200, verbose=True, validation_data=(testing_dataset, testing_targets, testing_weights), callbacks=callbacks)
+    start_time = timer()
+    batch_size = 5000
+    nb_epoch = 100
 
-    # history = model.fit(training_dataset, training_targets, sample_weight=training_weights, batch_size=5000,
-            # nb_epoch=5, verbose=True, callbacks=callbacks)
+    if HAVE_GPU and len(training_dataset) % 2 != 0:
+        # Drop the last event
+        training_dataset = training_dataset[:-1]
+        training_targets = training_targets[:-1]
+        training_weights = training_weights[:-1]
+
+    history = model.fit(training_dataset, training_targets, sample_weight=training_weights, batch_size=batch_size,
+            nb_epoch=nb_epoch, verbose=True, validation_data=(testing_dataset, testing_targets, testing_weights), callbacks=callbacks)
+
+    end_time = timer()
+    training_time = datetime.timedelta(seconds=(end_time - start_time))
+
+    save_training_parameters(output_folder, model,
+            batch_size=batch_size, nb_epoch=nb_epoch,
+            training_time=str(training_time),
+            parameters=parameters_list,
+            with_parameters_column=add_parameters_columns,
+            inputs=inputs,
+            cut=cut,
+            weights=nonresonant_weights)
 
     plotTools.draw_keras_history(history, output_dir=output_folder, output_name="loss.pdf")
 
@@ -125,54 +157,6 @@ if training:
 
 model = keras.models.load_model(output_model_filename)
 
-print("Evaluating model performances...")
+draw_non_resonant_training_plots(model, dataset, output_folder, split_by_parameters=add_parameters_columns)
 
-training_signal_weights, training_background_weights = dataset.get_training_weights()
-testing_signal_weights, testing_background_weights = dataset.get_testing_weights()
-
-training_signal_predictions, testing_signal_predictions = dataset.get_training_testing_signal_predictions(model)
-training_background_predictions, testing_background_predictions = dataset.get_training_testing_background_predictions(model)
-
-print("Done")
-
-print("Doing some plots...")
-n_background, n_signal = plotTools.drawNNOutput(training_background_predictions, testing_background_predictions,
-             training_signal_predictions, testing_signal_predictions,
-             training_background_weights, testing_background_weights,
-             training_signal_weights, testing_signal_weights,
-             output_dir=output_folder, output_name="nn_output.pdf")
-
-plotTools.draw_roc(n_signal, n_background, output_dir=output_folder, output_name="roc_curve.pdf")
-
-if add_parameters_columns:
-    output_folder = os.path.join(output_folder, 'splitted_by_parameters')
-    if not os.path.exists(output_folder):
-        os.makedirs(output_folder)
-
-    for parameters in parameters_list:
-        training_signal_mask = (training_signal_dataset[:,-1] == parameters[1]) & (training_signal_dataset[:,-2] == parameters[0])
-        training_background_mask = (training_background_dataset[:,-1] == parameters[1]) & (training_background_dataset[:,-2] == parameters[0])
-        testing_signal_mask = (testing_signal_dataset[:,-1] == parameters[1]) & (testing_signal_dataset[:,-2] == parameters[0])
-        testing_background_mask = (testing_background_dataset[:,-1] == parameters[1]) & (testing_background_dataset[:,-2] == parameters[0])
-
-        p_training_background_predictions = training_background_predictions[training_background_mask]
-        p_testing_background_predictions = testing_background_predictions[testing_background_mask]
-        p_training_signal_predictions = training_signal_predictions[training_signal_mask]
-        p_testing_signal_predictions = testing_signal_predictions[testing_signal_mask]
-
-        p_training_background_weights = training_background_weights[training_background_mask]
-        p_testing_background_weights = testing_background_weights[testing_background_mask]
-        p_training_signal_weights = training_signal_weights[training_signal_mask]
-        p_testing_signal_weights = testing_signal_weights[testing_signal_mask]
-
-        suffix = format_nonresonant_parameters(parameters)
-        n_background, n_signal = plotTools.drawNNOutput(
-                     p_training_background_predictions, p_testing_background_predictions,
-                     p_training_signal_predictions, p_testing_signal_predictions,
-                     p_training_background_weights, p_testing_background_weights,
-                     p_training_signal_weights, p_testing_signal_weights,
-                     output_dir=output_folder, output_name="nn_output_fixed_parameters_%s.pdf" % (suffix))
-
-        plotTools.draw_roc(n_signal, n_background, output_dir=output_folder, output_name="roc_curve_fixed_parameters_%s.pdf" % (suffix))
-
-print("Done")
+print("All done. Training time: %s" % str(training_time))
