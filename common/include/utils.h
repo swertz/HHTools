@@ -9,6 +9,9 @@
 #include <Math/Vector4D.h>
 #include <Math/VectorUtil.h>
 
+#include <KerasModelEvaluator.h>
+#include <TMVAEvaluator.h>
+
 typedef ROOT::Math::LorentzVector<ROOT::Math::PtEtaPhiE4D<float>> LorentzVector;
 
 // From https://stackoverflow.com/questions/35985960/c-why-is-boosthash-combine-the-best-way-to-combine-hash-values
@@ -47,22 +50,8 @@ template<typename Evaluator>
 class MVAEvaluatorCache {
     public:
         MVAEvaluatorCache(const Evaluator& evaluator): m_evaluator(evaluator) {}
-
-        double evaluate(const std::vector<double>& values) {
-
-            auto it = m_cache.find(values);
-            if (it == m_cache.end()) {
-                double result = m_evaluator.evaluate(values);
-                m_cache.emplace(values, result);
-                return result;
-            } else {
-                return it->second;
-            }
-        }
-
-        void clear() {
-            m_cache.clear();
-        }
+        double evaluate(const std::vector<double>& values);
+        void clear();
 
     private:
 

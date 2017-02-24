@@ -1,11 +1,14 @@
 #include "KerasModelEvaluator.h"
 
+#include <numpy/ndarrayobject.h>
+
 KerasModelEvaluator::KerasModelEvaluator(const std::string& keras_model_filename) {
     argv[0] = (char*) malloc(7);
     strcpy(argv[0], "python");
 
     Py_Initialize();
     PySys_SetArgv(1, argv);
+    import_array();
 
     const std::string python_wrapper = R"(
 
@@ -41,9 +44,8 @@ class KerasModelEvaluator(object):
           The model output
         """
 
-        values = np.array(values).reshape(1, len(values))
-        predictions = self.model.predict(values)
-        return predictions[0][0].astype(np.float64)
+        predictions = self.model.predict_on_batch(values)
+        return predictions
 )";
 
     try {
@@ -73,11 +75,16 @@ KerasModelEvaluator::~KerasModelEvaluator() {
 
 double KerasModelEvaluator::evaluate(const std::vector<double>& values) const {
     try {
-        bp::list py_values;
-        for (const auto& v: values)
-            py_values.append(v);
+        npy_intp shape[] = {1, (npy_intp) values.size()}; // array size
+        PyObject *obj = PyArray_SimpleNewFromData(2, shape, NPY_DOUBLE, const_cast<double*>(values.data()));
 
-        return bp::extract<double>(keras_method_evaluate(py_values))();
+        bp::handle<> py_array(obj);
+        bp::object result = keras_method_evaluate(py_array);
+
+        PyArrayObject* np_result = reinterpret_cast<PyArrayObject*>(result.ptr());
+        float* data = static_cast<float*>(PyArray_DATA(np_result));
+        return data[0];
+
     } catch(...) {
         print_python_exception();
         throw;
