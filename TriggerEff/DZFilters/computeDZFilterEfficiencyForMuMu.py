@@ -6,8 +6,6 @@ import struct
 import sys
 import re
 
-import numpy as np
-
 CMSSW_BASE = os.environ['CMSSW_BASE']
 SCRAM_ARCH = os.environ['SCRAM_ARCH']
 sys.path.append(os.path.join(CMSSW_BASE, 'bin', SCRAM_ARCH))
@@ -22,8 +20,9 @@ import ROOT
 ROOT.PyConfig.IgnoreCommandLineOptions = True
 ROOT.gROOT.Reset()
 
-parser = argparse.ArgumentParser(description='Compute efficiency of DZ filter on MuonEG data samples, by running on events where both versions are present: AND/noDZ gives efficiency')
+parser = argparse.ArgumentParser(description='Compute efficiency of DZ filter on DoubleMuon data samples, by running on events where both versions are present: AND/noDZ gives efficiency')
 parser.add_argument('-i', '--id', nargs='+', type=int, metavar='ID', help='Sample ID', required=True)
+parser.add_argument('-o', '--output', help='Output file', required=True)
 
 options = parser.parse_args()
 
@@ -52,53 +51,34 @@ for f in files:
 chain.SetBranchStatus("*", 0)
 
 chain.SetBranchStatus("event_run", 1)
+chain.SetBranchStatus("vertex_n", 1)
 chain.SetBranchStatus("hlt_paths*", 1)
 chain.SetBranchStatus("hh_leptons*", 1)
-chain.SetBranchStatus("electron_dz", 1)
-chain.SetBranchStatus("electron_dxy", 1)
-chain.SetBranchStatus("electron_isEB", 1)
-chain.SetBranchStatus("electron_ids", 1)
 
 triggers = {
-        "MuEl": {
-            "re_nodz": re.compile(r"HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v.*"),
-            "re_dz": re.compile(r"HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v.*"),
+        "MuMu": {
+            "re_nodz": re.compile(r"HLT_Mu17_TrkIsoVVL_(Tk)?Mu8_TrkIsoVVL_v.*"),
+            "re_dz": re.compile(r"HLT_Mu17_TrkIsoVVL_(Tk)?Mu8_TrkIsoVVL_DZ_v.*"),
         },
-        "ElMu": {
-            "re_nodz": re.compile(r"HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_v.*"),
-            "re_dz": re.compile(r"HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ_v.*")
-        }
     }
 
-for trig in triggers.values():
+for key, trig in triggers.items():
     trig["n_or"] = 0
     trig["n_nodz"] = 0
     trig["n_and"] = 0
+    trig["th_nodz"] = ROOT.TH1F("total_" + key, "efficiency vs. nPV", 30, 0, 60)
+    trig["th_and"] = ROOT.TH1F("pass_" + key, "efficiency vs. nPV", 30, 0, 60)
 
 total_entries = chain.GetEntries()
 count = 0
 
+print "Total entries in chain: ", total_entries
+
 for event in chain:
-    # DZ versions not present before this run
-    if event.event_run < 278273:
-        continue
+    #if event.event_run < 280960:
+    #    continue
 
-    if not event.hh_leptons[0].isEl and not event.hh_leptons[1].isEl:
-        continue
-
-    def check_ele(ele):
-        if ele.isEl:
-            if event.electron_isEB[ele.idx]:
-                if abs(event.electron_dz[ele.idx]) > 0.1 or abs(event.electron_dxy[ele.idx]) > 0.05:
-                    return False
-            else:
-                if abs(event.electron_dz[ele.idx]) > 0.2 or abs(event.electron_dxy[ele.idx]) > 0.1:
-                    return False
-            if not event.electron_ids[ele.idx].at("cutBasedElectronHLTPreselection-Summer16-V1"):
-                return False
-        return True
-
-    if not (check_ele(event.hh_leptons[0]) and check_ele(event.hh_leptons[1])):
+    if not event.hh_leptons[0].isMu or not event.hh_leptons[1].isMu:
         continue
 
     passed_nodz = {}
@@ -117,9 +97,11 @@ for event in chain:
     for trig in triggers.keys():
         if passed_nodz[trig]:
             triggers[trig]["n_nodz"] += 1
+            triggers[trig]["th_nodz"].Fill(ord(event.vertex_n))
             
         if passed_nodz[trig] and passed_dz[trig]:
             triggers[trig]["n_and"] += 1
+            triggers[trig]["th_and"].Fill(ord(event.vertex_n))
 
         if passed_nodz[trig] or passed_dz[trig]:
             triggers[trig]["n_or"] += 1
@@ -129,15 +111,33 @@ for event in chain:
     if count % 10000 == 0:
         print("Processing entry {}".format(count))
 
+tf = ROOT.TFile(options.output, "recreate")
 
 print("\n-- Summary --\n")
+
 for trig in triggers.keys():
+    
     print("\t -- Category {} -- ".format(trig))
+    
     try:
         print("Total OR check           : {}".format(triggers[trig]["n_or"]))
         print("Triggered entries        : {}".format(triggers[trig]["n_nodz"]))
         print("Triggered entries with DZ: {}".format(triggers[trig]["n_and"]))
-        print("DZ efficiency            : {}\n".format(float(triggers[trig]["n_and"])/triggers[trig]["n_nodz"]))
+        print("DZ efficiency            : {}\n".format(float(triggers[trig]["n_and"]) / triggers[trig]["n_nodz"]))
+        
+        c = ROOT.TCanvas("c", "c", 500, 500)
+        teff = ROOT.TEfficiency(triggers[trig]["th_and"], triggers[trig]["th_nodz"])
+        teff.SetStatisticOption(ROOT.TEfficiency.kBUniform)
+        teff.SetTitle("Efficiency vs. nPV -- average: {:.2f}%;nPV".format(100. * float(triggers[trig]["n_and"]) / triggers[trig]["n_nodz"]))
+        teff.Draw("AP")
+        teff.SetLineWidth(2)
+        teff.SetLineColor(ROOT.TColor.GetColor("#1f77b4"))
+        c.Print(options.output.split(".root")[0] + ".pdf")
+        teff.Write("eff_vs_nPV_" + trig)
+    
     except ZeroDivisionError:
         print("Error: tried to divide by zero!!")
+
 print("\nTotal entries check      : {}".format(total_entries))
+
+tf.Close()
