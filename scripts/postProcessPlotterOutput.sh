@@ -1,4 +1,4 @@
-#!/usr/bin/env zsh
+#!/usr/bin/env bash
 
 # Execute this after having run the plots
 
@@ -7,7 +7,7 @@ if [[ "$1" == "-h" || -z "$1" ]]; then
     exit 0
 fi
 
-directories=(`ls . | grep $1`)
+directories=`ls . | grep $1`
 
 echo "Found directories: ${directories}"
 
@@ -19,7 +19,7 @@ for d in ${directories}; do
         exit 1
     fi
 
-    cd $dir
+    pushd $dir
 
     # Merge all the plotter output files
     ../hadd_histos.sh -r
@@ -32,7 +32,7 @@ for d in ${directories}; do
         mergeReweightBases.sh . -r
     fi
 
-    file_content=`rootls ${dir_content[1]}`
+    file_content=`rootls ${dir_content[0]}`
 
     # flatten 2D plots
     if [[ ${file_content} =~ mjj_vs_NN ]]; then
@@ -59,22 +59,20 @@ for d in ${directories}; do
 
     echo "Done."
 
-    cd -
+    popd
 done
-
-echo "Done loop."
 
 if [[ ${directories} =~ $1_for_signal ]]; then echo "Moving signal files to main folder..."; mv $1_for_signal/condor/output/*.root $1/condor/output ; fi
 if [[ ${directories} =~ $1_for_data ]]; then echo "Moving data files to main folder..."; mv $1_for_data/condor/output/*.root $1/condor/output ; fi
 
 # subtract MC from data for DY estimation
-cd $1/condor/output/
+pushd $1/condor/output/
 
 echo "Subtracting things for DY"
 #../../../../DYEstimation/estimateDYfromData.py -d DoubleMuon* DoubleEG* --mc TTTo2L2Nu*.root ST_tW* W* Z* --dy DY*.root -o dyEstimation.root
 ../../../../DYEstimation/estimateDYfromData.py -d DoubleMuon* DoubleEG* --mc TTTo2L2Nu*.root ST_tW* --dy DY*.root -o dyEstimation.root
 
-cd -
+popd
 
 if [[ ${directories} =~ $1_for_signal ]]; echo "Removing empty signal folders..."; then rm -r $1_for_signal/ ; fi
 if [[ ${directories} =~ $1_for_data ]]; echo "Removing empty data folders..."; then rm -r $1_for_data/ ; fi
