@@ -47,6 +47,50 @@ def default_code_before_loop():
         // MVAEvaluatorCache<KerasModelEvaluator> nonresonant_nn_evaluator(nonresonant_nn);
         MVAEvaluatorCache<LWTNNEvaluator> nonresonant_nn_evaluator(nonresonant_lwt_nn);
 
+        // Stuff to ensure we evaluate the NN only on values corresponding to the signal we're running on
+        // IF we run on the signal!
+        bool shouldCheckResonantSignalPoint = false;
+        double resonantSignalMass;
+        if (!m_dataset.is_data) {
+            const std::string check = "ToHHTo2B2VTo2L2Nu_M-";
+            auto start = m_dataset.db_name.find(check);
+            if (start != std::string::npos) {
+                shouldCheckResonantSignalPoint = true;
+                start += check.size();
+                std::string mass_string = m_dataset.db_name.substr(start, 3);
+                resonantSignalMass = std::stod(mass_string);
+            }
+        }
+        
+        bool shouldCheckNonResonantSignalPoint = false;
+        double nonResonantSignalKl, nonResonantSignalKt;
+        if (!m_dataset.is_data) {
+            if (m_dataset.db_name.find("ToHHTo2B2VTo2L2Nu_node_") != std::string::npos) {
+                shouldCheckNonResonantSignalPoint = true;
+                nonResonantSignalKl = std::stod(m_dataset.sample_weight_args[1]);
+                nonResonantSignalKt = std::stod(m_dataset.sample_weight_args[2]);
+            }
+        }
+        
+        auto checkResonantSignalPoint = [shouldCheckResonantSignalPoint, resonantSignalMass](double m) -> bool {
+            if (!shouldCheckResonantSignalPoint)
+                return true;
+            if (shouldCheckNonResonantSignalPoint)
+                return false;
+            if (m == resonantSignalMass)
+                return true;
+            return false;
+        };
+        auto checkNonResonantSignalPoint = [shouldCheckNonResonantSignalPoint, nonResonantSignalKl,nonResonantSignalKt](double kl, double kt) -> bool {
+            if (!shouldCheckNonResonantSignalPoint)
+                return true;
+            if (shouldCheckResonantSignalPoint)
+                return false;
+            if (kl == nonResonantSignalKl && kt == nonResonantSignalKt)
+                return true;
+            return false;
+        };
+
         auto nn_reshaper = [](double nn) -> double {
             // Logarithmic, smaller alpha -> stretch more low-response end
             static double alpha = 0.25;
@@ -273,7 +317,7 @@ class BasePlotter:
             }
 
 
-    def generatePlots(self, categories, stage, requested_plots, weights, systematic="nominal", extraString="", prependCuts=[], appendCuts=[], allowWeightedData=False): 
+    def generatePlots(self, categories, stage, requested_plots, weights, systematic="nominal", extraString="", prependCuts=[], appendCuts=[], allowWeightedData=False, skimSignal2D=False): 
 
         # Protect against the fact that data do not have jecup collections, in the nominal case we still have to check that data have one candidate 
         sanityCheck = self.sanityCheck
@@ -294,7 +338,7 @@ class BasePlotter:
         keras_nonresonant_input_variables = '{%s, %s, %s, %s, %s, %s, %s, %s, (double) %s, %%f, %%f}' % (self.jj_str + ".Pt()", self.ll_str + ".Pt()", self.ll_str + ".M()", self.baseObject + ".DR_l_l", self.baseObject + ".DR_j_j", self.baseObject + ".DPhi_ll_jj", self.baseObject + ".minDR_l_j", self.baseObject + ".MT_formula", self.baseObject + ".isSF")
         
         # Keras resonant NN
-        resonant_signal_masses = [260, 300, 400, 550, 650, 800, 900]
+        resonant_signal_masses = [260, 270, 300, 350, 400, 450, 500, 550, 600, 650, 750, 800, 900]
         restricted_resonant_signals = [400, 650, 900] # For 1D plots, only select a few points
 
         # Keras non-resonant NN
@@ -354,7 +398,8 @@ class BasePlotter:
                 {{ 
                     ({lep1}.isEl) ? {sf_lep1_el} : {sf_lep1_mu},
                     ({lep1}.isEl) ? {err_lep1_el} : {err_lep1_mu}
-                }}, {{
+                }},
+                {{
                     ({lep2}.isEl) ? {sf_lep2_el} : {sf_lep2_mu},
                     ({lep2}.isEl) ? {err_lep2_el} : {err_lep2_mu}
                 }}
@@ -518,6 +563,12 @@ class BasePlotter:
                 })
             
             # Neural network output
+            def skimSignal2DCut(*args):
+                if len(args) == 1:
+                    return "checkResonantSignalPoint({})".format(*args)
+                if len(args) == 2:
+                    return "checkNonResonantSignalPoint({}, {})".format(*args)
+            
             for m in resonant_signal_masses:
                 if m in restricted_resonant_signals:
                     self.resonant_nnoutput_plot.append({
@@ -526,11 +577,12 @@ class BasePlotter:
                             'plot_cut': self.totalCut,
                             'binning': '(50, {}, {})'.format(0, 1)
                     })
-
+                
+                _cut = self.joinCuts(skimSignal2DCut(m), self.totalCut) if skimSignal2D else self.totalCut
                 self.mjj_vs_resonant_nnoutput_plot.append({
                         'name': 'mjj_vs_NN_resonant_M%d_%s_%s_%s%s' % (m, self.llFlav, self.suffix, self.extraString, self.systematicString),
                         'variable': self.jj_str + '.M() ::: nn_reshaper(resonant_nn_evaluator.evaluate(%s))' % (keras_resonant_input_variables % m),
-                        'plot_cut': self.totalCut,
+                        'plot_cut': _cut,
                         'binning': '(3, { 0, 75, 140, 13000 }, 20, 0, 1)'
                 })
 
@@ -538,6 +590,7 @@ class BasePlotter:
                 kl = point[0]
                 kt = point[1]
                 point_str = "point_{}_{}".format(kl, kt).replace(".", "p").replace("-", "m")
+                _cut = self.joinCuts(skimSignal2DCut(kl, kt), self.totalCut) if skimSignal2D else self.totalCut
                 kl += nonresonant_grid_shift["kl"]
                 kt += nonresonant_grid_shift["kt"]
                 if point in restricted_nonresonant_signals:
@@ -550,7 +603,7 @@ class BasePlotter:
                 self.mjj_vs_nonresonant_nnoutput_plot.append({
                         'name': 'mjj_vs_NN_nonresonant_%s_%s_%s_%s%s' % (point_str, self.llFlav, self.suffix, self.extraString, self.systematicString),
                         'variable': self.jj_str + '.M() ::: nn_reshaper(nonresonant_nn_evaluator.evaluate(%s))' % (keras_nonresonant_input_variables % (kl, kt)),
-                        'plot_cut': self.totalCut,
+                        'plot_cut': _cut,
                         'binning': '(3, { 0, 75, 140, 13000 }, 20, 0, 1)'
                 })
             

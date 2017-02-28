@@ -315,7 +315,6 @@ for key in keys:
             #    plot['x-axis-range'] = [76, 106]
             
             #### Do the yields here
-            plot['for-yields'] = True
             btag_stage = ""
             if "btagM" in key_name:
                 btag_stage = "llbb"
@@ -326,6 +325,7 @@ for key in keys:
                 stage = ", inverted mll cut"
             elif "mll_cut" in key_name:
                 stage = ", mll cut"
+                plot['for-yields'] = True
             elif "mll_peak" in key_name:
                 stage = ", mll peak"
             plot['yields-title'] = get_flavour(key_name) + ", " + btag_stage + stage

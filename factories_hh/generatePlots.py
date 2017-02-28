@@ -303,7 +303,7 @@ for systematicType in systematics.keys():
                 if skim_MuEl_stages and stage != "mll_cut" and "MuEl" in this_categories:
                     this_categories.remove("MuEl")
                 
-                plots.extend(basePlotter_llbb.generatePlots(this_categories, stage, systematic=systematic, weights=weights_llbb, requested_plots=plots_llbb))
+                plots.extend(basePlotter_llbb.generatePlots(this_categories, stage, systematic=systematic, weights=weights_llbb, requested_plots=plots_llbb, skimSignal2D=for_signal))
 
         # Signal: only do llbb!
         if for_signal:
@@ -318,7 +318,7 @@ for systematicType in systematics.keys():
             for stage in lljj_stages:
                 this_categories = lljj_categories[:]
                 
-                plots.extend(basePlotter_lljj.generatePlots(this_categories, stage, systematic=systematic, weights=weights_lljj, requested_plots=plots_lljj))
+                plots.extend(basePlotter_lljj.generatePlots(this_categories, stage, systematic=systematic, weights=weights_lljj, requested_plots=plots_lljj, skimSignal2D=for_signal))
 
 
         ###### lljj stage + no btag -> btagM reweighting applied: use LLBB values! #####
@@ -329,7 +329,7 @@ for systematicType in systematics.keys():
                 if skim_MuEl_stages and stage != "mll_cut" and "MuEl" in this_categories:
                     this_categories.remove("MuEl")
                 
-                plots.extend(basePlotter_lljj.generatePlots(this_categories, stage, systematic=systematic, weights=weights_lljj + ['dy_nobtag_to_btagM_BDT'], requested_plots=plots_llbb, extraString='_with_nobtag_to_btagM_reweighting', allowWeightedData=True))
+                plots.extend(basePlotter_lljj.generatePlots(this_categories, stage, systematic=systematic, weights=weights_lljj + ['dy_nobtag_to_btagM_BDT'], requested_plots=plots_llbb, extraString='_with_nobtag_to_btagM_reweighting', allowWeightedData=True, skimSignal2D=for_signal))
         
 
 #for plot in plots:
