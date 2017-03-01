@@ -13,14 +13,22 @@ def get_scram_tool_info(tool, tag):
 
 def default_code_before_loop():
     return r"""
-        // Stuff for DY reweighting
+        // DY reweighting
         
-        // split light
-        //FWBTagEfficiencyOnBDT fwBtagEff("/home/fynu/swertz/scratch/CMSSW_8_0_25/src/cp3_llbb/HHTools/DYEstimation/170222_btag_efficiency_systematics_splitLight/btagging_efficiency.root", "/home/fynu/swertz/scratch/CMSSW_8_0_25/src/cp3_llbb/HHTools/DYEstimation/170222_bb_cc_vs_rest_10var_dyFlavorFractions_systematics_splitLight/flavour_fractions.root", "/home/fynu/swertz/scratch/CMSSW_8_0_25/src/cp3_llbb/HHTools/DYEstimation/170222_btag_efficiency_systematics_splitLight/btagging_scale_factors.root");
-        
-        // regular, with specific one for low mll
-        FWBTagEfficiencyOnBDT fwBtagEff("/home/fynu/swertz/scratch/CMSSW_8_0_25/src/cp3_llbb/HHTools/DYEstimation/170217_btag_efficiency_systematics/btagging_efficiency.root", "/home/fynu/swertz/scratch/CMSSW_8_0_25/src/cp3_llbb/HHTools/DYEstimation/170217_bb_cc_vs_rest_10var_dyFlavorFractions_systematics/flavour_fractions.root", "/home/fynu/swertz/scratch/CMSSW_8_0_25/src/cp3_llbb/HHTools/DYEstimation/170217_btag_efficiency_systematics/btagging_scale_factors.root");
-        FWBTagEfficiencyOnBDT fwBtagEff_mll_cut("/home/fynu/swertz/scratch/CMSSW_8_0_25/src/cp3_llbb/HHTools/DYEstimation/170217_btag_efficiency_systematics/btagging_efficiency.root", "/home/fynu/swertz/scratch/CMSSW_8_0_25/src/cp3_llbb/HHTools/DYEstimation/170217_bb_cc_vs_rest_10var_dyFlavorFractions_systematics/mll_cut/flavour_fractions.root", "/home/fynu/swertz/scratch/CMSSW_8_0_25/src/cp3_llbb/HHTools/DYEstimation/170217_btag_efficiency_systematics/btagging_scale_factors.root");
+        // "binned" in mll: below peak, peak, above peak
+        auto get_mll_bin = [](float mll) -> std::size_t {
+            if (mll < 76)
+                return 0;
+            else if (mll > 106)
+                return 2;
+            return 1;
+        };
+        /*std::array<FWBTagEfficiencyOnBDT, 3> fwBtagEff {
+            FWBTagEfficiencyOnBDT("/home/fynu/swertz/scratch/CMSSW_8_0_25/src/cp3_llbb/HHTools/DYEstimation/170217_btag_efficiency_systematics/btagging_efficiency.root", "/home/fynu/swertz/scratch/CMSSW_8_0_25/src/cp3_llbb/HHTools/DYEstimation/170217_btag_efficiency_systematics/btagging_scale_factors.root", "/home/fynu/swertz/scratch/CMSSW_8_0_25/src/cp3_llbb/HHTools/DYEstimation/170217_bb_cc_vs_rest_10var_dyFlavorFractions_systematics/mll_cut/flavour_fractions.root"),
+            FWBTagEfficiencyOnBDT("/home/fynu/swertz/scratch/CMSSW_8_0_25/src/cp3_llbb/HHTools/DYEstimation/170217_btag_efficiency_systematics/btagging_efficiency.root", "/home/fynu/swertz/scratch/CMSSW_8_0_25/src/cp3_llbb/HHTools/DYEstimation/170217_btag_efficiency_systematics/btagging_scale_factors.root", "/home/fynu/swertz/scratch/CMSSW_8_0_25/src/cp3_llbb/HHTools/DYEstimation/170217_bb_cc_vs_rest_10var_dyFlavorFractions_systematics/mll_peak/flavour_fractions.root"),
+            FWBTagEfficiencyOnBDT("/home/fynu/swertz/scratch/CMSSW_8_0_25/src/cp3_llbb/HHTools/DYEstimation/170217_btag_efficiency_systematics/btagging_efficiency.root", "/home/fynu/swertz/scratch/CMSSW_8_0_25/src/cp3_llbb/HHTools/DYEstimation/170217_btag_efficiency_systematics/btagging_scale_factors.root", "/home/fynu/swertz/scratch/CMSSW_8_0_25/src/cp3_llbb/HHTools/DYEstimation/170217_bb_cc_vs_rest_10var_dyFlavorFractions_systematics/mll_above_peak/flavour_fractions.root")
+        };*/
+
 
         // DY BDT evaluation
         
@@ -29,6 +37,7 @@ def default_code_before_loop():
         MVAEvaluatorCache<TMVAEvaluator> dy_bdt(dy_bdt_reader);
 
         // Keras NN evaluation
+        
         // Resonant
         // KerasModelEvaluator resonant_nn("/home/fynu/sbrochet/scratch/Framework/CMSSW_8_0_24_patch1_HH_Analysis/src/cp3_llbb/HHTools/mvaTraining/hh_resonant_trained_models/2017-01-24_260_300_400_550_650_800_900_dy_estimation_from_BDT_new_prod_on_GPU_deeper_lr_scheduler_100epochs/hh_resonant_trained_model.h5");
 
@@ -72,7 +81,7 @@ def default_code_before_loop():
             }
         }
         
-        auto checkResonantSignalPoint = [shouldCheckResonantSignalPoint, resonantSignalMass](double m) -> bool {
+        auto checkResonantSignalPoint = [shouldCheckResonantSignalPoint, shouldCheckNonResonantSignalPoint, resonantSignalMass](double m) -> bool {
             if (!shouldCheckResonantSignalPoint)
                 return true;
             if (shouldCheckNonResonantSignalPoint)
@@ -81,7 +90,7 @@ def default_code_before_loop():
                 return true;
             return false;
         };
-        auto checkNonResonantSignalPoint = [shouldCheckNonResonantSignalPoint, nonResonantSignalKl,nonResonantSignalKt](double kl, double kt) -> bool {
+        auto checkNonResonantSignalPoint = [shouldCheckNonResonantSignalPoint, shouldCheckResonantSignalPoint, nonResonantSignalKl, nonResonantSignalKt](double kl, double kt) -> bool {
             if (!shouldCheckNonResonantSignalPoint)
                 return true;
             if (shouldCheckResonantSignalPoint)
@@ -118,7 +127,8 @@ def default_code_in_loop():
         nonresonant_nn_evaluator.clear();
         dy_bdt.clear();
         
-        fwBtagEff.clear_cache();
+        for (auto& rwgt: fwBtagEff)
+            rwgt.clear_cache();
 """
 
 def default_code_after_loop():
@@ -307,13 +317,15 @@ class BasePlotter:
         # Possible stages (selection)
         mll_cut = "({0}.M() < 91 - 15)".format(self.ll_str)
         inverted_mll_cut = "({0}.M() >= 91 - 15)".format(self.ll_str)
-        mll_peak = "(std::abs({0}.M() - 91) < 15)".format(self.ll_str)
+        mll_peak = "(std::abs({0}.M() - 91) <= 15)".format(self.ll_str)
+        mll_above_peak = "({0}.M() > 91 + 15)".format(self.ll_str)
 
         self.dict_stage_cut = {
                "no_cut": "", 
                "mll_cut": mll_cut,
                "inverted_mll_cut": inverted_mll_cut,
                "mll_peak": mll_peak,
+               "mll_above_peak": mll_above_peak,
             }
 
 
@@ -326,9 +338,10 @@ class BasePlotter:
 
         cuts = self.joinCuts(*(prependCuts + [sanityCheck]))
         
-        # FIXME
-        electron_1_id_cut = '({}.isEl ? electron_ids[{}].at("cutBasedElectronHLTPreselection-Summer16-V1") : 1)'.format(self.lep1_str, self.lep1_fwkIdx)
-        electron_2_id_cut = '({}.isEl ? electron_ids[{}].at("cutBasedElectronHLTPreselection-Summer16-V1") : 1)'.format(self.lep2_str, self.lep2_fwkIdx)
+        electron_1_id_cut = '({0}.isEl ? ( {0}.ele_hlt_id && !(std::abs({0}.p4.Eta()) > 1.444 && std::abs({0}.p4.Eta()) < 1.566) ) : 1)'.format(self.lep1_str)
+        electron_2_id_cut = '({0}.isEl ? ( {0}.ele_hlt_id && !(std::abs({0}.p4.Eta()) > 1.444 && std::abs({0}.p4.Eta()) < 1.566) ) : 1)'.format(self.lep2_str)
+        #electron_1_id_cut = '({}.isEl ? electron_ids[{}].at("cutBasedElectronHLTPreselection-Summer16-V1") : 1)'.format(self.lep1_str, self.lep1_fwkIdx)
+        #electron_2_id_cut = '({}.isEl ? electron_ids[{}].at("cutBasedElectronHLTPreselection-Summer16-V1") : 1)'.format(self.lep2_str, self.lep2_fwkIdx)
         #electron_1_id_cut = '({0}.isEl ? (electron_isEB[{1}] ? (std::abs(electron_dxy[{1}]) < 0.05 && std::abs(electron_dz[{1}]) < 0.1) : (std::abs(electron_dxy[{1}]) < 0.1 && std::abs(electron_dz[{1}]) < 0.2)) : 1)'.format(self.lep1_str, self.lep1_fwkIdx)
         #electron_2_id_cut = '({0}.isEl ? (electron_isEB[{1}] ? (std::abs(electron_dxy[{1}]) < 0.05 && std::abs(electron_dz[{1}]) < 0.1) : (std::abs(electron_dxy[{1}]) < 0.1 && std::abs(electron_dz[{1}]) < 0.2)) : 1)'.format(self.lep2_str, self.lep2_fwkIdx)
         cuts = self.joinCuts(cuts, electron_1_id_cut, electron_2_id_cut)
@@ -342,7 +355,7 @@ class BasePlotter:
         restricted_resonant_signals = [400, 650, 900] # For 1D plots, only select a few points
 
         # Keras non-resonant NN
-        nonresonant_signal_grid = [ (kl, kt) for kl in [-20, 0.0001, 1, 2.4, 3.8, 5, 20] for kt in [0.5, 1, 1.75, 2.5] ]
+        nonresonant_signal_grid = [ (kl, kt) for kl in [-20, -5, 0.0001, 1, 2.4, 3.8, 5, 20] for kt in [0.5, 1, 1.75, 2.5] ]
         nonresonant_grid_shift = { "kl": 20.0, "kt": 0 } # Shift parameters to be positive everywhere (goes in line with the training)
         restricted_nonresonant_signals = [ (1, 1), (2.4, 2.5), (-20, 0.5) ] # For 1D plots, only select a few points
 
@@ -351,15 +364,16 @@ class BasePlotter:
         ###########
 
         # Lepton ID and Iso Scale Factors
-        electron_id_branch = "electron_sf_id_medium_moriond17"
+        electron_id_branch = "electron_sf_id_mediumplushltsafe_hh"
         electron_reco_branch = "electron_sf_reco_moriond17"
+        muon_tracking_branch = "muon_sf_tracking"
         muon_id_branch = "muon_sf_id_tight"
         muon_iso_branch = "muon_sf_iso_tight_id_tight"
         llIdIso_sf_dict = {
                 "sf_lep1_el": "{id}[{0}][0] * {reco}[{0}][0]".format(self.lep1_fwkIdx, id=electron_id_branch, reco=electron_reco_branch),
                 "sf_lep2_el": "{id}[{0}][0] * {reco}[{0}][0]".format(self.lep2_fwkIdx, id=electron_id_branch, reco=electron_reco_branch),
-                "sf_lep1_mu": "{id}[{0}][0] * {iso}[{0}][0]".format(self.lep1_fwkIdx, id=muon_id_branch, iso=muon_iso_branch),
-                "sf_lep2_mu": "{id}[{0}][0] * {iso}[{0}][0]".format(self.lep2_fwkIdx, id=muon_id_branch, iso=muon_iso_branch),
+                "sf_lep1_mu": "{tracking}[{0}][0] * {id}[{0}][0] * {iso}[{0}][0]".format(self.lep1_fwkIdx, tracking=muon_tracking_branch, id=muon_id_branch, iso=muon_iso_branch),
+                "sf_lep2_mu": "{tracking}[{0}][0] * {id}[{0}][0] * {iso}[{0}][0]".format(self.lep2_fwkIdx, tracking=muon_tracking_branch, id=muon_id_branch, iso=muon_iso_branch),
                 "err_lep1_el": "0.",
                 "err_lep1_mu": "0.",
                 "err_lep2_el": "0.",
@@ -367,7 +381,7 @@ class BasePlotter:
             }
         llIdIso_var = "NOMINAL"
         
-        for sf in ["elidiso", "elreco", "muid", "muiso"]:
+        for sf in ["elidiso", "elreco", "mutracking", "muid", "muiso"]:
             if sf in systematic:
                 if "up" in systematic:
                     llIdIso_var = "UP"
@@ -386,13 +400,17 @@ class BasePlotter:
                     llIdIso_sf_dict["err_lep1_el"] = "{id}[{0}][0] * {reco}[{0}][{1}]".format(self.lep1_fwkIdx, var_index, id=electron_id_branch, reco=electron_reco_branch)
                     llIdIso_sf_dict["err_lep2_el"] = "{id}[{0}][0] * {reco}[{0}][{1}]".format(self.lep2_fwkIdx, var_index, id=electron_id_branch, reco=electron_reco_branch)
                 
+                if sf == "mutracking":
+                    llIdIso_sf_dict["err_lep1_mu"] = "{tracking}[{0}][{1}] * {id}[{0}][0] * {iso}[{0}][0]".format(self.lep1_fwkIdx, var_index, tracking=muon_tracking_branch, id=muon_id_branch, iso=muon_iso_branch)
+                    llIdIso_sf_dict["err_lep2_mu"] = "{tracking}[{0}][{1}] * {id}[{0}][0] * {iso}[{0}][0]".format(self.lep2_fwkIdx, var_index, tracking=muon_tracking_branch, id=muon_id_branch, iso=muon_iso_branch)
+                
                 if sf == "muid":
-                    llIdIso_sf_dict["err_lep1_mu"] = "{id}[{0}][{1}] * {iso}[{0}][0]".format(self.lep1_fwkIdx, var_index, id=muon_id_branch, iso=muon_iso_branch)
-                    llIdIso_sf_dict["err_lep2_mu"] = "{id}[{0}][{1}] * {iso}[{0}][0]".format(self.lep2_fwkIdx, var_index, id=muon_id_branch, iso=muon_iso_branch)
+                    llIdIso_sf_dict["err_lep1_mu"] = "{tracking}[{0}][0] * {id}[{0}][{1}] * {iso}[{0}][0]".format(self.lep1_fwkIdx, var_index, tracking=muon_tracking_branch, id=muon_id_branch, iso=muon_iso_branch)
+                    llIdIso_sf_dict["err_lep2_mu"] = "{tracking}[{0}][0] * {id}[{0}][{1}] * {iso}[{0}][0]".format(self.lep2_fwkIdx, var_index, tracking=muon_tracking_branch, id=muon_id_branch, iso=muon_iso_branch)
                 
                 if sf == "muiso":
-                    llIdIso_sf_dict["err_lep1_mu"] = "{id}[{0}][0] * {iso}[{0}][{1}]".format(self.lep1_fwkIdx, var_index, id=muon_id_branch, iso=muon_iso_branch)
-                    llIdIso_sf_dict["err_lep2_mu"] = "{id}[{0}][0] * {iso}[{0}][{1}]".format(self.lep2_fwkIdx, var_index, id=muon_id_branch, iso=muon_iso_branch)
+                    llIdIso_sf_dict["err_lep1_mu"] = "{tracking}[{0}][0] * {id}[{0}][0] * {iso}[{0}][{1}]".format(self.lep1_fwkIdx, var_index, tracking=muon_tracking_branch, id=muon_id_branch, iso=muon_iso_branch)
+                    llIdIso_sf_dict["err_lep2_mu"] = "{tracking}[{0}][0] * {id}[{0}][0] * {iso}[{0}][{1}]".format(self.lep2_fwkIdx, var_index, tracking=muon_tracking_branch, id=muon_id_branch, iso=muon_iso_branch)
 
         llIdIso_sf = """( common::combineScaleFactors<2>( {{ {{ 
                 {{ 
@@ -477,11 +495,7 @@ class BasePlotter:
             ]
         dy_bdt_variables_string = "{ " + ", ".join(dy_bdt_variables) + " }"
         
-        #dy_nobtag_to_btagM_weight_BDT = 'fwBtagEff.get_cached({0}, {1}, dy_bdt.evaluate({2}), "{3}")'.format(self.jet1_str + ".p4", self.jet2_str + ".p4", dy_bdt_variables_string, systematic)
-        if stage == "mll_cut":
-            dy_nobtag_to_btagM_weight_BDT = 'fwBtagEff_mll_cut.get_cached({0}, {1}, dy_bdt.evaluate({2}), "{3}")'.format(self.jet1_str + ".p4", self.jet2_str + ".p4", dy_bdt_variables_string, systematic)
-        else:
-            dy_nobtag_to_btagM_weight_BDT = 'fwBtagEff.get_cached({0}, {1}, dy_bdt.evaluate({2}), "{3}")'.format(self.jet1_str + ".p4", self.jet2_str + ".p4", dy_bdt_variables_string, systematic)
+        dy_nobtag_to_btagM_weight_BDT = 'fwBtagEff[get_mll_bin({mll})].get_cached({j1}, {j2}, dy_bdt.evaluate({bdt}), "{syst}")'.format(mll=self.ll_str + ".M", j1=self.jet1_str + ".p4", j2=self.jet2_str + ".p4", bdt=dy_bdt_variables_string, syst=systematic)
 
         available_weights = {
                 'trigeff': trigEff,
@@ -583,7 +597,7 @@ class BasePlotter:
                         'name': 'mjj_vs_NN_resonant_M%d_%s_%s_%s%s' % (m, self.llFlav, self.suffix, self.extraString, self.systematicString),
                         'variable': self.jj_str + '.M() ::: nn_reshaper(resonant_nn_evaluator.evaluate(%s))' % (keras_resonant_input_variables % m),
                         'plot_cut': _cut,
-                        'binning': '(3, { 0, 75, 140, 13000 }, 20, 0, 1)'
+                        'binning': '(3, { 0, 75, 140, 13000 }, 25, 0, 1)'
                 })
 
             for point in nonresonant_signal_grid:
@@ -604,12 +618,20 @@ class BasePlotter:
                         'name': 'mjj_vs_NN_nonresonant_%s_%s_%s_%s%s' % (point_str, self.llFlav, self.suffix, self.extraString, self.systematicString),
                         'variable': self.jj_str + '.M() ::: nn_reshaper(nonresonant_nn_evaluator.evaluate(%s))' % (keras_nonresonant_input_variables % (kl, kt)),
                         'plot_cut': _cut,
-                        'binning': '(3, { 0, 75, 140, 13000 }, 20, 0, 1)'
+                        'binning': '(3, { 0, 75, 140, 13000 }, 25, 0, 1)'
                 })
             
             # DY reweighting plots
             # 17_02_17
+            # Regular binning for plots:
             dy_bdt_flat_binning = '(50, {-0.5101676653977448, -0.3037112694618912, -0.25776621333925404, -0.22831473724254012, -0.2058976226947669, -0.18737627841862642, -0.17109101237779453, -0.1565703579397076, -0.14330560537675097, -0.1310359580150374, -0.1197784471015856, -0.10918491457907857, -0.09911075218981483, -0.08976692416038033, -0.0809107322448998, -0.07248030208546734, -0.06440158708656464, -0.05664445757506834, -0.04907888953354581, -0.04170318249950038, -0.0344922614769401, -0.0274908454765098, -0.02051556234044503, -0.01363614199605131, -0.006815197743717338, 0., 0.00860145135249569, 0.016666467134577426, 0.02408777663779528, 0.03222169904428225, 0.03964077613807283, 0.04650723992677568, 0.053785503108807996, 0.06085711547827342, 0.06764767808181676, 0.07489903876759747, 0.08197523639170723, 0.08905533336035248, 0.09649764674849821, 0.10422079837620835, 0.11189665635033663, 0.12002664935476777, 0.12849171686877514, 0.13806668191128738, 0.14732139513409487, 0.15859674959359168, 0.17097453554261796, 0.18582080656038966, 0.20358479195523596, 0.22993714767148515, 0.4})'
+            # Use these special binnings only for computing Fij:
+            if stage == "mll_cut":
+                dy_bdt_flat_binning =  '(30, {-0.51, -0.24336378993843724, -0.19334178535513655, -0.1617002719204834, -0.13722684111510575, -0.1176740939882657, -0.10000023478454165, -0.08465874454820496, -0.07126791628951663, -0.05939533454416219, -0.04886817525318505, -0.038169394085349605, -0.028170910327335083, -0.01842442408869435, -0.009175556128479562, 0., 0.017672337607399422, 0.032772612975530156, 0.04431836038599957, 0.057366730031835365, 0.06807419443633557, 0.08060152138866084, 0.09068752149504272, 0.10617761713855838, 0.11853985824697665, 0.13331654912329943, 0.14915837795007816, 0.16842695825466836, 0.19210912647356354, 0.23254815636598256, 0.4})'
+            elif stage == "mll_peak":
+                dy_bdt_flat_binning = '(50, {-0.51, -0.30648147039955576, -0.26049108258184067, -0.2309395665926607, -0.20862139231464938, -0.19007051097210237, -0.1737642840929558, -0.15920207826882662, -0.14585383293640194, -0.13349257728248393, -0.12205087646867921, -0.11132629744135186, -0.10115444403168983, -0.09167042348108852, -0.08268624748142982, -0.07413327042673702, -0.06592124575539784, -0.05794120013592082, -0.05020134497665048, -0.042654049233194, -0.0353232066854666, -0.028144119539440033, -0.021044635216304564, -0.013986791007770387, -0.006988409105077877, 0., 0.008175407998005178, 0.016056370744565632, 0.023625782464709852, 0.031382989560045246, 0.03873257041686817, 0.045859664140387724, 0.052895219580672566, 0.05985075344091263, 0.06694049588333532, 0.0741468555107746, 0.08128244677706187, 0.08859804055405016, 0.0959315335989803, 0.10324717838732622, 0.11103961896255608, 0.11910942137054367, 0.12755510999157632, 0.13683100174343424, 0.14638226962067796, 0.15732762127561312, 0.169380669967978, 0.1835774386408878, 0.20096074488986812, 0.22589059373981762, 0.4})'
+            elif stage == "mll_above_peak":
+                dy_bdt_flat_binning = '(30, {-0.51, -0.2694119711816292, -0.21997229307491342, -0.1877386173657523, -0.16216658708508025, -0.1410157739039748, -0.12183360982330284, -0.10558126766657198, -0.08999256096557819, -0.0757172462424543, -0.06202645816308408, -0.04907084721078949, -0.036242288160678926, -0.024218895694641727, -0.012123132322284874, 0., 0.013592735003800609, 0.02447521492303922, 0.036509902193321245, 0.04740083630187158, 0.05782216837961173, 0.06977325879168576, 0.07847199090508866, 0.09029205585468365, 0.10278579164891267, 0.11598060711671343, 0.12908019021888104, 0.14702650618665358, 0.1692660223200593, 0.20190847709874246, 0.4})'
             self.dy_rwgt_bdt_plot.extend([
                 {
                     'name': 'DY_BDT_flat_%s_%s_%s%s'%(self.llFlav, self.suffix, self.extraString, self.systematicString),
@@ -880,18 +902,18 @@ class BasePlotter:
                         'plot_cut': self.totalCut,
                         'binning': '(25, 0, 3.1416)'
                 },
-                {
-                        'name': 'jj_DPhi_j_j_%s_%s_%s%s'%(self.llFlav, self.suffix, self.extraString, self.systematicString),
-                        'variable': "abs("+self.baseObject+".DPhi_j_j)",
-                        'plot_cut': self.totalCut,
-                        'binning': '(50, 0, 3.1416)'
-                },
-                {
-                        'name': 'lljj_pt_%s_%s_%s%s'%(self.llFlav, self.suffix, self.extraString, self.systematicString),
-                        'variable': self.baseObject+".lljj_p4.Pt()",
-                        'plot_cut': self.totalCut,
-                        'binning': '(50, 0, 500)'
-                },
+                #{
+                #        'name': 'jj_DPhi_j_j_%s_%s_%s%s'%(self.llFlav, self.suffix, self.extraString, self.systematicString),
+                #        'variable': "abs("+self.baseObject+".DPhi_j_j)",
+                #        'plot_cut': self.totalCut,
+                #        'binning': '(50, 0, 3.1416)'
+                #},
+                #{
+                #        'name': 'lljj_pt_%s_%s_%s%s'%(self.llFlav, self.suffix, self.extraString, self.systematicString),
+                #        'variable': self.baseObject+".lljj_p4.Pt()",
+                #        'plot_cut': self.totalCut,
+                #        'binning': '(50, 0, 500)'
+                #},
             ])
 
             self.other_plot.extend([

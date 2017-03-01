@@ -1,3 +1,5 @@
+#include <cmath>
+
 #include "flavor_weighted_btag_efficiency_on_bdt.h"
 
 std::pair<double, double> GetPosteriorAlphaBeta(const TEfficiency& teff, std::size_t bin, double p_alpha, double p_beta) {
@@ -9,7 +11,7 @@ std::pair<double, double> GetPosteriorAlphaBeta(const TEfficiency& teff, std::si
     return std::make_pair(alpha, beta);
 }
         
-FWBTagEfficiencyOnBDT::FWBTagEfficiencyOnBDT(const std::string& btag_efficiencies, const std::string& flavor_fraction, const std::string& btag_sf) {
+FWBTagEfficiencyOnBDT::FWBTagEfficiencyOnBDT(const std::string& btag_efficiencies, const std::string& btag_sf, const std::string& flavor_fraction) {
     std::cout << "Initializing flavour-weighted reweighter." << std::endl;
         
     std::unique_ptr<TFile> file(TFile::Open(btag_efficiencies.c_str()));
@@ -199,119 +201,7 @@ double FWBTagEfficiencyOnBDT::get(const LorentzVector& jet1, const LorentzVector
     double error = propagate_linear(btag_bin_jet1, btag_bin_jet2, btag_sf_bin_jet1, btag_sf_bin_jet2, frac_bin, syst);
     //std::cout << "Systematics: " << syst << ", nominal: " << nominal_weight << ", error: " << error << std::endl;
     return std::max(0., nominal_weight + error);
-    
-    /*double variance = propagate_variance(jet1, jet2, BDTout, syst);
-    if (variance < 0)
-        throw systematics_error("Variance for systematics " + syst + " is negative!");
-    
-    if (syst.find("up") != std::string::npos) {
-        return std::max(0., nominal_weight + std::sqrt(variance));
-    } else if (syst.find("down") != std::string::npos)
-        return std::max(0., nominal_weight - std::sqrt(variance));
-    else
-        throw systematics_error("Could not understand up or down variation from " + syst);*/
 }
-
-/*double FWBTagEfficiencyOnBDT::propagate_variance(const LorentzVector& jet1, const LorentzVector& jet2, float BDTout, const std::string& syst) {
-    double var = 0;
-
-    // First btag efficiency-related part
-    // If the jets fall in the same bin, the efficiency is the same -> different computation!
-    // Assumes the binning is the same for the different flavours!
-    for (const auto& flav1: flavors) {
-        std::size_t eps_bin_jet1 = get_btag_bin(jet1);
-        std::size_t eps_bin_jet2 = get_btag_bin(jet2);
-        
-        // Jets fall in same bin 
-        if (eps_bin_jet1 == eps_bin_jet2) {
-            
-            double temp = 0;
-            for (const auto& flav2: flavors) {
-                double eps_flav1 = m_btagging_eff[flav1]["nominal"]->GetEfficiency(eps_bin_jet1);
-                const auto& fraction_eff_12 = m_fractions[std::make_pair(flav1, flav2)]["nominal"];
-                double F_12 = fraction_eff_12->GetEfficiency(fraction_eff_12->FindFixBin(BDTout));
-                const auto& fraction_eff_21 = m_fractions[std::make_pair(flav2, flav1)]["nominal"];
-                double F_21 = fraction_eff_21->GetEfficiency(fraction_eff_21->FindFixBin(BDTout));
-                temp += eps_flav1 * (F_12 + F_21);
-            }
-            // If stats, take stat. uncertainty, otherwise take delta = syst - nominal
-            double sigma_eps = get_sigma(syst, eps_bin_jet1, m_btagging_eff[flav1]);
-            var += std::pow(temp * sigma_eps, 2);
-        
-        } else {
-            
-            // d(W)/d(eps)
-            double temp = 0;
-            for (const auto& flav2: flavors) {
-                double eps_flav2 = m_btagging_eff[flav2]["nominal"]->GetEfficiency(eps_bin_jet2);
-                const auto& fraction_eff_12 = m_fractions[std::make_pair(flav1, flav2)]["nominal"];
-                double F_12 = fraction_eff_12->GetEfficiency(fraction_eff_12->FindFixBin(BDTout));
-                temp += eps_flav2 * F_12;
-            }
-            double sigma_eps = get_sigma(syst, eps_bin_jet1, m_btagging_eff[flav1]);
-            var += std::pow(temp * sigma_eps, 2);
-            // d(W)/d(eps')
-            temp = 0;
-            for (const auto& flav2: flavors) {
-                double eps_flav2 = m_btagging_eff[flav2]["nominal"]->GetEfficiency(eps_bin_jet1);
-                const auto& fraction_eff_21 = m_fractions[std::make_pair(flav2, flav1)]["nominal"];
-                double F_21 = fraction_eff_21->GetEfficiency(fraction_eff_21->FindFixBin(BDTout));
-                temp += eps_flav2 * F_21;
-            }
-            sigma_eps = get_sigma(syst, eps_bin_jet2, m_btagging_eff[flav1]);
-            var += std::pow(temp * sigma_eps, 2);
-        
-        }
-    }
-
-    // Next: diagonal flavour-fraction related part
-    for (const auto& flav1: flavors) {
-        for (const auto& flav2: flavors) {
-            double eps_jet1 = m_btagging_eff[flav1]["nominal"]->GetEfficiency(get_btag_bin(jet1));
-            
-            double eps_jet2 = m_btagging_eff[flav2]["nominal"]->GetEfficiency(get_btag_bin(jet2));
-            
-            auto& fraction_eff_map = m_fractions[std::make_pair(flav1, flav2)];
-            std::size_t frac_bin = fraction_eff_map["nominal"]->FindFixBin(BDTout);
-            double eps_fraction = get_sigma(syst, frac_bin, fraction_eff_map);
-
-            var += std::pow(eps_jet1 * eps_jet2 * eps_fraction, 2);
-        }
-    }
-
-    if (syst.find("dyStat") == std::string::npos) // It's a systematics => do NOT include correlations
-        return var;
-
-    // Finally: covariances between flavour fractions
-    for (const auto& flav1: flavors) {
-        for (const auto& flav2: flavors) {
-            for (const auto& flav3: flavors) {
-                for (const auto& flav4: flavors) {
-                    // Only take non-diagonal part!
-                    if (flav1 == flav3 && flav2 == flav4)
-                        continue;
-                    
-                    double eps1_jet1 = m_btagging_eff[flav1]["nominal"]->GetEfficiency(get_btag_bin(jet1));
-                    double eps1_jet2 = m_btagging_eff[flav1]["nominal"]->GetEfficiency(get_btag_bin(jet2));
-                    double eps2_jet1 = m_btagging_eff[flav2]["nominal"]->GetEfficiency(get_btag_bin(jet1));
-                    double eps2_jet2 = m_btagging_eff[flav2]["nominal"]->GetEfficiency(get_btag_bin(jet2));
-
-                    auto& fraction_eff_map_12 = m_fractions[std::make_pair(flav1, flav2)];
-                    auto& fraction_eff_map_34 = m_fractions[std::make_pair(flav3, flav4)];
-                    std::size_t frac_bin = fraction_eff_map_12["nominal"]->FindFixBin(BDTout);
-                    
-                    // From https://en.wikipedia.org/wiki/Dirichlet_distribution
-                    double cov = - m_fractions_alphas[std::make_pair(flav1, flav2)][frac_bin - 1] * m_fractions_alphas[std::make_pair(flav3, flav4)][frac_bin - 1] / ( std::pow(m_fractions_alpha_zeros[frac_bin - 1], 2) * (m_fractions_alpha_zeros[frac_bin - 1] + 1) );
-
-                    var += eps1_jet1 * eps1_jet2 * eps2_jet1 * eps2_jet2 * cov;
-                
-                }
-            }
-        }
-    }
-
-    return var;
-}*/
 
 double FWBTagEfficiencyOnBDT::get_sigma(const std::string& syst, std::size_t bin, const std::map<std::string, std::unique_ptr<TEfficiency>>& teff_map) {
     if (syst == "dyStatup")
@@ -463,7 +353,7 @@ std::size_t FWBTagEfficiencyOnBDT::get_btag_bin(const LorentzVector& jet) {
 
 std::size_t FWBTagEfficiencyOnBDT::get_frac_bin(float BDTout) {
     const auto& fraction_eff = m_fractions[std::make_pair(flavors.at(0), flavors.at(0))]["nominal"];
-    return fraction_eff->FindFixBin(BDTout);
+    return fraction_eff->FindFixBin(clip(BDTout, get_range(*fraction_eff->GetTotalHistogram()->GetXaxis())));
 }
  
 std::size_t FWBTagEfficiencyOnBDT::get_btag_sf_bin(const LorentzVector& jet) {
@@ -493,8 +383,8 @@ double FWBTagEfficiencyOnBDT::clip(double var, const std::pair<double, double>& 
     if (var < range.first)
         return range.first;
 
-    if (var > range.second)
-        return range.second;
+    if (var >= range.second)
+        return nextafter(range.second, range.first);
 
     return var;
 }

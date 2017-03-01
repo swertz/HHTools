@@ -58,7 +58,7 @@ class FWBTagEfficiencyOnBDT {
 
         FWBTagEfficiencyOnBDT() = delete;
 
-        FWBTagEfficiencyOnBDT(const std::string& btag_efficiencies, const std::string& flavor_fraction, const std::string& btag_sf);
+        FWBTagEfficiencyOnBDT(const std::string& btag_efficiencies, const std::string& btag_sf, const std::string& flavor_fraction);
         
         double propagate_linear(std::size_t jet1_eff_bin, std::size_t jet2_eff_bin, std::size_t jet1_sf_bin, std::size_t jet2_sf_bin, std::size_t frac_bin, const std::string& syst);
 
@@ -74,12 +74,6 @@ class FWBTagEfficiencyOnBDT {
          * If the systematics is not known, return 0.
          */
         double get_sigma(const std::string& syst, std::size_t bin, const std::map<std::string, std::unique_ptr<TEfficiency>>& teff_map);
-
-        /*
-         * Propagate variance on W = sum_ij(eps_i eps_j F_ij) using errors on efficiencies and fractions and covariances between fractions
-         * FIXME out of date! do not use!
-         *
-        double propagate_variance(const LorentzVector& jet1, const LorentzVector& jet2, float BDTout, const std::string& syst);*/
 
         double get(const LorentzVector& jet1, const LorentzVector& jet2, float BDTout, std::string syst="nominal");
         

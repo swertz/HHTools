@@ -1,6 +1,7 @@
 ####### Warning: put most recent tags first! ###### 
 analysis_tags = [
-        'v4.4.2+80X_HHAnalysis_2017-02-13.v2', # mini-prod with new SF and corrections
+        'v5.0.0+80X_HHAnalysis_2017-03-01.v0', # the one prod to end them all
+        #'v4.4.2+80X_HHAnalysis_2017-02-13.v2', # mini-prod with new SF and corrections
         #'v4.3.0+80X_HHAnalysis_2017-01-26.v0', # Fixed Muon triggers in data -> DoubleMuon, MuonEG
         #'v4.2.0+80X_HHAnalysis_2017-01-18.v0' # DoubleEG + Summer16 MC
         ]
@@ -16,8 +17,8 @@ samples_dict["Data"] = [
 
 # Main backgrounds:
 samples_dict["Main_Training"] = [
-    'ST_tW_top_5f_noFullyHadronicDecays_13TeV-powheg',
-    'ST_tW_antitop_5f_noFullyHadronicDecays_13TeV-powheg',
+    #'ST_tW_top_5f_noFullyHadronicDecays_13TeV-powheg',
+    #'ST_tW_antitop_5f_noFullyHadronicDecays_13TeV-powheg',
     ##'TT_TuneCUETP8M1_13TeV-powheg-pythia8_ext4', # TT incl NLO
     'TTTo2L2Nu_13TeV-powheg', # TT -> 2L 2Nu NLO
     ]

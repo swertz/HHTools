@@ -91,6 +91,12 @@ defaultStyle_events.update({
         'y-axis-format': '%1% / %2$.2f',
         })
 
+defaultStyle_events_NN = defaultStyle.copy()
+defaultStyle_events_NN.update({
+        'y-axis': 'Events',
+        'y-axis-format': '%1%',
+        })
+
 nHistos = 0
 
 def should_be_blind(name):
@@ -341,13 +347,13 @@ for key in keys:
         elif "NN_" in key_name and "_vs_" not in key_name:
             plot['x-axis'] = "NN output"
             plot['log-y'] = "both"
-            plot.update(defaultStyle_events)
+            plot.update(defaultStyle_events_NN)
             if should_be_blind(key_name):
                 plot['blinded-range'] = [0.7, 1]
 
         elif "flat_mjj_vs_NN" in key_name:
             plot['x-axis'] = "NN output, m_{jj} bins"
-            plot.update(defaultStyle_events)
+            plot.update(defaultStyle_events_NN)
             plot['vertical-lines'] = [ 
                     { "line-color": 1, "line-type": 2, "line-width": 2, "value": 1.0 }, 
                     { "line-color": 1, "line-type": 2, "line-width": 2, "value": 2.0 }

@@ -32,14 +32,14 @@ library_directories = []
 libraries = []
 sample_weights = {}
 
-code_before_loop = default_code_before_loop()
-code_in_loop = default_code_in_loop()
-code_after_loop = default_code_after_loop()
-include_directories = default_include_directories(scriptDir)
-headers = default_headers()
-libraries = default_libraries()
-library_directories = default_library_directories()
-sources = default_sources(scriptDir)
+#code_before_loop = default_code_before_loop()
+#code_in_loop = default_code_in_loop()
+#code_after_loop = default_code_after_loop()
+#include_directories = default_include_directories(scriptDir)
+#headers = default_headers()
+#libraries = default_libraries()
+#library_directories = default_library_directories()
+#sources = default_sources(scriptDir)
 
 ####### Reweighting -- ME-based -- only for signal #########
 if reweight_signal:

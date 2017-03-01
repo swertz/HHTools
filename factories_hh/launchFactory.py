@@ -72,7 +72,7 @@ def get_sample_splitting(sample, factor=2):
 def get_sample_events_per_job(sample, factor=1):
     nevents = 50000
     if "DoubleMu" in sample or "DoubleEG" in sample or "MuonEG" in sample:
-        nevents = 75000
+        nevents = 100000
     if "node" in sample:
         nevents = 75000
     if "TTTo" in sample:
@@ -139,16 +139,16 @@ SkimDYforBDTTraining = Configuration('generateTrees.py', workflow='skim_dy_bdt',
         })
 
 # Skim main samples to train the NN
-SkimForNNTraining_Main = Configuration('generateTrees.py', workflow='skim_nn_training', mode='skim', samples=['Main_Training'], generation_args={
+SkimForNNTraining_Main = Configuration('generateTrees.py', workflow='skim_nn_training', mode='skim', samples=['Main_Training', 'Signal_Resonant', 'Signal_NonResonant'], generation_args={
             'flavour': 'All',
             'branches': ['basic', 'weights']
         })
-SkimForNNTraining_ForDY = Configuration('generateTrees.py', workflow='skim_nn_training', mode='skim', suffix='_for_dy', samples=['DY_NLO'], generation_args={
-            'do_lljj': True,
-            'do_llbb': False,
-            'flavour': 'All',
-            'branches': ['basic', 'weights', 'dy_rwgt']
-        })
+#SkimForNNTraining_ForDY = Configuration('generateTrees.py', workflow='skim_nn_training', mode='skim', suffix='_for_dy', samples=['DY_NLO'], generation_args={
+#            'do_lljj': True,
+#            'do_llbb': False,
+#            'flavour': 'All',
+#            'branches': ['basic', 'weights', 'dy_rwgt']
+#        })
 
 # Plot the DY BDT in different flavour fractions before btagging, only for DY
 PlotsForDYFractions = Configuration('generatePlots.py', workflow='dy_fractions', mode='plots', suffix='_for_dy', samples=['DY_NLO'], generation_args={
@@ -157,17 +157,27 @@ PlotsForDYFractions = Configuration('generatePlots.py', workflow='dy_fractions',
             'syst_split_jec': True,
             'syst_split_pdf': True,
             'lljj_categories': ['SF'],
+            'lljj_stages': ['no_cut', 'mll_cut', 'mll_peak', 'mll_above_peak'],
+            'lljj_plots': ['dy_bdt', 'dy_bdt_flavour'],
+        })
+# Produce histograms needed to compute btagging efficiencies as a function of pt and eta
+PlotsForDYBtagEff = Configuration('generatePlots.py', workflow='dy_btag_eff', mode='plots', suffix='_for_dy', samples=['DY_NLO'], generation_args={
+            'sample_type': 'MC',
+            'syst': True,
+            'syst_split_jec': True,
+            'syst_split_pdf': True,
+            'lljj_categories': ['All'],
             'lljj_stages': ['no_cut'],
-            'lljj_plots': ['dy_bdt', 'dy_bdt_flavour', 'btag_efficiencies'],
+            'lljj_plots': ['btag_efficiencies'],
         })
 
 # General plots
 MainPlots_ForMC = Configuration('generatePlots.py', workflow='plot_main', mode='plots', samples=[
             "Main_Training",
             "DY_NLO",
-            #"Higgs",
-            #"VV_VVV",
-            #"Top_Other",
+            "Higgs",
+            "VV_VVV",
+            "Top_Other",
             #"WJets",
         ], generation_args={
             'sample_type': 'MC',
@@ -199,9 +209,9 @@ MainPlots_ForSignal = Configuration('generatePlots.py', workflow='plot_main', su
 NN2DPlots_ForMC = Configuration('generatePlots.py', workflow='plot_nn_2d', mode='plots', samples=[
             "Main_Training",
             "DY_NLO",
-            #"Higgs",
-            #"VV_VVV",
-            #"Top_Other",
+            "Higgs",
+            "VV_VVV",
+            "Top_Other",
             #"WJets",
         ], generation_args={
             'sample_type': 'MC',
@@ -384,7 +394,7 @@ def create_condor(samples, output, executable):
         elif node == "box": return "0"
         else: return node
 
-    training_grid = [ (kl, kt) for kl in [-20, 0.0001, 1, 2.4, 3.8, 5, 20] for kt in [0.5, 1, 1.75, 2.5] ]
+    training_grid = [ (kl, kt) for kl in [-20, -5, 0.0001, 1, 2.4, 3.8, 5, 20] for kt in [0.5, 1, 1.75, 2.5] ]
 
     ## Modify the input samples to add sample cuts and stuff
     for sample in mySub.sampleCfg[:]:
