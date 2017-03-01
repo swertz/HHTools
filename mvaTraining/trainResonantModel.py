@@ -115,6 +115,7 @@ if training:
 
 model = keras.models.load_model(output_model_filename)
 
+export_for_lwtnn(model, output_model_filename)
 draw_resonant_training_plots(model, dataset, output_folder, split_by_mass=add_mass_column)
 
 print("All done. Training time: %s" % str(training_time))

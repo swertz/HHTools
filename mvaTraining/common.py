@@ -834,3 +834,13 @@ def save_training_parameters(output, model, **kwargs):
     with open(os.path.join(output, 'parameters.json'), 'w') as f:
         json.dump(parameters, f, indent=4)
 
+
+def export_for_lwtnn(model, name):
+    base = os.path.splitext(name)
+
+    # Export architecture of the model
+    with open(base + '_arch.json', 'w') as f:
+        f.write(model.to_json())
+
+    # And the weights
+    model.save_weights(base + "_weights.h5")

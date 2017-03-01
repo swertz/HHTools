@@ -1,0 +1,67 @@
+{
+    "inputs": [
+        {
+            "name": "jj_pt",
+            "scale": 1,
+            "offset": 0,
+            "default": 0
+        },
+        {
+            "name": "ll_pt",
+            "scale": 1,
+            "offset": 0,
+            "default": 0
+        },
+        {
+            "name": "ll_M",
+            "scale": 1,
+            "offset": 0,
+            "default": 0
+        },
+        {
+            "name": "ll_DR_l_l",
+            "scale": 1,
+            "offset": 0,
+            "default": 0
+        },
+        {
+            "name": "jj_DR_j_j",
+            "scale": 1,
+            "offset": 0,
+            "default": 0
+        },
+        {
+            "name": "llmetjj_DPhi_ll_jj",
+            "scale": 1,
+            "offset": 0,
+            "default": 0
+        },
+        {
+            "name": "llmetjj_minDR_l_j",
+            "scale": 1,
+            "offset": 0,
+            "default": 0
+        },
+        {
+            "name": "llmetjj_MTformula",
+            "scale": 1,
+            "offset": 0,
+            "default": 0
+        },
+        {
+            "name": "isSF",
+            "scale": 1,
+            "offset": 0,
+            "default": 0
+        },
+        {
+            "name": "M_X",
+            "scale": 1,
+            "offset": 0,
+            "default": 0
+        }
+    ],
+    "class_labels": ["signal", "background"],
+    "keras_version": "1.0.0",
+    "miscellaneous": {}
+}

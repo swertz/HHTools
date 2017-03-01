@@ -247,6 +247,15 @@ TestPlots_ForData = Configuration('generatePlots.py', workflow='test', suffix='_
 #            'llbb_stages': ['mll_cut'],
 #        })
 
+LightTestPlots_ForMC = Configuration('generatePlots.py', workflow='light_test', mode='plots', samples=["DY_NLO"], generation_args={
+            'sample_type': 'MC',
+            'syst': False,
+            'llbb_plots': ['basic', 'nn'],
+            'llbb_stages': ['mll_cut'],
+            #'llbb_plots': ['basic', 'dy_bdt', 'nn'],
+            'llbb_categories': ['MuMu']
+        })
+
 ##### Parse arguments and do actual work ####
 
 parser = argparse.ArgumentParser(description='Facility to submit histFactory jobs on condor.')

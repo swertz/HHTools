@@ -1,5 +1,16 @@
 import copy, sys, os
 
+# Bunch of flags
+use_lwtnn = True
+use_keras = True
+
+def get_scram_tool_info(tool, tag):
+    import subprocess
+
+    cmd = ['scram', 'tool', 'tag', tool, tag]
+
+    return subprocess.check_output(cmd).strip()
+
 def default_code_before_loop():
     return r"""
         // Stuff for DY reweighting
@@ -16,14 +27,25 @@ def default_code_before_loop():
         TMVAEvaluator dy_bdt_reader("/home/fynu/swertz/scratch/CMSSW_8_0_25/src/cp3_llbb/HHTools/DYEstimation/weights/2017_02_17_BDTDY_bb_cc_vs_rest_10var_kBDT.weights.xml", { "jet1_pt",  "jet1_eta", "jet2_pt", "jet2_eta", "jj_pt", "ll_pt", "ll_eta", "llmetjj_DPhi_ll_met", "ht", "nJetsL" });
         
         MVAEvaluatorCache<TMVAEvaluator> dy_bdt(dy_bdt_reader);
-        
+
         // Keras NN evaluation
         // Resonant
-        KerasModelEvaluator resonant_nn("/home/fynu/sbrochet/scratch/Framework/CMSSW_8_0_24_patch1_HH_Analysis/src/cp3_llbb/HHTools/mvaTraining/hh_resonant_trained_models/2017-01-24_260_300_400_550_650_800_900_dy_estimation_from_BDT_new_prod_on_GPU_deeper_lr_scheduler_100epochs/hh_resonant_trained_model.h5");
-        MVAEvaluatorCache<KerasModelEvaluator> resonant_nn_evaluator(resonant_nn);
+        // KerasModelEvaluator resonant_nn("/home/fynu/sbrochet/scratch/Framework/CMSSW_8_0_24_patch1_HH_Analysis/src/cp3_llbb/HHTools/mvaTraining/hh_resonant_trained_models/2017-01-24_260_300_400_550_650_800_900_dy_estimation_from_BDT_new_prod_on_GPU_deeper_lr_scheduler_100epochs/hh_resonant_trained_model.h5");
+
+        LWTNNEvaluator resonant_lwt_nn("/home/fynu/sbrochet/scratch/Framework/CMSSW_8_0_24_patch1_HH_Analysis/src/cp3_llbb/HHTools/mvaTraining/hh_resonant_trained_models/2017-01-24_260_300_400_550_650_800_900_dy_estimation_from_BDT_new_prod_on_GPU_deeper_lr_scheduler_100epochs/hh_resonant_trained_model_lwtnn.json",
+            {"jj_pt", "ll_pt", "ll_M", "ll_DR_l_l", "jj_DR_j_j", "llmetjj_DPhi_ll_jj", "llmetjj_minDR_l_j", "llmetjj_MTformula", "isSF", "M_X"});
+
+        // MVAEvaluatorCache<KerasModelEvaluator> resonant_nn_evaluator(resonant_nn);
+        MVAEvaluatorCache<LWTNNEvaluator> resonant_nn_evaluator(resonant_lwt_nn);
+
         // Non-resonant
-        KerasModelEvaluator nonresonant_nn("/home/fynu/sbrochet/scratch/Framework/CMSSW_8_0_24_patch1_HH_Analysis/src/cp3_llbb/HHTools/mvaTraining/hh_nonresonant_trained_models/2017-01-24_dy_estimation_from_BDT_new_prod_deeper_lr_scheduler_st_0p005_100epochs/hh_nonresonant_trained_model.h5");
-        MVAEvaluatorCache<KerasModelEvaluator> nonresonant_nn_evaluator(nonresonant_nn);
+        // KerasModelEvaluator nonresonant_nn("/home/fynu/sbrochet/scratch/Framework/CMSSW_8_0_24_patch1_HH_Analysis/src/cp3_llbb/HHTools/mvaTraining/hh_nonresonant_trained_models/2017-01-24_dy_estimation_from_BDT_new_prod_deeper_lr_scheduler_st_0p005_100epochs/hh_nonresonant_trained_model.h5");
+
+        LWTNNEvaluator nonresonant_lwt_nn("/home/fynu/sbrochet/scratch/Framework/CMSSW_8_0_24_patch1_HH_Analysis/src/cp3_llbb/HHTools/mvaTraining/hh_nonresonant_trained_models/2017-01-24_dy_estimation_from_BDT_new_prod_deeper_lr_scheduler_st_0p005_100epochs/hh_nonresonant_trained_model_lwtnn.json",
+            {"jj_pt", "ll_pt", "ll_M", "ll_DR_l_l", "jj_DR_j_j", "llmetjj_DPhi_ll_jj", "llmetjj_minDR_l_j", "llmetjj_MTformula", "isSF", "k_l", "k_t"});
+
+        // MVAEvaluatorCache<KerasModelEvaluator> nonresonant_nn_evaluator(nonresonant_nn);
+        MVAEvaluatorCache<LWTNNEvaluator> nonresonant_nn_evaluator(nonresonant_lwt_nn);
 
         auto nn_reshaper = [](double nn) -> double {
             // Logarithmic, smaller alpha -> stretch more low-response end
@@ -63,17 +85,30 @@ def default_headers():
             "utils.h",
             "flavor_weighted_btag_efficiency_on_bdt.h",
             "KerasModelEvaluator.h",
-            "TMVAEvaluator.h"
+            "TMVAEvaluator.h",
+            "LWTNNEvaluator.h"
             ]
 
 def default_include_directories(scriptDir):
+    global use_lwtnn
     paths = [
             os.path.join(scriptDir, "..", "common", "include"),
             ]
 
     # We need numpy headers for Keras NN evaluator
-    import numpy as np
-    paths.append(np.get_include())
+    if use_keras:
+        import numpy as np
+        paths.append(np.get_include())
+
+    if use_lwtnn:
+        # We need eigen and lwtnn
+        # lwtnn is not currenly available in a CMSSW release, so use the
+        # direct path
+        # FIXME: This will break as soon as the SCRAM_ARCH change. The correct
+        # way to do it to bump to a CMSSW release including lwtnn and use
+        # `scram tool` to get the correct path
+        paths.append(get_scram_tool_info('eigen', 'INCLUDE'))
+        paths.append('/cvmfs/cms.cern.ch/slc6_amd64_gcc530/external/lwtnn/1.0-oenich/include')
 
     return paths
 
@@ -81,13 +116,35 @@ def default_sources(scriptDir):
     files = [
             "utils.cc",
             "flavor_weighted_btag_efficiency_on_bdt.cc",
-            "KerasModelEvaluator.cc",
             "TMVAEvaluator.cc"
             ]
-    return [ os.path.join(scriptDir, "..", "common", "src", f) for f in files ]
+
+    if use_keras:
+        files.append("KerasModelEvaluator.cc")
+
+    if use_lwtnn:
+        files.append('LWTNNEvaluator.cc')
+
+    files = [ os.path.join(scriptDir, "..", "common", "src", f) for f in files ]
+
+    return files
 
 def default_libraries():
-    return []
+    libs = []
+
+    if use_lwtnn:
+        libs.append('lwtnn')
+
+    return libs
+
+def default_library_directories():
+    dirs = []
+
+    if use_lwtnn:
+        # FIXME: Use scram tool once lwtnn is included into a cmssw release
+        dirs.append('/cvmfs/cms.cern.ch/slc6_amd64_gcc530/external/lwtnn/1.0-oenich/lib')
+
+    return dirs
 
 class GridReweighting:
     def __init__(self, scriptDir):
@@ -469,12 +526,14 @@ class BasePlotter:
                             'plot_cut': self.totalCut,
                             'binning': '(50, {}, {})'.format(0, 1)
                     })
+
                 self.mjj_vs_resonant_nnoutput_plot.append({
                         'name': 'mjj_vs_NN_resonant_M%d_%s_%s_%s%s' % (m, self.llFlav, self.suffix, self.extraString, self.systematicString),
                         'variable': self.jj_str + '.M() ::: nn_reshaper(resonant_nn_evaluator.evaluate(%s))' % (keras_resonant_input_variables % m),
                         'plot_cut': self.totalCut,
                         'binning': '(3, { 0, 75, 140, 13000 }, 20, 0, 1)'
                 })
+
             for point in nonresonant_signal_grid:
                 kl = point[0]
                 kt = point[1]

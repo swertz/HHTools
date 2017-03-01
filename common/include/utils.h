@@ -9,9 +9,6 @@
 #include <Math/Vector4D.h>
 #include <Math/VectorUtil.h>
 
-#include <KerasModelEvaluator.h>
-#include <TMVAEvaluator.h>
-
 typedef ROOT::Math::LorentzVector<ROOT::Math::PtEtaPhiE4D<float>> LorentzVector;
 
 // From https://stackoverflow.com/questions/35985960/c-why-is-boosthash-combine-the-best-way-to-combine-hash-values
