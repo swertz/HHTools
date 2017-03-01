@@ -2,6 +2,10 @@
 
 #include "utils.h"
 
+#include <KerasModelEvaluator.h>
+#include <TMVAEvaluator.h>
+#include <LWTNNEvaluator.h>
+
 template<typename Evaluator>
 double MVAEvaluatorCache<Evaluator>::evaluate(const std::vector<double>& values) {
     auto it = m_cache.find(values);
@@ -21,6 +25,7 @@ void MVAEvaluatorCache<Evaluator>::clear() {
 
 template class MVAEvaluatorCache<KerasModelEvaluator>;
 template class MVAEvaluatorCache<TMVAEvaluator>;
+template class MVAEvaluatorCache<LWTNNEvaluator>;
 
 double Lerp(double v0, double v1, double t) {
     return (1 - t) * v0 + t * v1;

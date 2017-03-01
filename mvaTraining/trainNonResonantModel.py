@@ -157,6 +157,7 @@ if training:
 
 model = keras.models.load_model(output_model_filename)
 
+export_for_lwtnn(model, output_model_filename)
 draw_non_resonant_training_plots(model, dataset, output_folder, split_by_parameters=add_parameters_columns)
 
 print("All done. Training time: %s" % str(training_time))
