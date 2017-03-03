@@ -17,8 +17,8 @@ samples_dict["Data"] = [
 
 # Main backgrounds:
 samples_dict["Main_Training"] = [
-    #'ST_tW_top_5f_noFullyHadronicDecays_13TeV-powheg',
-    #'ST_tW_antitop_5f_noFullyHadronicDecays_13TeV-powheg',
+    'ST_tW_top_5f_noFullyHadronicDecays_13TeV-powheg',
+    'ST_tW_antitop_5f_noFullyHadronicDecays_13TeV-powheg',
     ##'TT_TuneCUETP8M1_13TeV-powheg-pythia8_ext4', # TT incl NLO
     'TTTo2L2Nu_13TeV-powheg', # TT -> 2L 2Nu NLO
     ]

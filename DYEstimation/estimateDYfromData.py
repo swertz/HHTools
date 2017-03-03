@@ -21,8 +21,8 @@ parser.add_argument("-s", "--syst", help="Take care of systematics", action="sto
 options = parser.parse_args()
 
 # FIXME
-LUMI_mumu = 1. * 35860
-LUMI_ee = 1. * 35860
+LUMI_mumu = 1. * 35862
+LUMI_ee = 1. * 35852
 
 split_jec_sources = [
                 "AbsoluteFlavMap",
@@ -81,7 +81,7 @@ if options.syst:
         histos_ee += performSubtraction(options.data, options.mc, R".*ElEl.*_with_nobtag_to_btagM_reweighting__" + _s + "$" , LUMI_ee).values()
 
     # Systematics for which only MC is affected, not the reweighting => take nominal histos in Data
-    systematics = ["elreco", "elidiso", "muid", "muiso", "trigeff", "pdf", "pdfqq", "pdfgg", "pdfqg", "hdamp"]
+    systematics = ["elreco", "elidiso", "mutracking", "muid", "muiso", "trigeff", "pdf", "pdfqq", "pdfgg", "pdfqg", "hdamp"]
     
     for _s in build_syst(systematics) + build_scale("scaleUncorr"):
         print "Handling systematics {}".format(_s)

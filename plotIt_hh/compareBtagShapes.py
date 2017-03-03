@@ -110,13 +110,16 @@ for key in keys:
 
         if 'with_nobtag_to_btagM' in key_name:
             continue
+
+        #if "NN" in key_name:
+        #    continue
         
         ## Update all the plots with title, ...
 
         alreadyIn.append(key_name)
         plot = {
                 'x-axis': key_name,
-                'normalized': True,
+                #'normalized': True,
                 'rename': [
                     {'from': '(.*)(_log.)?\.(.*)', 'to': '\\1_DY_btag_comparison\\2.\\3'},
                     {'from': '_nobtag', 'to': ''}

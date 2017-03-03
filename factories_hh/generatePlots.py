@@ -181,18 +181,18 @@ else:
                 "jerup", "jerdown"
                 ], 
             "SF": [
-                #"elidisoup", "elidisodown",
-                ##"elrecoup", "elrecodown",
-                ##"mutrackingup", "mutrackingdown",
-                #"muidup", "muiddown",
-                #"muisoup", "muisodown",
-                #"jjbtaglightup", "jjbtaglightdown",
-                #"jjbtagheavyup", "jjbtagheavydown",
+                "elidisoup", "elidisodown",
+                "muidup", "muiddown",
+                "muisoup", "muisodown",
+                "jjbtaglightup", "jjbtaglightdown",
+                "jjbtagheavyup", "jjbtagheavydown",
                 "puup", "pudown",
-                #"trigeffup", "trigeffdown",
+                "trigeffup", "trigeffdown",
                 "pdfup", "pdfdown",
+                "dyStatup", "dyStatdown"
+                #"elrecoup", "elrecodown",
+                #"mutrackingup", "mutrackingdown",
                 #"hdampup", "hdampdown",
-                #"dyStatup", "dyStatdown"
                 ]
             }
     # Scale uncertainties

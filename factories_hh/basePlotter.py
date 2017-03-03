@@ -23,11 +23,11 @@ def default_code_before_loop():
                 return 2;
             return 1;
         };
-        /*std::array<FWBTagEfficiencyOnBDT, 3> fwBtagEff {
-            FWBTagEfficiencyOnBDT("/home/fynu/swertz/scratch/CMSSW_8_0_25/src/cp3_llbb/HHTools/DYEstimation/170217_btag_efficiency_systematics/btagging_efficiency.root", "/home/fynu/swertz/scratch/CMSSW_8_0_25/src/cp3_llbb/HHTools/DYEstimation/170217_btag_efficiency_systematics/btagging_scale_factors.root", "/home/fynu/swertz/scratch/CMSSW_8_0_25/src/cp3_llbb/HHTools/DYEstimation/170217_bb_cc_vs_rest_10var_dyFlavorFractions_systematics/mll_cut/flavour_fractions.root"),
-            FWBTagEfficiencyOnBDT("/home/fynu/swertz/scratch/CMSSW_8_0_25/src/cp3_llbb/HHTools/DYEstimation/170217_btag_efficiency_systematics/btagging_efficiency.root", "/home/fynu/swertz/scratch/CMSSW_8_0_25/src/cp3_llbb/HHTools/DYEstimation/170217_btag_efficiency_systematics/btagging_scale_factors.root", "/home/fynu/swertz/scratch/CMSSW_8_0_25/src/cp3_llbb/HHTools/DYEstimation/170217_bb_cc_vs_rest_10var_dyFlavorFractions_systematics/mll_peak/flavour_fractions.root"),
-            FWBTagEfficiencyOnBDT("/home/fynu/swertz/scratch/CMSSW_8_0_25/src/cp3_llbb/HHTools/DYEstimation/170217_btag_efficiency_systematics/btagging_efficiency.root", "/home/fynu/swertz/scratch/CMSSW_8_0_25/src/cp3_llbb/HHTools/DYEstimation/170217_btag_efficiency_systematics/btagging_scale_factors.root", "/home/fynu/swertz/scratch/CMSSW_8_0_25/src/cp3_llbb/HHTools/DYEstimation/170217_bb_cc_vs_rest_10var_dyFlavorFractions_systematics/mll_above_peak/flavour_fractions.root")
-        };*/
+        std::array<FWBTagEfficiencyOnBDT, 3> fwBtagEff {
+            FWBTagEfficiencyOnBDT("/home/fynu/swertz/scratch/CMSSW_8_0_25/src/cp3_llbb/HHTools/DYEstimation/170217_btag_efficiency_systematics/btagging_efficiency.root", "/home/fynu/swertz/scratch/CMSSW_8_0_25/src/cp3_llbb/HHTools/DYEstimation/170217_btag_efficiency_systematics/btagging_scale_factors.root", "/home/fynu/swertz/scratch/CMSSW_8_0_25/src/cp3_llbb/HHTools/DYEstimation/170302_bb_cc_vs_rest_10var_dyFlavorFractions_systematics/mll_cut/flavour_fractions.root"),
+            FWBTagEfficiencyOnBDT("/home/fynu/swertz/scratch/CMSSW_8_0_25/src/cp3_llbb/HHTools/DYEstimation/170217_btag_efficiency_systematics/btagging_efficiency.root", "/home/fynu/swertz/scratch/CMSSW_8_0_25/src/cp3_llbb/HHTools/DYEstimation/170217_btag_efficiency_systematics/btagging_scale_factors.root", "/home/fynu/swertz/scratch/CMSSW_8_0_25/src/cp3_llbb/HHTools/DYEstimation/170302_bb_cc_vs_rest_10var_dyFlavorFractions_systematics/mll_peak/flavour_fractions.root"),
+            FWBTagEfficiencyOnBDT("/home/fynu/swertz/scratch/CMSSW_8_0_25/src/cp3_llbb/HHTools/DYEstimation/170217_btag_efficiency_systematics/btagging_efficiency.root", "/home/fynu/swertz/scratch/CMSSW_8_0_25/src/cp3_llbb/HHTools/DYEstimation/170217_btag_efficiency_systematics/btagging_scale_factors.root", "/home/fynu/swertz/scratch/CMSSW_8_0_25/src/cp3_llbb/HHTools/DYEstimation/170302_bb_cc_vs_rest_10var_dyFlavorFractions_systematics/mll_above_peak/flavour_fractions.root")
+        };
 
 
         // DY BDT evaluation
@@ -39,21 +39,15 @@ def default_code_before_loop():
         // Keras NN evaluation
         
         // Resonant
-        // KerasModelEvaluator resonant_nn("/home/fynu/sbrochet/scratch/Framework/CMSSW_8_0_24_patch1_HH_Analysis/src/cp3_llbb/HHTools/mvaTraining/hh_resonant_trained_models/2017-01-24_260_300_400_550_650_800_900_dy_estimation_from_BDT_new_prod_on_GPU_deeper_lr_scheduler_100epochs/hh_resonant_trained_model.h5");
-
-        LWTNNEvaluator resonant_lwt_nn("/home/fynu/sbrochet/scratch/Framework/CMSSW_8_0_24_patch1_HH_Analysis/src/cp3_llbb/HHTools/mvaTraining/hh_resonant_trained_models/2017-01-24_260_300_400_550_650_800_900_dy_estimation_from_BDT_new_prod_on_GPU_deeper_lr_scheduler_100epochs/hh_resonant_trained_model_lwtnn.json",
+        LWTNNEvaluator resonant_lwt_nn("/nfs/scratch/fynu/sbrochet/Moriond17/CMSSW_8_0_26_p2_HH_analysis/src/cp3_llbb/HHTools/mvaTraining/hh_resonant_trained_models/2017-03-02_260_270_300_350_400_450_500_550_600_650_750_800_900_latest_march_prod_100epochs/hh_resonant_trained_model_lwtnn.json",
             {"jj_pt", "ll_pt", "ll_M", "ll_DR_l_l", "jj_DR_j_j", "llmetjj_DPhi_ll_jj", "llmetjj_minDR_l_j", "llmetjj_MTformula", "isSF", "M_X"});
 
-        // MVAEvaluatorCache<KerasModelEvaluator> resonant_nn_evaluator(resonant_nn);
         MVAEvaluatorCache<LWTNNEvaluator> resonant_nn_evaluator(resonant_lwt_nn);
 
         // Non-resonant
-        // KerasModelEvaluator nonresonant_nn("/home/fynu/sbrochet/scratch/Framework/CMSSW_8_0_24_patch1_HH_Analysis/src/cp3_llbb/HHTools/mvaTraining/hh_nonresonant_trained_models/2017-01-24_dy_estimation_from_BDT_new_prod_deeper_lr_scheduler_st_0p005_100epochs/hh_nonresonant_trained_model.h5");
-
-        LWTNNEvaluator nonresonant_lwt_nn("/home/fynu/sbrochet/scratch/Framework/CMSSW_8_0_24_patch1_HH_Analysis/src/cp3_llbb/HHTools/mvaTraining/hh_nonresonant_trained_models/2017-01-24_dy_estimation_from_BDT_new_prod_deeper_lr_scheduler_st_0p005_100epochs/hh_nonresonant_trained_model_lwtnn.json",
+        LWTNNEvaluator nonresonant_lwt_nn("/nfs/scratch/fynu/sbrochet/Moriond17/CMSSW_8_0_26_p2_HH_analysis/src/cp3_llbb/HHTools/mvaTraining/hh_nonresonant_trained_models/2017-03-02_latest_march_prod_100epochs/hh_nonresonant_trained_model_lwtnn.json",
             {"jj_pt", "ll_pt", "ll_M", "ll_DR_l_l", "jj_DR_j_j", "llmetjj_DPhi_ll_jj", "llmetjj_minDR_l_j", "llmetjj_MTformula", "isSF", "k_l", "k_t"});
 
-        // MVAEvaluatorCache<KerasModelEvaluator> nonresonant_nn_evaluator(nonresonant_nn);
         MVAEvaluatorCache<LWTNNEvaluator> nonresonant_nn_evaluator(nonresonant_lwt_nn);
 
         // Stuff to ensure we evaluate the NN only on values corresponding to the signal we're running on
@@ -102,7 +96,7 @@ def default_code_before_loop():
 
         auto nn_reshaper = [](double nn) -> double {
             // Logarithmic, smaller alpha -> stretch more low-response end
-            static double alpha = 0.25;
+            static double alpha = 0.2;
             static double a = log(1 + alpha) - log(alpha);
             static double b = log(alpha);
             return (log(nn + alpha) - b) / a;
@@ -340,10 +334,6 @@ class BasePlotter:
         
         electron_1_id_cut = '({0}.isEl ? ( {0}.ele_hlt_id && !(std::abs({0}.p4.Eta()) > 1.444 && std::abs({0}.p4.Eta()) < 1.566) ) : 1)'.format(self.lep1_str)
         electron_2_id_cut = '({0}.isEl ? ( {0}.ele_hlt_id && !(std::abs({0}.p4.Eta()) > 1.444 && std::abs({0}.p4.Eta()) < 1.566) ) : 1)'.format(self.lep2_str)
-        #electron_1_id_cut = '({}.isEl ? electron_ids[{}].at("cutBasedElectronHLTPreselection-Summer16-V1") : 1)'.format(self.lep1_str, self.lep1_fwkIdx)
-        #electron_2_id_cut = '({}.isEl ? electron_ids[{}].at("cutBasedElectronHLTPreselection-Summer16-V1") : 1)'.format(self.lep2_str, self.lep2_fwkIdx)
-        #electron_1_id_cut = '({0}.isEl ? (electron_isEB[{1}] ? (std::abs(electron_dxy[{1}]) < 0.05 && std::abs(electron_dz[{1}]) < 0.1) : (std::abs(electron_dxy[{1}]) < 0.1 && std::abs(electron_dz[{1}]) < 0.2)) : 1)'.format(self.lep1_str, self.lep1_fwkIdx)
-        #electron_2_id_cut = '({0}.isEl ? (electron_isEB[{1}] ? (std::abs(electron_dxy[{1}]) < 0.05 && std::abs(electron_dz[{1}]) < 0.1) : (std::abs(electron_dxy[{1}]) < 0.1 && std::abs(electron_dz[{1}]) < 0.2)) : 1)'.format(self.lep2_str, self.lep2_fwkIdx)
         cuts = self.joinCuts(cuts, electron_1_id_cut, electron_2_id_cut)
 
         # Keras neural network
@@ -495,7 +485,7 @@ class BasePlotter:
             ]
         dy_bdt_variables_string = "{ " + ", ".join(dy_bdt_variables) + " }"
         
-        dy_nobtag_to_btagM_weight_BDT = 'fwBtagEff[get_mll_bin({mll})].get_cached({j1}, {j2}, dy_bdt.evaluate({bdt}), "{syst}")'.format(mll=self.ll_str + ".M", j1=self.jet1_str + ".p4", j2=self.jet2_str + ".p4", bdt=dy_bdt_variables_string, syst=systematic)
+        dy_nobtag_to_btagM_weight_BDT = 'fwBtagEff[get_mll_bin({ll}.M())].get_cached({j1}, {j2}, dy_bdt.evaluate({bdt}), "{syst}")'.format(ll=self.ll_str, j1=self.jet1_str + ".p4", j2=self.jet2_str + ".p4", bdt=dy_bdt_variables_string, syst=systematic)
 
         available_weights = {
                 'trigeff': trigEff,

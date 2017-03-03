@@ -73,8 +73,10 @@ def get_sample_events_per_job(sample, factor=1):
     nevents = 50000
     if "DoubleMu" in sample or "DoubleEG" in sample or "MuonEG" in sample:
         nevents = 100000
-    if "node" in sample:
-        nevents = 75000
+    if "HHTo2B2VTo2L2Nu" in sample:
+        nevents = 100000
+    #if "node" in sample:
+    #    nevents = 75000
     if "TTTo" in sample:
         nevents = 25000
     return nevents * factor
@@ -141,14 +143,15 @@ SkimDYforBDTTraining = Configuration('generateTrees.py', workflow='skim_dy_bdt',
 # Skim main samples to train the NN
 SkimForNNTraining_Main = Configuration('generateTrees.py', workflow='skim_nn_training', mode='skim', samples=['Main_Training', 'Signal_Resonant', 'Signal_NonResonant'], generation_args={
             'flavour': 'All',
+            'reweight_signal': True,
             'branches': ['basic', 'weights']
         })
-#SkimForNNTraining_ForDY = Configuration('generateTrees.py', workflow='skim_nn_training', mode='skim', suffix='_for_dy', samples=['DY_NLO'], generation_args={
-#            'do_lljj': True,
-#            'do_llbb': False,
-#            'flavour': 'All',
-#            'branches': ['basic', 'weights', 'dy_rwgt']
-#        })
+SkimForNNTraining_ForDY = Configuration('generateTrees.py', workflow='skim_nn_training', mode='skim', suffix='_for_dy', samples=['DY_NLO'], generation_args={
+            'do_lljj': True,
+            'do_llbb': False,
+            'flavour': 'All',
+            'branches': ['basic', 'weights', 'dy_rwgt']
+        })
 
 # Plot the DY BDT in different flavour fractions before btagging, only for DY
 PlotsForDYFractions = Configuration('generatePlots.py', workflow='dy_fractions', mode='plots', suffix='_for_dy', samples=['DY_NLO'], generation_args={
@@ -239,32 +242,28 @@ NN2DPlots_ForSignal = Configuration('generatePlots.py', workflow='plot_nn_2d', s
         })
 
 # Testing area
-TestPlots_ForMC = Configuration('generatePlots.py', workflow='test', mode='plots', samples=["Main_Training", "DY_NLO"], generation_args={
+TestPlots_ForMC = Configuration('generatePlots.py', workflow='test', mode='plots', samples=["DY_NLO"], generation_args={
             'sample_type': 'MC',
-            'llbb_plots': ['basic'],
-            'llbb_stages': ['mll_cut', 'no_cut', 'mll_peak'],
-            'llbb_categories': ['ElEl', 'MuMu'],
+            'syst': True,
+            'lljj_plots': ['basic', 'dy_bdt', 'nn'],
+            'lljj_categories': ['MuMu', 'ElEl'],
+            'lljj_stages': ['no_cut'],
+            'llbb_plots': ['basic', 'dy_bdt', 'nn'],
+            'llbb_categories': ['MuMu', 'ElEl'],
+            'llbb_stages': ['no_cut'],
         })
-TestPlots_ForData = Configuration('generatePlots.py', workflow='test', suffix='_for_data', mode='plots', samples=['Data'], generation_args={
-            'sample_type': 'Data',
-            'llbb_plots': ['basic'],
-            'llbb_stages': ['mll_cut', 'no_cut', 'mll_peak'],
-            'llbb_categories': ['ElEl', 'MuMu'],
-        })
-#TestPlots_ForSignal = Configuration('generatePlots.py', workflow='test', suffix='_for_signal', mode='plots', samples=['Signal_Resonant', 'Signal_NonResonant'], generation_args={
-#            'sample_type': 'Signal',
-#            'llbb_plots': ['other'],
+#TestPlots_ForData = Configuration('generatePlots.py', workflow='test', suffix='_for_data', mode='plots', samples=['Data'], generation_args={
+#            'sample_type': 'Data',
+#            'llbb_plots': ['nn'],
+#            'llbb_categories': ['All'],
 #            'llbb_stages': ['mll_cut'],
 #        })
-
-LightTestPlots_ForMC = Configuration('generatePlots.py', workflow='light_test', mode='plots', samples=["DY_NLO"], generation_args={
-            'sample_type': 'MC',
-            'syst': False,
-            'llbb_plots': ['basic', 'nn'],
-            'llbb_stages': ['mll_cut'],
-            #'llbb_plots': ['basic', 'dy_bdt', 'nn'],
-            'llbb_categories': ['MuMu']
-        })
+#TestPlots_ForSignal = Configuration('generatePlots.py', workflow='test', suffix='_for_signal', mode='plots', samples=['Signal_Resonant', 'Signal_NonResonant'], generation_args={
+#            'sample_type': 'Signal',
+#            'llbb_plots': ['nn'],
+#            'llbb_categories': ['All'],
+#            'llbb_stages': ['mll_cut'],
+#        })
 
 ##### Parse arguments and do actual work ####
 
