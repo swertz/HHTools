@@ -1,0 +1,152 @@
+'tt':
+  legend: ' t#bar{t}'
+  legend-order: 6
+  fill-color: '#EB6841'
+'ttV':
+  legend: ' t#bar{t}V'
+  legend-order: 2
+  fill-color: '#53777A'
+'t':
+  legend: 'Single top'
+  legend-order: 4
+  fill-color: '#C02942'
+'DY':
+  legend: 'Drell-Yan'
+  legend-order: 5
+  fill-color: '#00A0B0'
+'Data':
+  legend: 'Data'
+'Higgs':
+  legend: 'SM Higgs'
+  legend-order: 1
+  fill-color: '#A8DBA8'
+'Other':
+  legend: 'Other'
+  legend-order: 0 
+  fill-color: '#774F38' #'#6A4A3C'
+'VV':
+  fill-color: '#ECD078'
+  legend: 'VV'
+  legend-order: 3
+    
+'low_mll':
+  legend: 'm_{ll} < 76'
+  line-width: 2.7
+  line-type: 1
+  fill-type: 0
+  line-color: '#00A0B0'
+  legend-style: l
+
+'high_mll':
+  legend: 'm_{ll} > 106'
+  line-width: 2.7
+  line-type: 1
+  fill-type: 0
+  legend-style: l
+
+'inverted_mll':
+  legend: 'm_{ll} #geq 76'
+  line-width: 2.7
+  line-type: 1
+  fill-type: 0
+  line-color: '#BF0A2B'
+  legend-style: l
+
+'inverted_mll_reweighted':
+  legend: 'm_{ll} #geq 76 reweighted'
+  line-width: 2.7
+  line-type: 1
+  fill-type: 0
+  line-color: '#4C1B1B'
+  legend-style: l
+
+'no_btag':
+  legend: 'No btag'
+  legend-order: 1
+  line-width: 2.7
+  line-type: 1
+  fill-type: 0
+  line-color: '#1BA1E2'
+  legend-style: l
+
+'with_btag':
+  legend: '#geq 2 btag'
+  legend-order: 2
+  line-width: 2.7
+  line-type: 1
+  fill-type: 0
+  line-color: '#E51400'
+  legend-style: l
+
+'no_btag_with_eff':
+  legend: 'No btag with b-tag eff'
+  legend-order: 2
+  line-width: 2.7
+  line-type: 1
+  fill-type: 0
+  #line-color: '#4C1B1B'
+  line-color: '#BF0A2B'
+  legend-style: l
+
+'no_btag_with_reweighting':
+  legend: 'W[No btag]'
+  legend-order: 3
+  line-width: 2.7
+  line-type: 1
+  fill-type: 0
+  line-color: '#AA00FF'
+  legend-style: l
+
+'data_nobtag_subtracted':
+  legend: 'Data (nobtag), bkg. subtracted'
+  legend-order: 4
+  line-width: 2.7
+  line-type: 1
+  fill-type: 0
+  fill-color: '#A4C400'
+  legend-style: l
+
+'data_btagM_subtracted':
+  legend: 'Data (btag), bkg. subtracted'
+  legend-order: 5
+  line-width: 2.7
+  line-type: 1
+  fill-type: 0
+  fill-color: '#C02942'
+  legend-style: l
+
+'reweighted_data_subtracted':
+  legend: 'W[Data (nobtag), bkg. subtracted]'
+  legend-order: 6
+  line-width: 2.7
+  line-type: 1
+  fill-type: 0
+  fill-color: '#008A00'
+  legend-style: l
+
+'real_b':
+  legend: 'Z + bb / cc / bc'
+  legend-order: 2
+  line-width: 2.7
+  line-type: 1
+  fill-type: 0
+  line-color: '#00A0B0'
+  legend-style: l
+
+'bx':
+  legend: 'Z + bx / cx'
+  legend-order: 2
+  line-width: 2.7
+  line-type: 1
+  fill-type: 0
+  line-color: '#BF0A2B'
+  legend-style: l
+
+'light':
+  legend: 'Z + ll'
+  legend-order: 1
+  line-width: 2.7
+  line-type: 1
+  fill-type: 0
+  line-color: '#4C1B1B'
+  legend-style: l
