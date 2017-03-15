@@ -1,11 +1,11 @@
 configuration:
-    include: ['centralConfig_shapes_postfit.yml']
+  include: ['centralConfig_shapes_postfit.yml']
 
 files:
-    include: ['MCFiles_shapes_postfit.yml', 'DataFiles_shapes_postfit.yml']
+  include: ['MCFiles_shapes_postfit.yml', 'DataFiles_shapes_postfit.yml']
 
 plots:
-    include: ['postfitPlots.yml']
+  include: ['postfitPlots.yml']
 
 groups:
   include: ['groups.yml']

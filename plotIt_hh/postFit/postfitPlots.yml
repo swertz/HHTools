@@ -1,34 +1,19 @@
-mjj_MuMu:
-  labels:
-  - position: [0.22, 0.895]
-    size: 24
-    text: '#mu#mu channel'
-  legend-columns: 2
-  save-extensions: [pdf, png]
-  show-errors: true
-  show-overflow: false
-  show-ratio: true
-  log-y: both
-  x-axis: m_{jj} (GeV)
-  y-axis: Events
-  y-axis-format: '%1% / %2$.2f GeV'
-
-ptjj_MuMu:
-  labels:
-  - position: [0.22, 0.895]
-    text: '#mu#mu channel'
-    size: 24
-  legend-columns: 2
-  save-extensions: [pdf, png]
-  show-errors: true
-  show-overflow: false
-  show-ratio: true
-  log-y: both
-  x-axis: Dijet system p_{T} (GeV)
-  y-axis: Events
-  y-axis-format: '%1% / %2$.2f GeV'
-
-#NN_M400_MuMu:
+#mjj_MuMu:
+#  labels:
+#  - position: [0.22, 0.895]
+#    size: 24
+#    text: '#mu#mu channel'
+#  legend-columns: 2
+#  save-extensions: [pdf, png]
+#  show-errors: true
+#  show-overflow: false
+#  show-ratio: true
+#  log-y: both
+#  x-axis: m_{jj} (GeV)
+#  y-axis: Events
+#  y-axis-format: '%1% / %2$.2f GeV'
+#
+#ptjj_MuMu:
 #  labels:
 #  - position: [0.22, 0.895]
 #    text: '#mu#mu channel'
@@ -39,11 +24,26 @@ ptjj_MuMu:
 #  show-overflow: false
 #  show-ratio: true
 #  log-y: both
-#  x-axis: NN output at m_{X} = 400 GeV
+#  x-axis: Dijet system p_{T} (GeV)
+#  y-axis: Events
+#  y-axis-format: '%1% / %2$.2f GeV'
+
+#NN_M900_MuMu:
+#  labels:
+#  - position: [0.22, 0.895]
+#    text: '#mu#mu channel'
+#    size: 24
+#  legend-columns: 2
+#  save-extensions: [pdf, png]
+#  show-errors: true
+#  show-overflow: false
+#  show-ratio: true
+#  log-y: both
+#  x-axis: NN output at m_{X} = 900 GeV
 #  y-axis: Events
 #  y-axis-format: '%1%'
 #
-#mjj_vs_NN_M400_MuMu:
+#mjj_vs_NN_M900_MuMu:
 #  labels:
 #  - position: [0.22, 0.895]
 #    text: '#mu#mu channel'
@@ -55,7 +55,7 @@ ptjj_MuMu:
 #  show-overflow: false
 #  show-ratio: true
 #  save-extensions: [pdf, png]
-#  x-axis: NN output at m_{X} = 400 GeV, m_{jj} bins
+#  x-axis: NN output at m_{X} = 900 GeV, m_{jj} bins
 #  y-axis: Events
 #  y-axis-format: '%1%'
 #  labels:
@@ -83,57 +83,58 @@ ptjj_MuMu:
 #        line-width: 2
 #        value: 1.88
 
-#NN_1p00_1p00_MuMu:
-#  labels:
-#  - position: [0.22, 0.895]
-#    text: '#mu#mu channel'
-#    size: 24
-#  legend-columns: 2
-#  save-extensions: [pdf, png]
-#  show-errors: true
-#  show-overflow: false
-#  show-ratio: true
-#  log-y: both
-#  x-axis: NN output at (#kappa_{#lambda}, #kappa_{t}) = (-20, 0.5), m_{jj} bins
-#  y-axis: Events
-#  y-axis-format: '%1%'
+NN_1p00_1p00_MuMu:
+  labels:
+  - position: [0.22, 0.895]
+    text: '#mu#mu channel'
+    size: 24
+  legend-columns: 2
+  save-extensions: [pdf, png]
+  show-errors: true
+  show-overflow: false
+  show-ratio: true
+  log-y: both
+  x-axis: 'NN output at (#kappa_{#lambda}, #kappa_{t}) = (1, 1), m_{jj} bins'
+  y-axis: Events
+  y-axis-format: '%1%'
+  rebin: 2
 
-#mjj_vs_NN_1p00_1p00_MuMu:
-#  labels:
-#  - position: [0.22, 0.895]
-#    text: '#mu#mu channel'
-#    size: 24
-#  legend-columns: 2
-#  legend-position: [0.45, 0.61, 0.91, 0.89]
-#  log-y: both
-#  show-errors: true
-#  show-overflow: false
-#  show-ratio: true
-#  save-extensions: [pdf, png]
-#  x-axis: NN output at (#kappa_{#lambda}, #kappa_{t}) = (-20, 0.5), m_{jj} bins
-#  y-axis: Events
-#  y-axis-format: '%1%'
-#  labels:
-#      -
-#        size: 18
-#        position: [ 0.24, 0.65 ]
-#        text: "m_{jj} < 75 GeV"
-#      -
-#        size: 18
-#        position: [ 0.45, 0.65 ]
-#        text: "75 GeV #leq m_{jj} < 140 GeV"
-#      -
-#        size: 18
-#        position: [ 0.76, 0.65 ]
-#        text: "m_{jj} #geq 140 GeV"
-#  vertical-lines:
-#      - 
-#        line-color: 1
-#        line-type: 2
-#        line-width: 2
-#        value: 1.00
-#      - 
-#        line-color: 1
-#        line-type: 2
-#        line-width: 2
-#        value: 1.88
+mjj_vs_NN_1p00_1p00_MuMu:
+  labels:
+  - position: [0.22, 0.895]
+    text: '#mu#mu channel'
+    size: 24
+  legend-columns: 2
+  legend-position: [0.45, 0.61, 0.91, 0.89]
+  log-y: both
+  show-errors: true
+  show-overflow: false
+  show-ratio: true
+  save-extensions: [pdf, png]
+  x-axis: 'NN output at (#kappa_{#lambda}, #kappa_{t}) = (1, 1), m_{jj} bins'
+  y-axis: Events
+  y-axis-format: '%1%'
+  labels:
+      -
+        size: 18
+        position: [ 0.24, 0.65 ]
+        text: "m_{jj} < 75 GeV"
+      -
+        size: 18
+        position: [ 0.45, 0.65 ]
+        text: "75 GeV #leq m_{jj} < 140 GeV"
+      -
+        size: 18
+        position: [ 0.76, 0.65 ]
+        text: "m_{jj} #geq 140 GeV"
+  vertical-lines:
+      - 
+        line-color: 1
+        line-type: 2
+        line-width: 2
+        value: 1.00
+      - 
+        line-color: 1
+        line-type: 2
+        line-width: 2
+        value: 1.88

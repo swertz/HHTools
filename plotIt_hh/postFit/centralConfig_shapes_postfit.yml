@@ -6,7 +6,7 @@ extra-label: "Preliminary"
 
 root: 'shapes'
 
-luminosity: 35862 # according to brilcalc 
+luminosity: 35922 # according to brilcalc 
 no-lumi-rescaling: true
 blinded-range-fill-color: "16" #"#29556270"
 blinded-range-fill-style: 3004
