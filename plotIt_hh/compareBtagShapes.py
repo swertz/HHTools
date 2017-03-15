@@ -288,7 +288,7 @@ for key in keys:
         
         elif "DY_BDT" in key_name:
             plot['x-axis'] = "DY reweighting BDT"
-            plot['legend-position'] = [0.2, 0.6, 0.4, 0.83]
+            plot['legend-position'] = [0.2, 0.52, 0.53, 0.80]
             plot['for-yields'] = True #### Do the yields here
             plot.update(defaultStyle_events)
         

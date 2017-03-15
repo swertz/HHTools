@@ -4,6 +4,7 @@ import sys, os, json
 import copy
 import datetime
 import subprocess
+import numpy as np
 
 import argparse
 
@@ -75,13 +76,41 @@ def get_sample_events_per_job(sample, factor=1):
         nevents = 100000
     if "HHTo2B2VTo2L2Nu" in sample:
         nevents = 100000
-    #if "node" in sample:
-    #    nevents = 75000
     if "TTTo" in sample:
-        nevents = 25000
+        nevents = 30000
     return nevents * factor
 
 workflows = {}
+
+# Signal grid for resonant samples
+resonant_signal_grid = [260, 270, 300, 350, 400, 450, 500, 550, 600, 650, 700, 750, 800, 900]
+#resonant_signal_grid = [400, 650, 900]
+#resonant_signal_grid = list(np.concatenate([ np.arange(260, 351, 5, dtype=int), np.arange(360, 901, 10, dtype=int) ]))
+
+# Reweighting grid for non-resonant signals
+def check_grid_klambda(grid):
+    for p in grid[:]:
+        if p[0] == 0:
+            grid.remove(p)
+            grid.append( (0.0001, p[1]) )
+
+nonresonant_signal_grid = [ (kl, kt) for kl in [-20, -5, 0, 1, 2.4, 3.8, 5, 20] for kt in [0.5, 1, 1.75, 2.5] ]
+
+# Set of extra points for 1D/2D scans, comment if not needed
+#extra_1d_signals = []
+#extra_1d_signals += [ (kl, 1) for kl in np.arange(-20, 21) ]
+#extra_1d_signals += [ (kl, 1) for kl in np.arange(-5, 5.5, 0.5) ]
+#extra_1d_signals += [ (1, kt) for kt in np.arange(0.5, 2.75, 0.25) ]
+#extra_2d_signals = []
+#extra_2d_signals = [ (kl, kt) for kl in np.arange(-20, 21, 2.5) for kt in np.arange(0.5, 2.75, 0.5) ]
+#extra_2d_signals = [ (kl, kt) for kl in np.arange(-20, 21, 2.5) for kt in np.arange(0.75, 2.5, 0.5) ]
+#nonresonant_signal_grid = extra_2d_signals
+#nonresonant_signal_grid = list(set(extra_1d_signals + nonresonant_signal_grid))
+#nonresonant_signal_grid = [ (1, 1), (5, 2.5), (-20, 0.5) ]
+#nonresonant_signal_grid = [ (1,1) ]
+#nonresonant_signal_grid = [  ]
+
+check_grid_klambda(nonresonant_signal_grid)
 
 class Configuration:
     def __init__(self, config, workflow='default', mode='plot', suffix='', samples=[], generation_args={}):
@@ -91,6 +120,8 @@ class Configuration:
         self.suffix = suffix
         self.mode = mode
         self.generation_args = generation_args
+        self.generation_args['resonant_signal_grid'] = resonant_signal_grid
+        self.generation_args['nonresonant_signal_grid'] = nonresonant_signal_grid
 
         if workflow not in workflows.keys():
             workflows[workflow] = [ self ]
@@ -181,7 +212,7 @@ MainPlots_ForMC = Configuration('generatePlots.py', workflow='plot_main', mode='
             "Higgs",
             "VV_VVV",
             "Top_Other",
-            #"WJets",
+            "WJets",
         ], generation_args={
             'sample_type': 'MC',
             'lljj_plots': ['basic', 'dy_bdt'],
@@ -215,14 +246,14 @@ NN2DPlots_ForMC = Configuration('generatePlots.py', workflow='plot_nn_2d', mode=
             "Higgs",
             "VV_VVV",
             "Top_Other",
-            #"WJets",
+            "WJets",
         ], generation_args={
             'sample_type': 'MC',
             'llbb_stages': ['mll_cut'],
             'llbb_plots': ['mjj_vs_nn'],
             'syst': True,
             'syst_split_jec': True,
-            #'syst_split_pdf': True,
+            #'syst_only_jec': True,
         })
 NN2DPlots_ForData = Configuration('generatePlots.py', workflow='plot_nn_2d', suffix='_for_data', mode='plots', samples=['Data'], generation_args={
             'sample_type': 'Data',
@@ -230,40 +261,46 @@ NN2DPlots_ForData = Configuration('generatePlots.py', workflow='plot_nn_2d', suf
             'llbb_plots': ['mjj_vs_nn'],
             'syst': True,
             'syst_split_jec': True,
-            #'syst_split_pdf': True,
+            #'syst_only_jec': True,
         })
-NN2DPlots_ForSignal = Configuration('generatePlots.py', workflow='plot_nn_2d', suffix='_for_signal', mode='plots', samples=['Signal_Resonant', 'Signal_NonResonant'], generation_args={
+NN2DPlots_ForSignal = Configuration('generatePlots.py', workflow='plot_nn_2d', suffix='_for_signal', mode='plots', samples=['Signal_NonResonant', 'Signal_Resonant'], generation_args={
             'sample_type': 'Signal',
             'llbb_stages': ['mll_cut'],
             'llbb_plots': ['mjj_vs_nn'],
             'syst': True,
             'syst_split_jec': True,
-            #'syst_split_pdf': True,
+            #'syst_only_jec': True,
         })
 
 # Testing area
-TestPlots_ForMC = Configuration('generatePlots.py', workflow='test', mode='plots', samples=["DY_NLO"], generation_args={
+TestPlots_ForMC = Configuration('generatePlots.py', workflow='test', mode='plots', samples=[
+            "Main_Training",
+            "DY_NLO",
+            "Higgs",
+            "VV_VVV",
+            "Top_Other",
+            "WJets",
+        ], generation_args={
             'sample_type': 'MC',
+            'llbb_stages': ['mll_cut'],
+            'llbb_plots': ['basic', 'nn', 'mjj_vs_nn'],
             'syst': True,
-            'lljj_plots': ['basic', 'dy_bdt', 'nn'],
-            'lljj_categories': ['MuMu', 'ElEl'],
-            'lljj_stages': ['no_cut'],
-            'llbb_plots': ['basic', 'dy_bdt', 'nn'],
-            'llbb_categories': ['MuMu', 'ElEl'],
-            'llbb_stages': ['no_cut'],
+            'syst_split_jec': True,
         })
-#TestPlots_ForData = Configuration('generatePlots.py', workflow='test', suffix='_for_data', mode='plots', samples=['Data'], generation_args={
-#            'sample_type': 'Data',
-#            'llbb_plots': ['nn'],
-#            'llbb_categories': ['All'],
-#            'llbb_stages': ['mll_cut'],
-#        })
-#TestPlots_ForSignal = Configuration('generatePlots.py', workflow='test', suffix='_for_signal', mode='plots', samples=['Signal_Resonant', 'Signal_NonResonant'], generation_args={
-#            'sample_type': 'Signal',
-#            'llbb_plots': ['nn'],
-#            'llbb_categories': ['All'],
-#            'llbb_stages': ['mll_cut'],
-#        })
+TestPlots_ForData = Configuration('generatePlots.py', workflow='test', suffix='_for_data', mode='plots', samples=['Data'], generation_args={
+            'sample_type': 'Data',
+            'llbb_stages': ['mll_cut'],
+            'llbb_plots': ['basic', 'nn', 'mjj_vs_nn'],
+            'syst': True,
+            'syst_split_jec': True,
+        })
+TestPlots_ForSignal = Configuration('generatePlots.py', workflow='test', suffix='_for_signal', mode='plots', samples=['Signal_NonResonant', 'Signal_BM_Resonant'], generation_args={
+            'sample_type': 'Signal',
+            'llbb_stages': ['mll_cut'],
+            'llbb_plots': ['basic', 'nn', 'mjj_vs_nn'],
+            'syst': True,
+            'syst_split_jec': True,
+        })
 
 ##### Parse arguments and do actual work ####
 
@@ -374,7 +411,7 @@ def create_condor(samples, output, executable):
     ## Create test_condor directory and subdirs
     mySub.setupCondorDirs()
 
-    splitTT = False
+    splitTT = True
     splitDY = False
 
     def get_node(db_name):
@@ -393,45 +430,54 @@ def create_condor(samples, output, executable):
         elif node == "box": return "0"
         else: return node
 
-    training_grid = [ (kl, kt) for kl in [-20, -5, 0.0001, 1, 2.4, 3.8, 5, 20] for kt in [0.5, 1, 1.75, 2.5] ]
-
     ## Modify the input samples to add sample cuts and stuff
     for sample in mySub.sampleCfg[:]:
         # TTbar final state splitting
-        if splitTT and 'TT_TuneCUETP8M1_13TeV-powheg-pythia8_Fall15MiniAODv2' in sample["db_name"]:
+        if splitTT and 'TT_TuneCUETP8M2T4_13TeV-powheg-pythia8' in sample["db_name"]:
 
             # Fully leptonic
-            tt_fl_sample = copy.deepcopy(sample)
+            #tt_fl_sample = copy.deepcopy(sample)
+            #newJson = copy.deepcopy(sample["json_skeleton"][sample["db_name"]])
+
+            #tt_fl_sample["db_name"] = sample["db_name"].replace("TT_Tune", "TT_FL_Tune")
+            #newJson["sample_cut"] = "(hh_gen_ttbar_decay_type >= 4 && hh_gen_ttbar_decay_type <= 10 && hh_gen_ttbar_decay_type != 7)"
+
+            #tt_fl_sample["json_skeleton"][tt_fl_sample["db_name"]] = newJson
+            #tt_fl_sample["json_skeleton"].pop(sample["db_name"])
+            #mySub.sampleCfg.append(tt_fl_sample)
+
+            ## Semi leptonic
+            #tt_sl_sample = copy.deepcopy(sample)
+            #newJson = copy.deepcopy(sample["json_skeleton"][sample["db_name"]])
+
+            #tt_sl_sample["db_name"] = sample["db_name"].replace("TT_Tune", "TT_SL_Tune")
+            #newJson["sample_cut"] = "(hh_gen_ttbar_decay_type == 2 || hh_gen_ttbar_decay_type == 3 || hh_gen_ttbar_decay_type == 7)"
+
+            #tt_sl_sample["json_skeleton"][tt_sl_sample["db_name"]] = newJson
+            #tt_sl_sample["json_skeleton"].pop(sample["db_name"])
+            #mySub.sampleCfg.append(tt_sl_sample)
+
+            ## Fully hadronic
+            #tt_fh_sample = copy.deepcopy(sample)
+            #newJson = copy.deepcopy(sample["json_skeleton"][sample["db_name"]])
+
+            #tt_fh_sample["db_name"] = sample["db_name"].replace("TT_Tune", "TT_FH_Tune")
+            #newJson["sample_cut"] = "(hh_gen_ttbar_decay_type == 1)"
+
+            #tt_fh_sample["json_skeleton"][tt_fh_sample["db_name"]] = newJson
+            #tt_fh_sample["json_skeleton"].pop(sample["db_name"])
+            #mySub.sampleCfg.append(tt_fh_sample)
+
+            # Not fully leptonic
+            tt_other_sample = copy.deepcopy(sample)
             newJson = copy.deepcopy(sample["json_skeleton"][sample["db_name"]])
 
-            tt_fl_sample["db_name"] = sample["db_name"].replace("TT_Tune", "TT_FL_Tune")
-            newJson["sample_cut"] = "(hh_gen_ttbar_decay_type >= 4 && hh_gen_ttbar_decay_type <= 10 && hh_gen_ttbar_decay_type != 7)"
+            tt_other_sample["db_name"] = sample["db_name"].replace("TT_Tune", "TT_Other_Tune")
+            newJson["sample_cut"] = "(hh_gen_ttbar_decay_type <= 3 || hh_gen_ttbar_decay_type == 7)"
 
-            tt_fl_sample["json_skeleton"][tt_fl_sample["db_name"]] = newJson
-            tt_fl_sample["json_skeleton"].pop(sample["db_name"])
-            mySub.sampleCfg.append(tt_fl_sample)
-
-            # Semi leptonic
-            tt_sl_sample = copy.deepcopy(sample)
-            newJson = copy.deepcopy(sample["json_skeleton"][sample["db_name"]])
-
-            tt_sl_sample["db_name"] = sample["db_name"].replace("TT_Tune", "TT_SL_Tune")
-            newJson["sample_cut"] = "(hh_gen_ttbar_decay_type == 2 || hh_gen_ttbar_decay_type == 3 || hh_gen_ttbar_decay_type == 7)"
-
-            tt_sl_sample["json_skeleton"][tt_sl_sample["db_name"]] = newJson
-            tt_sl_sample["json_skeleton"].pop(sample["db_name"])
-            mySub.sampleCfg.append(tt_sl_sample)
-
-            # Fully hadronic
-            tt_fh_sample = copy.deepcopy(sample)
-            newJson = copy.deepcopy(sample["json_skeleton"][sample["db_name"]])
-
-            tt_fh_sample["db_name"] = sample["db_name"].replace("TT_Tune", "TT_FH_Tune")
-            newJson["sample_cut"] = "(hh_gen_ttbar_decay_type == 1)"
-
-            tt_fh_sample["json_skeleton"][tt_fh_sample["db_name"]] = newJson
-            tt_fh_sample["json_skeleton"].pop(sample["db_name"])
-            mySub.sampleCfg.append(tt_fh_sample)
+            tt_other_sample["json_skeleton"][tt_other_sample["db_name"]] = newJson
+            tt_other_sample["json_skeleton"].pop(sample["db_name"])
+            mySub.sampleCfg.append(tt_other_sample)
 
             mySub.sampleCfg.remove(sample)
 
@@ -474,24 +520,24 @@ def create_condor(samples, output, executable):
         if 'DYJetsToLL_M-5to50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8' in sample["db_name"] or 'DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8' in sample["db_name"]:
             sample["json_skeleton"][sample["db_name"]]["sample_cut"] = "event_ht < 100"
 
-        if 'WJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8' in sample["db_name"]:
-            sample["json_skeleton"][sample["db_name"]]["sample_cut"] = "event_ht < 100"
+        #if 'WJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8' in sample["db_name"]:
+        #    sample["json_skeleton"][sample["db_name"]]["sample_cut"] = "event_ht < 100"
 
         # Benchmark to training grid reweighting (ME-based)
         if "node" in sample["db_name"]:
             base = get_node(sample["db_name"])
             
-            for grid_point in training_grid:
-                kl = str(grid_point[0])
-                kt = str(grid_point[1])
+            for grid_point in nonresonant_signal_grid:
+                kl = "{:.2f}".format(grid_point[0])
+                kt = "{:.2f}".format(grid_point[1])
                 
-                weight_args = [get_node_id(base), kl, kt, number_of_bases]
+                weight_args = [get_node_id(base), grid_point[0], grid_point[1], number_of_bases]
 
                 newSample = copy.deepcopy(sample)
                 newJson = copy.deepcopy(sample["json_skeleton"][sample["db_name"]])
             
                 point_str = "base_" + base + "_point_" + kl + "_" + kt
-                point_str = point_str.replace(".", "p")
+                point_str = point_str.replace(".", "p").replace("-", "m")
                 newSample["db_name"] = sample["db_name"].replace("node_" + base, point_str)
                 newJson["sample-weight"] = "training_grid"
                 newJson["sample-weight-args"] = weight_args

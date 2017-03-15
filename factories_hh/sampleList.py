@@ -1,5 +1,6 @@
 ####### Warning: put most recent tags first! ###### 
 analysis_tags = [
+        'v5.0.1+80X_HHAnalysis_2017-03-01.v0', # fix for JER (only MC)
         'v5.0.0+80X_HHAnalysis_2017-03-01.v0', # the one prod to end them all
         #'v4.4.2+80X_HHAnalysis_2017-02-13.v2', # mini-prod with new SF and corrections
         #'v4.3.0+80X_HHAnalysis_2017-01-26.v0', # Fixed Muon triggers in data -> DoubleMuon, MuonEG
@@ -19,7 +20,7 @@ samples_dict["Data"] = [
 samples_dict["Main_Training"] = [
     'ST_tW_top_5f_noFullyHadronicDecays_13TeV-powheg',
     'ST_tW_antitop_5f_noFullyHadronicDecays_13TeV-powheg',
-    ##'TT_TuneCUETP8M1_13TeV-powheg-pythia8_ext4', # TT incl NLO
+    'TT_TuneCUETP8M2T4_13TeV-powheg-pythia8_extended_ext0_plus_ext1', # TT incl NLO
     'TTTo2L2Nu_13TeV-powheg', # TT -> 2L 2Nu NLO
     ]
 
@@ -146,7 +147,7 @@ samples_dict["WJets"] = [
 # Resonant signal
 samples_dict["Signal_Resonant"] = [
     'GluGluToRadionToHHTo2B2VTo2L2Nu_M',
-    #'GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M'
+    'GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M'
 ]
 samples_dict["Signal_BM_Resonant"] = [
     'GluGluToRadionToHHTo2B2VTo2L2Nu_M-400',

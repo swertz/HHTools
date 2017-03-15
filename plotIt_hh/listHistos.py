@@ -72,7 +72,7 @@ if args.yields:
     logY = False
 defaultStyle = {
         'log-y': logY,
-        'save-extensions': ['pdf'],
+        'save-extensions': ['pdf', 'png'],
         'legend-columns': 2,
         'show-ratio': True,
         'show-overflow': True,
@@ -136,6 +136,8 @@ for key in keys:
         #    continue
 
         if "nobtag_to_btagM_reweighting" in key_name: continue
+
+        #if "NN" not in key_name and "jj_M" not in key_name: continue
 
         ## Update all the plots with title, ...
 
@@ -295,7 +297,7 @@ for key in keys:
         
         elif "DY_BDT" in key_name:
             plot['x-axis'] = "DY reweighting BDT"
-            plot['legend-position'] = [0.2, 0.6, 0.4, 0.83]
+            plot['legend-position'] = [0.2, 0.52, 0.53, 0.80]
             plot.update(defaultStyle_events)
         
         elif "MT2" in key_name:
@@ -366,6 +368,22 @@ for key in keys:
             plot['legend-position'] = [0.45, 0.61, 0.91, 0.89]
             if should_be_blind(key_name):
                 plot['blinded-range'] = [1.7, 1.999]
+        
+        elif "flatDrop_mjj_vs_NN" in key_name:
+            plot['x-axis'] = "NN output, m_{jj} bins"
+            plot.update(defaultStyle_events_NN)
+            plot['vertical-lines'] = [ 
+                    { "line-color": 1, "line-type": 2, "line-width": 2, "value": 1.00 }, 
+                    { "line-color": 1, "line-type": 2, "line-width": 2, "value": 1.88 }
+                ]
+            plot['labels'] += [
+                    { "size": 18, "position": [ 0.24, 0.65 ], "text": "m_{jj} < 75 GeV" },
+                    { "size": 18, "position": [ 0.45, 0.65 ], "text": "75 GeV #leq m_{jj} < 140 GeV" },
+                    { "size": 18, "position": [ 0.76, 0.65 ], "text": "m_{jj} #geq 140 GeV" },
+                ]
+            plot['legend-position'] = [0.45, 0.61, 0.91, 0.89]
+            if should_be_blind(key_name):
+                plot['blinded-range'] = [1.58, 1.879]
         
         # Default:
         

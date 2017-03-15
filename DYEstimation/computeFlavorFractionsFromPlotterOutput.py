@@ -16,6 +16,7 @@ SCRAM_ARCH = os.environ['SCRAM_ARCH']
 sys.path.append(os.path.join(CMSSW_BASE, 'src', 'cp3_llbb', 'CommonTools', 'toolBox'))
 
 from drawCanvas import drawTGraph
+from cp3_llbb.CommonTools import TFileWrapper
 
 
 totalName = "DY_BDT_flat_SF_hh_llmetjj_HWWleptons_nobtag_cmva_no_cut"
@@ -116,7 +117,7 @@ for syst in systematics:
 for file in options.input:
     print "Reading histograms from file {}...".format(file)
 
-    r_file = R.TFile.Open(file)
+    r_file = TFileWrapper.Open(file)
     if not r_file.IsOpen():
         raise Exception("Could not read from file {}".format(file))
 

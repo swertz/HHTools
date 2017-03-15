@@ -1,4 +1,5 @@
 import copy, sys, os
+import numpy as np
 
 # Bunch of flags
 use_lwtnn = True
@@ -24,9 +25,9 @@ def default_code_before_loop():
             return 1;
         };
         std::array<FWBTagEfficiencyOnBDT, 3> fwBtagEff {
-            FWBTagEfficiencyOnBDT("/home/fynu/swertz/scratch/CMSSW_8_0_25/src/cp3_llbb/HHTools/DYEstimation/170217_btag_efficiency_systematics/btagging_efficiency.root", "/home/fynu/swertz/scratch/CMSSW_8_0_25/src/cp3_llbb/HHTools/DYEstimation/170217_btag_efficiency_systematics/btagging_scale_factors.root", "/home/fynu/swertz/scratch/CMSSW_8_0_25/src/cp3_llbb/HHTools/DYEstimation/170302_bb_cc_vs_rest_10var_dyFlavorFractions_systematics/mll_cut/flavour_fractions.root"),
-            FWBTagEfficiencyOnBDT("/home/fynu/swertz/scratch/CMSSW_8_0_25/src/cp3_llbb/HHTools/DYEstimation/170217_btag_efficiency_systematics/btagging_efficiency.root", "/home/fynu/swertz/scratch/CMSSW_8_0_25/src/cp3_llbb/HHTools/DYEstimation/170217_btag_efficiency_systematics/btagging_scale_factors.root", "/home/fynu/swertz/scratch/CMSSW_8_0_25/src/cp3_llbb/HHTools/DYEstimation/170302_bb_cc_vs_rest_10var_dyFlavorFractions_systematics/mll_peak/flavour_fractions.root"),
-            FWBTagEfficiencyOnBDT("/home/fynu/swertz/scratch/CMSSW_8_0_25/src/cp3_llbb/HHTools/DYEstimation/170217_btag_efficiency_systematics/btagging_efficiency.root", "/home/fynu/swertz/scratch/CMSSW_8_0_25/src/cp3_llbb/HHTools/DYEstimation/170217_btag_efficiency_systematics/btagging_scale_factors.root", "/home/fynu/swertz/scratch/CMSSW_8_0_25/src/cp3_llbb/HHTools/DYEstimation/170302_bb_cc_vs_rest_10var_dyFlavorFractions_systematics/mll_above_peak/flavour_fractions.root")
+            FWBTagEfficiencyOnBDT("/home/fynu/swertz/scratch/CMSSW_8_0_25/src/cp3_llbb/HHTools/DYEstimation/170311_btag_efficiency_systematics/btagging_efficiency.root", "/home/fynu/swertz/scratch/CMSSW_8_0_25/src/cp3_llbb/HHTools/DYEstimation/170311_btag_efficiency_systematics/btagging_scale_factors.root", "/home/fynu/swertz/scratch/CMSSW_8_0_25/src/cp3_llbb/HHTools/DYEstimation/170311_bb_cc_vs_rest_10var_dyFlavorFractions_systematics/mll_cut/flavour_fractions.root"),
+            FWBTagEfficiencyOnBDT("/home/fynu/swertz/scratch/CMSSW_8_0_25/src/cp3_llbb/HHTools/DYEstimation/170311_btag_efficiency_systematics/btagging_efficiency.root", "/home/fynu/swertz/scratch/CMSSW_8_0_25/src/cp3_llbb/HHTools/DYEstimation/170311_btag_efficiency_systematics/btagging_scale_factors.root", "/home/fynu/swertz/scratch/CMSSW_8_0_25/src/cp3_llbb/HHTools/DYEstimation/170311_bb_cc_vs_rest_10var_dyFlavorFractions_systematics/mll_peak/flavour_fractions.root"),
+            FWBTagEfficiencyOnBDT("/home/fynu/swertz/scratch/CMSSW_8_0_25/src/cp3_llbb/HHTools/DYEstimation/170311_btag_efficiency_systematics/btagging_efficiency.root", "/home/fynu/swertz/scratch/CMSSW_8_0_25/src/cp3_llbb/HHTools/DYEstimation/170311_btag_efficiency_systematics/btagging_scale_factors.root", "/home/fynu/swertz/scratch/CMSSW_8_0_25/src/cp3_llbb/HHTools/DYEstimation/170311_bb_cc_vs_rest_10var_dyFlavorFractions_systematics/mll_above_peak/flavour_fractions.root")
         };
 
 
@@ -68,7 +69,7 @@ def default_code_before_loop():
         bool shouldCheckNonResonantSignalPoint = false;
         double nonResonantSignalKl, nonResonantSignalKt;
         if (!m_dataset.is_data) {
-            if (m_dataset.db_name.find("ToHHTo2B2VTo2L2Nu_node_") != std::string::npos) {
+            if (m_dataset.db_name.find("ToHHTo2B2VTo2L2Nu_node_") != std::string::npos && m_dataset.sample_weight_args.size() == 4) {
                 shouldCheckNonResonantSignalPoint = true;
                 nonResonantSignalKl = std::stod(m_dataset.sample_weight_args[1]);
                 nonResonantSignalKt = std::stod(m_dataset.sample_weight_args[2]);
@@ -76,19 +77,19 @@ def default_code_before_loop():
         }
         
         auto checkResonantSignalPoint = [shouldCheckResonantSignalPoint, shouldCheckNonResonantSignalPoint, resonantSignalMass](double m) -> bool {
-            if (!shouldCheckResonantSignalPoint)
-                return true;
             if (shouldCheckNonResonantSignalPoint)
                 return false;
+            if (!shouldCheckResonantSignalPoint)
+                return true;
             if (m == resonantSignalMass)
                 return true;
             return false;
         };
         auto checkNonResonantSignalPoint = [shouldCheckNonResonantSignalPoint, shouldCheckResonantSignalPoint, nonResonantSignalKl, nonResonantSignalKt](double kl, double kt) -> bool {
-            if (!shouldCheckNonResonantSignalPoint)
-                return true;
             if (shouldCheckResonantSignalPoint)
                 return false;
+            if (!shouldCheckNonResonantSignalPoint)
+                return true;
             if (kl == nonResonantSignalKl && kt == nonResonantSignalKt)
                 return true;
             return false;
@@ -145,7 +146,6 @@ def default_include_directories(scriptDir):
 
     # We need numpy headers for Keras NN evaluator
     if use_keras:
-        import numpy as np
         paths.append(np.get_include())
 
     if use_lwtnn:
@@ -323,7 +323,7 @@ class BasePlotter:
             }
 
 
-    def generatePlots(self, categories, stage, requested_plots, weights, systematic="nominal", extraString="", prependCuts=[], appendCuts=[], allowWeightedData=False, skimSignal2D=False): 
+    def generatePlots(self, categories, stage, requested_plots, weights, systematic="nominal", extraString="", prependCuts=[], appendCuts=[], allowWeightedData=False, resonant_signal_grid=[], nonresonant_signal_grid=[], skimSignal2D=False): 
 
         # Protect against the fact that data do not have jecup collections, in the nominal case we still have to check that data have one candidate 
         sanityCheck = self.sanityCheck
@@ -337,17 +337,16 @@ class BasePlotter:
         cuts = self.joinCuts(cuts, electron_1_id_cut, electron_2_id_cut)
 
         # Keras neural network
-        keras_resonant_input_variables = '{%s, %s, %s, %s, %s, %s, %s, %s, (double) %s, %%d}' % (self.jj_str + ".Pt()", self.ll_str + ".Pt()", self.ll_str + ".M()", self.baseObject + ".DR_l_l", self.baseObject + ".DR_j_j", self.baseObject + ".DPhi_ll_jj", self.baseObject + ".minDR_l_j", self.baseObject + ".MT_formula", self.baseObject + ".isSF")
+        keras_resonant_input_variables = '{%s, %s, %s, %s, %s, %s, %s, %s, (double) %s, (double) %%s}' % (self.jj_str + ".Pt()", self.ll_str + ".Pt()", self.ll_str + ".M()", self.baseObject + ".DR_l_l", self.baseObject + ".DR_j_j", self.baseObject + ".DPhi_ll_jj", self.baseObject + ".minDR_l_j", self.baseObject + ".MT_formula", self.baseObject + ".isSF")
         keras_nonresonant_input_variables = '{%s, %s, %s, %s, %s, %s, %s, %s, (double) %s, %%f, %%f}' % (self.jj_str + ".Pt()", self.ll_str + ".Pt()", self.ll_str + ".M()", self.baseObject + ".DR_l_l", self.baseObject + ".DR_j_j", self.baseObject + ".DPhi_ll_jj", self.baseObject + ".minDR_l_j", self.baseObject + ".MT_formula", self.baseObject + ".isSF")
         
-        # Keras resonant NN
-        resonant_signal_masses = [260, 270, 300, 350, 400, 450, 500, 550, 600, 650, 750, 800, 900]
+        # Keras parameter inputs
         restricted_resonant_signals = [400, 650, 900] # For 1D plots, only select a few points
-
-        # Keras non-resonant NN
-        nonresonant_signal_grid = [ (kl, kt) for kl in [-20, -5, 0.0001, 1, 2.4, 3.8, 5, 20] for kt in [0.5, 1, 1.75, 2.5] ]
-        nonresonant_grid_shift = { "kl": 20.0, "kt": 0 } # Shift parameters to be positive everywhere (goes in line with the training)
-        restricted_nonresonant_signals = [ (1, 1), (2.4, 2.5), (-20, 0.5) ] # For 1D plots, only select a few points
+        restricted_nonresonant_signals = [ (1, 1), (5.0, 2.5), (-20, 0.5) ]
+        nonresonant_grid_shift  = {
+                "kl": abs(min([ p[0] for p in nonresonant_signal_grid if p[0] < 0 ] + [0])),
+                "kt": abs(min([ p[1] for p in nonresonant_signal_grid if p[1] < 0 ] + [0]))
+            }
 
         ###########
         # Weights #
@@ -573,7 +572,7 @@ class BasePlotter:
                 if len(args) == 2:
                     return "checkNonResonantSignalPoint({}, {})".format(*args)
             
-            for m in resonant_signal_masses:
+            for m in resonant_signal_grid:
                 if m in restricted_resonant_signals:
                     self.resonant_nnoutput_plot.append({
                             'name': 'NN_resonant_M%d_%s_%s_%s%s' % (m, self.llFlav, self.suffix, self.extraString, self.systematicString),
@@ -593,7 +592,7 @@ class BasePlotter:
             for point in nonresonant_signal_grid:
                 kl = point[0]
                 kt = point[1]
-                point_str = "point_{}_{}".format(kl, kt).replace(".", "p").replace("-", "m")
+                point_str = "point_{:.2f}_{:.2f}".format(kl, kt).replace(".", "p").replace("-", "m")
                 _cut = self.joinCuts(skimSignal2DCut(kl, kt), self.totalCut) if skimSignal2D else self.totalCut
                 kl += nonresonant_grid_shift["kl"]
                 kt += nonresonant_grid_shift["kt"]

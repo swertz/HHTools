@@ -9,15 +9,14 @@ def csv_list(string):
 def get_args():
     parser = argparse.ArgumentParser(description='Compute different flavour fractions from histograms', formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
-    parser.add_argument('-m', '--mc', nargs='+', type=csv_list, help='Input ROOT files for MC -- group files for the same process with commas', required=True)
-    parser.add_argument('-n', '--names', nargs='+', help='Names of the MC groups', required=True)
-    parser.add_argument('-d', '--data', nargs='+', help='Input ROOT files for data', required=True)
+    parser.add_argument('--dy', nargs='+', help='Input ROOT files for DY', required=True)
+    parser.add_argument('--bkg', nargs='+', help='Input ROOT files for other backgrounds', required=True)
+    parser.add_argument('--data', nargs='+', help='Input ROOT files for data', required=True)
     parser.add_argument('-o', '--output', help='Output folder for validation')
-    parser.add_argument('--llbb', help='Do llbb stage', action='store_true')
+    parser.add_argument('--stage', help='Mll stage', default='no_cut')
+    parser.add_argument('--btag', help='Btag stage', default='nobtag')
 
     options = parser.parse_args()
-
-    assert(len(options.mc) == len(options.names))
 
     return options
 
@@ -34,33 +33,39 @@ def check_histo(_h):
         if _h.GetBinContent(i) < 0:
             _h.SetBinContent(i, 0)
 
-def fitContributions(data, mc, names, hist_name, lumi, output=None):
-    prefit_mc = []
-    prefit_total = 0
-    
+def fitContributions(data, processes, names, hist_name, lumi, output=None):
     histos_mc = []
-    for group in mc:
-        hist_group = []
-        for f in group:
-            hist_group.append(getHistogramsFromFileRegex(f, "^" + hist_name + "$").values()[0])
-        _h = add_histos(hist_group)
+    for process in processes:
+        _h = add_histos( [ getHistogramsFromFileRegex(f, "^" + hist_name + "$").values()[0] for f in process ] )
         check_histo(_h)
         _h.Scale(lumi)
-        prefit_mc.append(_h.Integral())
-        prefit_total += prefit_mc[-1]
         histos_mc.append(_h)
+
+    prefit_mc = []
+    prefit_total = 0
+    bins = (1, histos_mc[0].GetNbinsX())
+    #bins = (histos_mc[0].GetXaxis().FindFixBin(60), histos_mc[0].GetXaxis().FindFixBin(250))
+    print("Using bins: {}".format(bins))
+    
+    for i in range(len(histos_mc)):
+        _h = histos_mc[i]
+        _int = _h.Integral(*bins)
+        prefit_mc.append(_int)
+        prefit_total += _int
+        print("Pre-fit yield of process {}: {:.2f}".format(names[i], _int))
+    print("Total yield pre-fit: {:.2f}".format(prefit_total))
 
     mc = ROOT.TObjArray(len(histos_mc))
     for _h in histos_mc:
         mc.Add(_h)
     
-    histos_data = []
-    for f in data:
-        histos_data.append(getHistogramsFromFileRegex(f, "^" + hist_name + "$").values()[0])
+    data = add_histos( [ getHistogramsFromFileRegex(f, "^" + hist_name + "$").values()[0] for f in data ] )
 
-    data = add_histos(histos_data)
+    data_total = data.Integral(*bins)
+    print("Total yield data: {:.2f}".format(data_total))
 
     fit = ROOT.TFractionFitter(data, mc)
+    fit.SetRangeX(*bins)
     status = int(fit.Fit())
     print status
 
@@ -69,17 +74,20 @@ def fitContributions(data, mc, names, hist_name, lumi, output=None):
         raise Exception("Fit did not succeed!")
 
     postfit_total = 0
-
     for i in range(len(histos_mc)):
         res = ROOT.Double()
         err = ROOT.Double()
         fit.GetResult(i, res, err)
-        postfit_mc = res * data.Integral()
+        
+        postfit_mc = res * data_total
         postfit_total += postfit_mc
-        postfit_mc_err = err * data.Integral()
+        postfit_mc_err = err * data_total
         scale = postfit_mc / prefit_mc[i]
         scale_err = postfit_mc_err / prefit_mc[i]
-        print("Result {}: {:.2f} +- {:.2f} ==> scale by {:.3f} +- {:.3f}".format(options.names[i], postfit_mc, postfit_mc_err, scale, scale_err))
+        
+        print("Result {}: {:.2f} +- {:.2f} ==> scale by {:.3f} +- {:.3f}".format(names[i], postfit_mc, postfit_mc_err, scale, scale_err))
+    
+    print("Total yield post-fit: {}".format(postfit_total))
     print("Had to scale overall by {:.2f}".format(postfit_total / prefit_total))
 
     if output is not None:
@@ -105,21 +113,12 @@ if __name__ == "__main__":
 
     hist_template = "ll_M_{flav}_hh_llmetjj_HWWleptons_{btag}_cmva_{stage}"
     
-    LUMI = 35870
+    LUMI = 35920
 
-    stage = "no_cut"
-    btag = "nobtag"
-    flavours = ["ElEl", "MuEl", "MuMu"]
-
-    if options.llbb:
-        stage = "mll_peak"
-        btag = "btagM"
-        flavours = ["ElEl", "MuMu"]
-
-    for flav in flavours:
+    for flav in ["ElEl", "MuMu"]:
         print("\n\n--- Doing {} ---".format(flav))
 
-        hist_name = hist_template.format(flav=flav, btag=btag, stage=stage)
+        hist_name = hist_template.format(flav=flav, btag=options.btag, stage=options.stage)
         
-        fitContributions(options.data, options.mc, options.names, hist_name, LUMI, options.output)
+        fitContributions(options.data, [options.dy, options.bkg], ["dy", "bkg"], hist_name, LUMI, options.output)
 

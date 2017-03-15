@@ -21,8 +21,13 @@ parser.add_argument("-s", "--syst", help="Take care of systematics", action="sto
 options = parser.parse_args()
 
 # FIXME
-LUMI_mumu = 1. * 35862
-LUMI_ee = 1. * 35852
+# Normalise backgrounds before subtraction
+scale_ee = 0.937
+scale_mumu = 0.967
+# Normalise result of the subtraction
+rescale_ee = 0.828
+rescale_mumu = 0.879
+LUMI = 35922
 
 split_jec_sources = [
                 "AbsoluteFlavMap",
@@ -55,9 +60,9 @@ split_jec_sources = [
 
 # Get SF histograms and perform the subtraction
 print "Subtracting MuMu histograms"
-histos_mumu = performSubtraction(options.data, options.mc, R".*MuMu.*_with_nobtag_to_btagM_reweighting$", LUMI_mumu).values()
+histos_mumu = performSubtraction(options.data, options.mc, R".*MuMu.*_with_nobtag_to_btagM_reweighting$", LUMI, scale_mc=scale_mumu, rescale_result=rescale_mumu).values()
 print "Subtracting ElEl histograms"
-histos_ee = performSubtraction(options.data, options.mc, R".*ElEl.*_with_nobtag_to_btagM_reweighting$", LUMI_ee).values()
+histos_ee = performSubtraction(options.data, options.mc, R".*ElEl.*_with_nobtag_to_btagM_reweighting$", LUMI, scale_mc=scale_ee, rescale_result=rescale_ee).values()
 
 if options.syst:
     def build_syst(_list):
@@ -77,8 +82,8 @@ if options.syst:
     for _s in build_syst(systematics) + build_scale("dyScaleUncorr"):
         print "Handling systematics {}".format(_s)
         
-        histos_mumu += performSubtraction(options.data, options.mc, R".*MuMu.*_with_nobtag_to_btagM_reweighting__" + _s + "$" , LUMI_mumu).values()
-        histos_ee += performSubtraction(options.data, options.mc, R".*ElEl.*_with_nobtag_to_btagM_reweighting__" + _s + "$" , LUMI_ee).values()
+        histos_mumu += performSubtraction(options.data, options.mc, R".*MuMu.*_with_nobtag_to_btagM_reweighting__" + _s + "$" , LUMI, scale_mc=scale_mumu, rescale_result=rescale_mumu).values()
+        histos_ee += performSubtraction(options.data, options.mc, R".*ElEl.*_with_nobtag_to_btagM_reweighting__" + _s + "$" , LUMI, scale_mc=scale_ee, rescale_result=rescale_ee).values()
 
     # Systematics for which only MC is affected, not the reweighting => take nominal histos in Data
     systematics = ["elreco", "elidiso", "mutracking", "muid", "muiso", "trigeff", "pdf", "pdfqq", "pdfgg", "pdfqg", "hdamp"]
@@ -86,8 +91,8 @@ if options.syst:
     for _s in build_syst(systematics) + build_scale("scaleUncorr"):
         print "Handling systematics {}".format(_s)
         
-        histos_mumu += performSubtraction(options.data, options.mc, R".*MuMu.*_with_nobtag_to_btagM_reweighting$", LUMI_mumu, mc_regexp=R".*MuMu.*_with_nobtag_to_btagM_reweighting__" + _s + "$", translation=(R"$", R"__" + _s)).values()
-        histos_ee += performSubtraction(options.data, options.mc, R".*ElEl.*_with_nobtag_to_btagM_reweighting$", LUMI_ee, mc_regexp=R".*ElEl.*_with_nobtag_to_btagM_reweighting__" + _s + "$", translation=(R"$", R"__" + _s)).values()
+        histos_mumu += performSubtraction(options.data, options.mc, R".*MuMu.*_with_nobtag_to_btagM_reweighting$", LUMI, scale_mc=scale_mumu, rescale_result=rescale_mumu, mc_regexp=R".*MuMu.*_with_nobtag_to_btagM_reweighting__" + _s + "$", translation=(R"$", R"__" + _s)).values()
+        histos_ee += performSubtraction(options.data, options.mc, R".*ElEl.*_with_nobtag_to_btagM_reweighting$", LUMI, scale_mc=scale_ee, rescale_result=rescale_ee, mc_regexp=R".*ElEl.*_with_nobtag_to_btagM_reweighting__" + _s + "$", translation=(R"$", R"__" + _s)).values()
         
 
 # For MuE, get histograms from MC

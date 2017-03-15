@@ -16,10 +16,11 @@ SCRAM_ARCH = os.environ['SCRAM_ARCH']
 sys.path.append(os.path.join(CMSSW_BASE, 'src', 'cp3_llbb', 'CommonTools', 'toolBox'))
 
 from drawCanvas import drawTGraph
+from cp3_llbb.CommonTools import TFileWrapper
 
 
-totalNameTemplate = "btag_efficiency_jet_{}_all_flav_{}_SF_hh_llmetjj_HWWleptons_nobtag_cmva_no_cut"
-passNameTemplate = "btag_efficiency_jet_{}_tagged_flav_{}_SF_hh_llmetjj_HWWleptons_nobtag_cmva_no_cut"
+totalNameTemplate = "btag_efficiency_jet_{}_all_flav_{}_All_hh_llmetjj_HWWleptons_nobtag_cmva_no_cut"
+passNameTemplate = "btag_efficiency_jet_{}_tagged_flav_{}_All_hh_llmetjj_HWWleptons_nobtag_cmva_no_cut"
 
 parser = argparse.ArgumentParser(description='Compute different flavour fractions from histograms', formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
@@ -120,7 +121,7 @@ for syst in systematics:
 for file in options.input:
     print "Reading histograms from file {}...".format(file)
 
-    r_file = R.TFile.Open(file)
+    r_file = TFileWrapper.Open(file)
     if not r_file.IsOpen():
         raise Exception("Could not read from file {}".format(file))
 

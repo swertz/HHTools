@@ -13,7 +13,7 @@ def addHistoDicos(dic1, dic2, alpha=1):
     for key in dic1.keys():
         dic1[key].Add(dic2[key], alpha)
 
-def performSubtraction(data, mc, regexp, lumi, verbose=False, mc_regexp=None, translation=None):
+def performSubtraction(data, mc, regexp, lumi, verbose=False, mc_regexp=None, translation=None, scale_mc=1., rescale_result=1.):
     if mc_regexp is not None and regexp != mc_regexp and translation is None:
         raise Exception("Invalid input")
 
@@ -56,7 +56,10 @@ def performSubtraction(data, mc, regexp, lumi, verbose=False, mc_regexp=None, tr
     # No replacement to do: easy
     if regexp == mc_regexp:
         if verbose: print("Performing subtraction on histograms!")
-        addHistoDicos(histograms, mc_histograms, -1)
+        addHistoDicos(histograms, mc_histograms, -scale_mc)
+        if rescale_result != 1:
+            for _h in histograms.values():
+                _h.Scale(rescale_result)
         
         return histograms
 
@@ -70,7 +73,11 @@ def performSubtraction(data, mc, regexp, lumi, verbose=False, mc_regexp=None, tr
         new_histograms[new_name] = h[1]
 
     if verbose: print("Performing subtraction on histograms!")
-    addHistoDicos(new_histograms, mc_histograms, -1)
+    addHistoDicos(new_histograms, mc_histograms, -scale_mc)
+    
+    if rescale_result != 1:
+        for _h in new_histograms.values():
+            _h.Scale(rescale_result)
 
     return new_histograms
 

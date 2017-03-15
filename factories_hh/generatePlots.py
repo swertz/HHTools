@@ -85,6 +85,7 @@ check_overlap([for_data, for_MC, for_signal])
 
 use_syst = get_cfg('syst')
 syst_split_jec = get_cfg('syst_split_jec', False)
+syst_only_jec = get_cfg('syst_only_jec', False)
 syst_split_pdf = get_cfg('syst_split_pdf', False)
 
 lljj_categories = get_cfg('lljj_categories', ['MuMu', 'MuEl', 'ElEl'])
@@ -94,6 +95,10 @@ llbb_stages = get_cfg('llbb_stages', ['no_cut', 'mll_cut'])
 lljj_plot_families = get_cfg('lljj_plots', [])
 llbb_plot_families = get_cfg('llbb_plots', [])
 skim_MuEl_stages = get_cfg('skim_MuEl_stages', False) # MuEl category: do only only "mll_cut" for llbb
+
+resonant_signal_grid = get_cfg('resonant_signal_grid', [])
+nonresonant_signal_grid = get_cfg('nonresonant_signal_grid', [])
+nonresonant_signal_grid = [ tuple(point) for point in nonresonant_signal_grid ] # For some fucking reason
 
 # Ask Factories to regroup "similar" plots
 optimize_plots = True
@@ -169,6 +174,40 @@ if for_data:
     weights_llbb = []
 
 ##### Systematics ####
+
+split_jec_sources_base = [
+        "AbsoluteFlavMap",
+        "AbsoluteMPFBias",
+        "AbsoluteScale",
+        "AbsoluteStat",
+        "FlavorQCD",
+        "Fragmentation",
+        "PileUpDataMC",
+        "PileUpPtBB",
+        "PileUpPtEC1",
+        "PileUpPtEC2",
+        "PileUpPtHF",
+        "PileUpPtRef",
+        "RelativeBal",
+        "RelativeFSR",
+        "RelativeJEREC1",
+        "RelativeJEREC2",
+        "RelativeJERHF",
+        "RelativePtBB",
+        "RelativePtEC1",
+        "RelativePtEC2",
+        "RelativePtHF",
+        "RelativeStatEC",
+        "RelativeStatFSR",
+        "RelativeStatHF",
+        "SinglePionECAL",
+        "SinglePionHCAL",
+        "TimePtEta"]
+split_jec_sources = []
+for _s in split_jec_sources_base:
+    split_jec_sources.append("jec" + _s.lower() + "up")
+    split_jec_sources.append("jec" + _s.lower() + "down")
+
 if not use_syst:
     # No systematics
     systematics = { "modifObjects": ["nominal"] }
@@ -202,48 +241,17 @@ else:
 
     # All JEC sources, if asked
     if syst_split_jec:
-        #systematics["modifObjects"].remove("jecup")
-        #systematics["modifObjects"].remove("jecdown")
-        split_jec_sources = [
-                "AbsoluteFlavMap",
-                "AbsoluteMPFBias",
-                "AbsoluteScale",
-                "AbsoluteStat",
-                "FlavorQCD",
-                "Fragmentation",
-                "PileUpDataMC",
-                "PileUpPtBB",
-                "PileUpPtEC1",
-                "PileUpPtEC2",
-                "PileUpPtHF",
-                "PileUpPtRef",
-                "RelativeBal",
-                "RelativeFSR",
-                "RelativeJEREC1",
-                "RelativeJEREC2",
-                "RelativeJERHF",
-                "RelativePtBB",
-                "RelativePtEC1",
-                "RelativePtEC2",
-                "RelativePtHF",
-                "RelativeStatEC",
-                "RelativeStatFSR",
-                "RelativeStatHF",
-                "SinglePionECAL",
-                "SinglePionHCAL",
-                "TimePtEta"]
-        for _s in split_jec_sources:
-            systematics["modifObjects"].append("jec" + _s.lower() + "up")
-            systematics["modifObjects"].append("jec" + _s.lower() + "down")
+        systematics["modifObjects"] += split_jec_sources
 
     # PDF split by initial state, if asked
     if syst_split_pdf:
-        #systematics["SF"].remove("pdfup")
-        #systematics["SF"].remove("pdfdown")
         for _s in ["qq", "gg", "qg"]:
             systematics["SF"].append("pdf" + _s + "up")
             systematics["SF"].append("pdf" + _s + "down")
 
+    if syst_only_jec:
+        systematics["SF"] = []
+        systematics["modifObjects"] = split_jec_sources
 
 # Systematic uncertainties: depends on the stage on what we're running on...
 def allowed_systematics_llbb(syst):
@@ -304,7 +312,7 @@ for systematicType in systematics.keys():
                 if skim_MuEl_stages and stage != "mll_cut" and "MuEl" in this_categories:
                     this_categories.remove("MuEl")
                 
-                plots.extend(basePlotter_llbb.generatePlots(this_categories, stage, systematic=systematic, weights=weights_llbb, requested_plots=plots_llbb, skimSignal2D=for_signal))
+                plots.extend(basePlotter_llbb.generatePlots(this_categories, stage, systematic=systematic, weights=weights_llbb, requested_plots=plots_llbb, resonant_signal_grid=resonant_signal_grid, nonresonant_signal_grid=nonresonant_signal_grid, skimSignal2D=for_signal))
 
         # Signal: only do llbb!
         if for_signal:
@@ -319,7 +327,7 @@ for systematicType in systematics.keys():
             for stage in lljj_stages:
                 this_categories = lljj_categories[:]
                 
-                plots.extend(basePlotter_lljj.generatePlots(this_categories, stage, systematic=systematic, weights=weights_lljj, requested_plots=plots_lljj, skimSignal2D=for_signal))
+                plots.extend(basePlotter_lljj.generatePlots(this_categories, stage, systematic=systematic, weights=weights_lljj, requested_plots=plots_lljj))
 
 
         ###### lljj stage + no btag -> btagM reweighting applied: use LLBB values! #####
@@ -330,7 +338,7 @@ for systematicType in systematics.keys():
                 if skim_MuEl_stages and stage != "mll_cut" and "MuEl" in this_categories:
                     this_categories.remove("MuEl")
                 
-                plots.extend(basePlotter_lljj.generatePlots(this_categories, stage, systematic=systematic, weights=weights_lljj + ['dy_nobtag_to_btagM_BDT'], requested_plots=plots_llbb, extraString='_with_nobtag_to_btagM_reweighting', allowWeightedData=True, skimSignal2D=for_signal))
+                plots.extend(basePlotter_lljj.generatePlots(this_categories, stage, systematic=systematic, weights=weights_lljj + ['dy_nobtag_to_btagM_BDT'], requested_plots=plots_llbb, extraString='_with_nobtag_to_btagM_reweighting', allowWeightedData=True, resonant_signal_grid=resonant_signal_grid, nonresonant_signal_grid=nonresonant_signal_grid, skimSignal2D=for_signal))
         
 
 #for plot in plots:
