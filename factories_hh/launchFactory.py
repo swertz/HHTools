@@ -83,9 +83,10 @@ def get_sample_events_per_job(sample, factor=1):
 workflows = {}
 
 # Signal grid for resonant samples
-resonant_signal_grid = [260, 270, 300, 350, 400, 450, 500, 550, 600, 650, 700, 750, 800, 900]
-#resonant_signal_grid = [400, 650, 900]
-#resonant_signal_grid = list(np.concatenate([ np.arange(260, 351, 5, dtype=int), np.arange(360, 901, 10, dtype=int) ]))
+# resonant_signal_grid = [260, 270, 300, 350, 400, 450, 500, 550, 600, 650, 700, 750, 800, 900]
+# resonant_signal_grid = [400, 650, 900] # Postfit mode
+resonant_signal_grid = [] # Only non-resonant
+# resonant_signal_grid = list(np.concatenate([ np.arange(260, 351, 5, dtype=int), np.arange(360, 901, 10, dtype=int) ]))
 
 # Reweighting grid for non-resonant signals
 def check_grid_klambda(grid):
@@ -97,18 +98,18 @@ def check_grid_klambda(grid):
 nonresonant_signal_grid = [ (kl, kt) for kl in [-20, -5, 0, 1, 2.4, 3.8, 5, 20] for kt in [0.5, 1, 1.75, 2.5] ]
 
 # Set of extra points for 1D/2D scans, comment if not needed
-#extra_1d_signals = []
-#extra_1d_signals += [ (kl, 1) for kl in np.arange(-20, 21) ]
-#extra_1d_signals += [ (kl, 1) for kl in np.arange(-5, 5.5, 0.5) ]
-#extra_1d_signals += [ (1, kt) for kt in np.arange(0.5, 2.75, 0.25) ]
-#extra_2d_signals = []
-#extra_2d_signals = [ (kl, kt) for kl in np.arange(-20, 21, 2.5) for kt in np.arange(0.5, 2.75, 0.5) ]
-#extra_2d_signals = [ (kl, kt) for kl in np.arange(-20, 21, 2.5) for kt in np.arange(0.75, 2.5, 0.5) ]
-#nonresonant_signal_grid = extra_2d_signals
-#nonresonant_signal_grid = list(set(extra_1d_signals + nonresonant_signal_grid))
-#nonresonant_signal_grid = [ (1, 1), (5, 2.5), (-20, 0.5) ]
-#nonresonant_signal_grid = [ (1,1) ]
-#nonresonant_signal_grid = [  ]
+extra_1d_signals = []
+# extra_1d_signals += [ (kl, 1) for kl in np.arange(-20, 21) ]
+# extra_1d_signals += [ (kl, 1) for kl in np.arange(-5, 5.5, 0.5) ]
+# extra_1d_signals += [ (1, kt) for kt in np.arange(0.5, 2.75, 0.25) ]
+extra_2d_signals = []
+# extra_2d_signals = [ (kl, kt) for kl in np.arange(-20, 21, 2.5) for kt in np.arange(0.5, 2.75, 0.5) ]
+# extra_2d_signals = [ (kl, kt) for kl in np.arange(-20, 21, 2.5) for kt in np.arange(0.75, 2.5, 0.5) ]
+# nonresonant_signal_grid = extra_2d_signals
+nonresonant_signal_grid = list(set(extra_1d_signals + nonresonant_signal_grid))
+# nonresonant_signal_grid = [ (1,1) ]
+# nonresonant_signal_grid = [ (1, 1), (5, 2.5), (-20, 0.5) ] # Postfit mode
+# nonresonant_signal_grid = [ (kl, 1) for kl in np.linspace(2.3, 2.7, 41, endpoint=True)] # Finer scan between 2.3 and 2.7 for Andre (kink at 2.5)
 
 check_grid_klambda(nonresonant_signal_grid)
 
@@ -263,7 +264,10 @@ NN2DPlots_ForData = Configuration('generatePlots.py', workflow='plot_nn_2d', suf
             'syst_split_jec': True,
             #'syst_only_jec': True,
         })
-NN2DPlots_ForSignal = Configuration('generatePlots.py', workflow='plot_nn_2d', suffix='_for_signal', mode='plots', samples=['Signal_NonResonant', 'Signal_Resonant'], generation_args={
+NN2DPlots_ForSignal = Configuration('generatePlots.py', workflow='plot_nn_2d', suffix='_for_signal', mode='plots', samples=[
+    'Signal_NonResonant',
+    'Signal_Resonant'
+    ], generation_args={
             'sample_type': 'Signal',
             'llbb_stages': ['mll_cut'],
             'llbb_plots': ['mjj_vs_nn'],
