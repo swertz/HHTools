@@ -45,7 +45,6 @@
 #'ggX0HH_M400_postfit_histos.root':
 #  type: signal
 #  cross-section: 179610000
-#  #line-color: '#ff0000'
 #  line-color: '#17becf'
 #  legend: 'm_{X} = 400 GeV'
 #  legend-order: 5
@@ -70,14 +69,14 @@
 #  line-width: 2
 #  line-type: 1
 
-'ggHH_1p00_1p00_postfit_histos.root':
-  type: signal
-  cross-section: 179610000
-  legend: 'SM'
-  line-color: '#2ca02c' # from https://github.com/vega/vega/wiki/Scales#scale-range-literals
-  legend-order: 14
-  line-width: 2
-  line-type: 1
+#'ggHH_1p00_1p00_postfit_histos.root':
+#  type: signal
+#  cross-section: 179610000
+#  legend: 'SM'
+#  line-color: '#2ca02c'
+#  legend-order: 14
+#  line-width: 2
+#  line-type: 1
 
 #'ggHH_m20p00_0p50_postfit_histos.root':
 #  type: signal
