@@ -81,7 +81,7 @@ def default_code_before_loop():
                 return false;
             if (!shouldCheckResonantSignalPoint)
                 return true;
-            if (m == resonantSignalMass)
+            if (std::abs(m - resonantSignalMass) < 1e-4)
                 return true;
             return false;
         };
@@ -90,7 +90,7 @@ def default_code_before_loop():
                 return false;
             if (!shouldCheckNonResonantSignalPoint)
                 return true;
-            if (kl == nonResonantSignalKl && kt == nonResonantSignalKt)
+            if ((std::abs(kl - nonResonantSignalKl) < 1e-4) && (std::abs(kt - nonResonantSignalKt) < 1e-4))
                 return true;
             return false;
         };
@@ -199,7 +199,11 @@ class GridReweighting:
         self.scriptDir = scriptDir
 
     def before_loop(self):
-        return r'getHHEFTReweighter("{}");'.format( os.path.join(self.scriptDir, "..", "common", "MatrixElements") )
+        path = os.path.abspath(os.path.join(self.scriptDir, "..", "common", "MatrixElements"))
+        if len(path) > 125:
+            raise Exception("ERROR: The path to the MatrixElements folder ({}) *must* have a length smaller than 125 characters. Sorry...".format(path))
+
+        return r'getHHEFTReweighter("{}");'.format(path)
 
     def in_loop(self):
         return ""
@@ -343,9 +347,10 @@ class BasePlotter:
         # Keras parameter inputs
         restricted_resonant_signals = [400, 650, 900] # For 1D plots, only select a few points
         restricted_nonresonant_signals = [ (1, 1), (5.0, 2.5), (-20, 0.5) ]
+
         nonresonant_grid_shift  = {
-                "kl": abs(min([ p[0] for p in nonresonant_signal_grid if p[0] < 0 ] + [0])),
-                "kt": abs(min([ p[1] for p in nonresonant_signal_grid if p[1] < 0 ] + [0]))
+                "kl": 20,
+                "kt": 0
             }
 
         ###########
