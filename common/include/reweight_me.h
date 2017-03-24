@@ -274,11 +274,11 @@ class HHEFTReweighter {
         HHEFTReweighter(std::string ME_dir=".") {
             m_evaluator_AC = std::make_shared<EFTMEEvaluator<pp_hh_5coup_BSM_gg_hh::P1_Sigma_BSM_gg_hh_gg_hh>>(ME_dir + "/pp_hh_5coup/Cards/param_card.dat", clustering_couplings, clustering_coupling_names);
             
-            m_evaluator_MV_noTree = std::make_shared<EFTMEEvaluator<WrapperNoTree::pp_hh_noTree>>(ME_dir + "/pp_hh_all_MV/Cards/param_card", MV_noTree_couplings, MV_noTree_coupling_names);
-            m_me_MV_SM_OphiG = std::make_shared<WrapperSMOphiG::pp_hh_SM_OphiG>(ME_dir + "/pp_hh_all_MV/Cards/param_card");
-            m_me_MV_OphiG_ops = std::make_shared<WrapperOphiGOps::pp_hh_OphiG_ops>(ME_dir + "/pp_hh_all_MV/Cards/param_card");
+            //m_evaluator_MV_noTree = std::make_shared<EFTMEEvaluator<WrapperNoTree::pp_hh_noTree>>(ME_dir + "/pp_hh_all_MV/Cards/param_card", MV_noTree_couplings, MV_noTree_coupling_names);
+            //m_me_MV_SM_OphiG = std::make_shared<WrapperSMOphiG::pp_hh_SM_OphiG>(ME_dir + "/pp_hh_all_MV/Cards/param_card");
+            //m_me_MV_OphiG_ops = std::make_shared<WrapperOphiGOps::pp_hh_OphiG_ops>(ME_dir + "/pp_hh_all_MV/Cards/param_card");
             
-            m_me_MV_OphiG_sq = std::make_shared<pp_hh_tree_MV_standalone_modTEFT_H::P1_Sigma_modTEFT_H_gg_hh>(ME_dir + "/pp_hh_tree_MV/Cards/param_card.dat");
+            //m_me_MV_OphiG_sq = std::make_shared<pp_hh_tree_MV_standalone_modTEFT_H::P1_Sigma_modTEFT_H_gg_hh>(ME_dir + "/pp_hh_tree_MV/Cards/param_card.dat");
         }
 
         ///////////////////////////////////////////////////////////////////
