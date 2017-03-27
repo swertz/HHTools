@@ -30,7 +30,7 @@ import tensorflow as tf
 
 import plotTools
 
-INPUT_FOLDER = '/home/fynu/sbrochet/scratch/Framework/CMSSW_8_0_24_patch1_HH_Analysis/src/cp3_llbb/HHTools/mvaTraining/inputs/2017-01-24_new_prod'
+INPUT_FOLDER = '/nfs/scratch/fynu/sbrochet/Moriond17/CMSSW_8_0_26_p2_HH_analysis/src/cp3_llbb/HHTools/mvaTraining/inputs/2017-03-02_latest_prod'
 
 HAVE_GPU = 'ingrid-ui8' in socket.gethostname()
 
@@ -47,20 +47,19 @@ backgrounds = [
         },
 
         {
-            'input': 'DYJetsToLL_M-10to50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_*_histos.root',
+            'input': 'DYJetsToLL_M-10to50_*_histos.root',
         },
 
         {
-            'input': 'DYToLL_1J_TuneCUETP8M1_*_histos.root',
+            'input': 'DYToLL_1J_*_histos.root',
         },
 
         {
-            'input': 'DYToLL_2J_TuneCUETP8M1_*_histos.root',
+            'input': 'DYToLL_2J_*_histos.root',
         },
 
-        # Use only one of the 0J samples until we have the merged sample
         {
-            'input': 'DYToLL_0J_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_Summer16MiniAODv2_ext1_*_histos.root',
+            'input': 'DYToLL_0J_*_histos.root',
         },
 
         {
@@ -70,7 +69,7 @@ backgrounds = [
         ]
 
 resonant_signals = {}
-resonant_signal_masses = [260, 300, 400, 550, 650, 800, 900]
+resonant_signal_masses = [260, 270, 300, 350, 400, 450, 500, 550, 600, 650, 750, 800, 900]
 for m in resonant_signal_masses:
     resonant_signals[m] = 'GluGluToRadionToHHTo2B2VTo2L2Nu_M-%d_narrow_*_histos.root' % m
 
@@ -78,7 +77,7 @@ for m in resonant_signal_masses:
 # nonresonant_parameters = [(kl, kt) for kl in [-15, -5, -1, 0.0001, 1, 5, 15] for kt in [0.5, 1, 1.75, 2.5]]
 
 # New grid
-nonresonant_parameters = [(kl, kt) for kl in [-20, 0.0001, 1, 2.4, 3.8, 5, 20] for kt in [0.5, 1, 1.75, 2.5]]
+nonresonant_parameters = [(kl, kt) for kl in [-20, -5, 0.0001, 1, 2.4, 3.8, 5, 20] for kt in [0.5, 1, 1.75, 2.5]]
 
 nonresonant_weights = {
             '__base__': "event_weight * trigeff * jjbtag_heavy * jjbtag_light * llidiso * pu",
@@ -651,7 +650,7 @@ class DatasetManager:
 def get_file_from_glob(f):
     files = glob.glob(f)
     if len(files) != 1:
-        raise Exception('Only one input file is supported per glob pattern: %s' % files)
+        raise Exception('Only one input file is supported per glob pattern: %s -> %s' % (f, files))
 
     return files[0]
 
@@ -690,14 +689,13 @@ def draw_non_resonant_training_plots(model, dataset, output_folder, split_by_par
     print("Done.")
 
     print("Plotting time...")
-    binning = np.concatenate((np.linspace(0, 0.1, 10, endpoint=False), np.linspace(0.1, 1, 30 + 1)))
 
     # NN output
     plotTools.drawNNOutput(training_background_predictions, testing_background_predictions,
                  training_signal_predictions, testing_signal_predictions,
                  training_background_weights, testing_background_weights,
                  training_signal_weights, testing_signal_weights,
-                 output_dir=output_folder, output_name="nn_output.pdf", bins=binning)
+                 output_dir=output_folder, output_name="nn_output.pdf", bins=50)
 
     # ROC curve
     binned_training_background_predictions, _, bins = plotTools.binDataset(training_background_predictions, training_background_weights, bins=50, range=[0, 1])
@@ -712,7 +710,9 @@ def draw_non_resonant_training_plots(model, dataset, output_folder, split_by_par
         training_signal_dataset, training_background_dataset = dataset.get_training_datasets()
         testing_signal_dataset, testing_background_dataset = dataset.get_testing_datasets()
         for parameters in dataset.get_nonresonant_parameters_list():
-            print("  Plotting NN output and ROC curve for %s" % str(dataset.positive_to_user_parameters(parameters)))
+            user_parameters = ['{:.2f}'.format(x) for x in dataset.positive_to_user_parameters(parameters)]
+
+            print("  Plotting NN output and ROC curve for %s" % str(user_parameters))
 
             training_signal_mask = (training_signal_dataset[:,-1] == parameters[1]) & (training_signal_dataset[:,-2] == parameters[0])
             training_background_mask = (training_background_dataset[:,-1] == parameters[1]) & (training_background_dataset[:,-2] == parameters[0])
@@ -729,13 +729,13 @@ def draw_non_resonant_training_plots(model, dataset, output_folder, split_by_par
             p_training_signal_weights = training_signal_weights[training_signal_mask]
             p_testing_signal_weights = testing_signal_weights[testing_signal_mask]
 
-            suffix = format_nonresonant_parameters(dataset.positive_to_user_parameters(parameters))
+            suffix = format_nonresonant_parameters(user_parameters)
             plotTools.drawNNOutput(
                          p_training_background_predictions, p_testing_background_predictions,
                          p_training_signal_predictions, p_testing_signal_predictions,
                          p_training_background_weights, p_testing_background_weights,
                          p_training_signal_weights, p_testing_signal_weights,
-                         output_dir=output_folder, output_name="nn_output_fixed_parameters_%s.pdf" % (suffix), bins=binning)
+                         output_dir=output_folder, output_name="nn_output_fixed_parameters_%s.pdf" % (suffix), bins=50)
 
             binned_training_background_predictions, _, bins = plotTools.binDataset(p_training_background_predictions, p_training_background_weights, bins=50, range=[0, 1])
             binned_training_signal_predictions, _, _ = plotTools.binDataset(p_training_signal_predictions, p_training_signal_weights, bins=bins)
@@ -770,14 +770,13 @@ def draw_resonant_training_plots(model, dataset, output_folder, split_by_mass=Fa
     print("Done.")
 
     print("Plotting time...")
-    binning = np.concatenate((np.linspace(0, 0.1, 20, endpoint=False), np.linspace(0.1, 1, 18 + 1)))
 
     # NN output
     plotTools.drawNNOutput(training_background_predictions, testing_background_predictions,
                  training_signal_predictions, testing_signal_predictions,
                  training_background_weights, testing_background_weights,
                  training_signal_weights, testing_signal_weights,
-                 output_dir=output_folder, output_name="nn_output.pdf", bins=binning)
+                 output_dir=output_folder, output_name="nn_output.pdf", bins=50)
 
     # ROC curve
     binned_training_background_predictions, _, bins = plotTools.binDataset(training_background_predictions, training_background_weights, bins=50, range=[0, 1])
@@ -815,7 +814,7 @@ def draw_resonant_training_plots(model, dataset, output_folder, split_by_mass=Fa
                          p_training_background_weights, p_testing_background_weights,
                          p_training_signal_weights, p_testing_signal_weights,
                          output_dir=output_folder, output_name="nn_output_fixed_M%d.pdf" % (m),
-                         bins=binning)
+                         bins=50)
 
             binned_training_background_predictions, _, bins = plotTools.binDataset(p_training_background_predictions, p_training_background_weights, bins=50, range=[0, 1])
             binned_training_signal_predictions, _, _ = plotTools.binDataset(p_training_signal_predictions, p_training_signal_weights, bins=bins)
@@ -836,7 +835,7 @@ def save_training_parameters(output, model, **kwargs):
 
 
 def export_for_lwtnn(model, name):
-    base = os.path.splitext(name)
+    base, _ = os.path.splitext(name)
 
     # Export architecture of the model
     with open(base + '_arch.json', 'w') as f:

@@ -39,10 +39,12 @@ add_mass_column = True
 # add_mass_column = False
 
 # signal_masses = [260, 300, 400, 550, 650, 800, 900]
-signal_masses = [260, 300, 400, 550, 800, 900]
+# signal_masses = [260, 300, 400, 550, 800, 900]
 # signal_masses = [900]
 
-suffix = "dy_estimation_from_BDT_new_prod_on_GPU_deeper_100epochs"
+signal_masses = resonant_signal_masses
+
+suffix = "latest_march_prod_100epochs"
 output_suffix = '{:%Y-%m-%d}_{}_{}'.format(datetime.date.today(), '_'.join([str(x) for x in signal_masses]), suffix)
 output_folder = os.path.join('hh_resonant_trained_models', output_suffix)
 

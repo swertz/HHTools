@@ -68,13 +68,14 @@ inputs = [
 cut = "(91 - ll_M) > 15"
 
 # parameters_list = nonresonant_parameters
-# add_parameters_columns = True
+parameters_list = nonresonant_parameters
+add_parameters_columns = True
 
-parameters_list = [(-20, 0.5)]
-add_parameters_columns = False
+# parameters_list = [(-20, 0.5)]
+# add_parameters_columns = False
 
 # suffix = "dy_estimation_from_BDT_new_prod_deeper_lr_scheduler_120epochs"
-suffix = "dy_estimation_from_BDT_new_prod_deeper_lr_scheduler_st_0p005_only-20_0p5_100epochs"
+suffix = "latest_march_prod_100epochs"
 
 output_suffix = '{:%Y-%m-%d}_{}'.format(datetime.date.today(), suffix)
 output_folder = os.path.join('hh_nonresonant_trained_models', output_suffix)
