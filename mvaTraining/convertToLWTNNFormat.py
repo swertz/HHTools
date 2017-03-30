@@ -111,6 +111,8 @@ def _get_h5_layers(layer_group):
         prefixes.add(prefix)
         numbers.add(number)
         name, _ = name.split(':', 2)
+        if '_' in name:
+            name, _ = name.split('_', 2)
         layers[name] = np.asarray(ds)
     assert len(prefixes) == 1, 'too many prefixes: {}'.format(prefixes)
     assert len(numbers) == 1, 'too many numbers: {}'.format(numbers)
