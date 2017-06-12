@@ -1,0 +1,516 @@
+diff --git a/etc/config/settings_ele.py b/etc/config/settings_ele.py
+index 922e68b..a6a01c0 100644
+--- a/etc/config/settings_ele.py
++++ b/etc/config/settings_ele.py
+@@ -1,27 +1,13 @@
+ #############################################################
+ ########## General settings
+ #############################################################
+-# flag to be Tested
+-cutpass80 = '(( abs(probe_sc_eta) < 0.8 && probe_Ele_nonTrigMVA > %f ) ||  ( abs(probe_sc_eta) > 0.8 && abs(probe_sc_eta) < 1.479&& probe_Ele_nonTrigMVA > %f ) || ( abs(probe_sc_eta) > 1.479 && probe_Ele_nonTrigMVA > %f ) )' % (0.967083,0.929117,0.726311)
+-cutpass90 = '(( abs(probe_sc_eta) < 0.8 && probe_Ele_nonTrigMVA > %f ) ||  ( abs(probe_sc_eta) > 0.8 && abs(probe_sc_eta) < 1.479&& probe_Ele_nonTrigMVA > %f ) || ( abs(probe_sc_eta) > 1.479 && probe_Ele_nonTrigMVA > %f ) )' % (0.913286,0.805013,0.358969)
+ 
+ # flag to be Tested
+ flags = {
+-    'passingVeto'       : '(passingVeto   == 1)',
+-    'passingLoose'      : '(passingLoose  == 1)',
+-    'passingMedium'     : '(passingMedium == 1)',
+-    'passingTight'      : '(passingTight  == 1)',
+-    'passingVeto80X'    : '(passingVeto80X   == 1)',
+-    'passingLoose80X'   : '(passingLoose80X  == 1)',
+-    'passingMedium80X'  : '(passingMedium80X == 1)',
+-    'passingTight80X'   : '(passingTight80X  == 1)',
+-    'passingMVAwp80'    : cutpass80,
+-    'passingMVAwp90'    : cutpass90,
+-    'passingMVA80Xwp80' : '(passingMVA80Xwp80 == 1)',
+-    'passingMVA80Xwp90' : '(passingMVA80Xwp90 == 1)',
++    'passingMediumAndHLTSafe': '(passingMedium80X == 1 && passingHLTsafe == 1)'
+     }
+ 
+-baseOutDir = 'results/Moriond17/tnpEleID/runGH/'
++baseOutDir = 'results/Moriond17/tnpEff/runBCDEFGH_reMiniAOD/'
+ 
+ #############################################################
+ ########## samples definition  - preparing the samples
+@@ -33,24 +19,34 @@ tnpTreeDir = 'GsfElectronToEleID'
+ 
+ samplesDef = {
+     'data'   : tnpSamples.Moriond17_80X['data_Run2016H'].clone(),
++    # 'data': None,
+     'mcNom'  : tnpSamples.Moriond17_80X['DY_madgraph_Winter17'].clone(),
++    # 'mcNom'  : None,
+     'mcAlt'  : tnpSamples.Moriond17_80X['DY_amcatnlo_Winter17'].clone(),
++    # 'mcAlt': None,
+     'tagSel' : tnpSamples.Moriond17_80X['DY_madgraph_Winter17'].clone(),
++    # 'tagSel' : None,
+ }
++
+ ## can add data sample easily
+-samplesDef['data'].add_sample( tnpSamples.Moriond17_80X['data_Run2016G'] )
+-#samplesDef['data'].add_sample( tnpSamples.Moriond17_80X['data_Run2016F'] )
+-#samplesDef['data'].add_sample( tnpSamples.Moriond17_80X['data_Run2016E'] )
+-#samplesDef['data'].add_sample( tnpSamples.Moriond17_80X['data_Run2016D'] )
+-#samplesDef['data'].add_sample( tnpSamples.Moriond17_80X['data_Run2016C'] )
+-#samplesDef['data'].add_sample( tnpSamples.Moriond17_80X['data_Run2016B'] )
++if samplesDef['data']:
++    samplesDef['data'].add_sample( tnpSamples.Moriond17_80X['data_Run2016G'] )
++    samplesDef['data'].add_sample( tnpSamples.Moriond17_80X['data_Run2016F'] )
++    samplesDef['data'].add_sample( tnpSamples.Moriond17_80X['data_Run2016E'] )
++    samplesDef['data'].add_sample( tnpSamples.Moriond17_80X['data_Run2016D'] )
++    samplesDef['data'].add_sample( tnpSamples.Moriond17_80X['data_Run2016C'] )
++    samplesDef['data'].add_sample( tnpSamples.Moriond17_80X['data_Run2016B'] )
+ 
+ ## some sample-based cuts... general cuts defined here after
+ ## require mcTruth on MC DY samples and additional cuts
+ ## all the samples MUST have different names (i.e. sample.name must be different for all)
+ ## if you need to use 2 times the same sample, then rename the second one
+ #samplesDef['data'  ].set_cut('run >= 273726')
+-samplesDef['data' ].set_tnpTree(tnpTreeDir)
++
++if samplesDef['data']:
++    samplesDef['data'].set_tnpTree(tnpTreeDir)
++    samplesDef['data'].rename('data_Run2016')
++
+ if not samplesDef['mcNom' ] is None: samplesDef['mcNom' ].set_tnpTree(tnpTreeDir)
+ if not samplesDef['mcAlt' ] is None: samplesDef['mcAlt' ].set_tnpTree(tnpTreeDir)
+ if not samplesDef['tagSel'] is None: samplesDef['tagSel'].set_tnpTree(tnpTreeDir)
+@@ -62,28 +58,28 @@ if not samplesDef['tagSel'] is None:
+     samplesDef['tagSel'].rename('mcAltSel_DY_madgraph')
+     samplesDef['tagSel'].set_cut('tag_Ele_pt > 35  && tag_Ele_nonTrigMVA80X > 0.95')
+ 
+-## set MC weight, simple way (use tree weight) 
+-#weightName = 'totWeight'
+-#if not samplesDef['mcNom' ] is None: samplesDef['mcNom' ].set_weight(weightName)
+-#if not samplesDef['mcAlt' ] is None: samplesDef['mcAlt' ].set_weight(weightName)
+-#if not samplesDef['tagSel'] is None: samplesDef['tagSel'].set_weight(weightName)
+-
+-## set MC weight, can use several pileup rw for different data taking periods
+-weightName = 'weights_2016_runGH.totWeight'
++# set MC weight, simple way (use tree weight) 
++weightName = 'totWeight'
+ if not samplesDef['mcNom' ] is None: samplesDef['mcNom' ].set_weight(weightName)
+ if not samplesDef['mcAlt' ] is None: samplesDef['mcAlt' ].set_weight(weightName)
+ if not samplesDef['tagSel'] is None: samplesDef['tagSel'].set_weight(weightName)
+-if not samplesDef['mcNom' ] is None: samplesDef['mcNom' ].set_puTree('eos/cms/store/group/phys_egamma/tnp/80X/pu/Winter17/DY_madgraph_Winter17_ele.pu.puTree.root')
+-if not samplesDef['mcAlt' ] is None: samplesDef['mcAlt' ].set_puTree('eos/cms/store/group/phys_egamma/tnp/80X/pu/Winter17/DY_amcatnlo_Winter17_ele.pu.puTree.root')
+-if not samplesDef['tagSel'] is None: samplesDef['tagSel'].set_puTree('eos/cms/store/group/phys_egamma/tnp/80X/pu/Winter17/DY_madgraph_Winter17_ele.pu.puTree.root')
++
++## set MC weight, can use several pileup rw for different data taking periods
++# weightName = 'weights_2016_runGH.totWeight'
++# if not samplesDef['mcNom' ] is None: samplesDef['mcNom' ].set_weight(weightName)
++# if not samplesDef['mcAlt' ] is None: samplesDef['mcAlt' ].set_weight(weightName)
++# if not samplesDef['tagSel'] is None: samplesDef['tagSel'].set_weight(weightName)
++# if not samplesDef['mcNom' ] is None: samplesDef['mcNom' ].set_puTree('eos/cms/store/group/phys_egamma/tnp/80X/pu/Winter17/DY_madgraph_Winter17_ele.pu.puTree.root')
++# if not samplesDef['mcAlt' ] is None: samplesDef['mcAlt' ].set_puTree('eos/cms/store/group/phys_egamma/tnp/80X/pu/Winter17/DY_amcatnlo_Winter17_ele.pu.puTree.root')
++# if not samplesDef['tagSel'] is None: samplesDef['tagSel'].set_puTree('eos/cms/store/group/phys_egamma/tnp/80X/pu/Winter17/DY_madgraph_Winter17_ele.pu.puTree.root')
+ 
+ 
+ #############################################################
+ ########## bining definition  [can be nD bining]
+ #############################################################
+ biningDef = [
+-   { 'var' : 'probe_sc_eta' , 'type': 'float', 'bins': [-2.5,-2.0,-1.566,-1.4442, -0.8, 0.0, 0.8, 1.4442, 1.566, 2.0, 2.5] },
+-   { 'var' : 'probe_Ele_pt' , 'type': 'float', 'bins': [10,20,35,50,100,200,500] },
++   { 'var' : 'probe_sc_eta' , 'type': 'float', 'bins': [-2.5, -2.0, -1.566, -1.4442, -0.8, 0.0, 0.8, 1.4442, 1.566, 2.0, 2.5] },
++   { 'var' : 'probe_Ele_pt' , 'type': 'float', 'bins': [10, 20, 35, 50, 90, 150, 500] },
+ ]
+ 
+ #############################################################
+@@ -113,17 +109,17 @@ additionalCuts = {
+ ########## fitting params to tune fit by hand if necessary
+ #############################################################
+ tnpParNomFit = [
+-    "meanP[-0.0,-5.0,5.0]","sigmaP[0.9,0.5,5.0]",
+-    "meanF[-0.0,-5.0,5.0]","sigmaF[0.9,0.5,5.0]",
+-    "acmsP[60.,50.,80.]","betaP[0.05,0.01,0.08]","gammaP[0.1, -2, 2]","peakP[90.0]",
+-    "acmsF[60.,50.,80.]","betaF[0.05,0.01,0.08]","gammaF[0.1, -2, 2]","peakF[90.0]",
++    "meanP[-0.0,-5.0,5.0]","sigmaP[0.9,0.5,5]",
++    "meanF[-0.0,-10.0,10.0]","sigmaF[0.9,0.5,5]",
++    "acmsP[60.,50.,150.]","betaP[0.05,0.01,0.08]","gammaP[0.1, -2, 2]","peakP[90.0]",
++    "acmsF[60.,50.,300.]","betaF[0.05,0.001, 0.08]", "gammaF[0.1, -2, 2]","peakF[90.0, 88.0, 92.0]",
+     ]
+ 
+ tnpParAltSigFit = [
+     "meanP[-0.0,-5.0,5.0]","sigmaP[1,0.7,6.0]","alphaP[2.0,1.2,3.5]" ,'nP[3,-5,5]',"sigmaP_2[1.5,0.5,6.0]","sosP[1,0.5,5.0]",
+     "meanF[-0.0,-5.0,5.0]","sigmaF[2,0.7,15.0]","alphaF[2.0,1.2,3.5]",'nF[3,-5,5]',"sigmaF_2[2.0,0.5,6.0]","sosF[1,0.5,5.0]",
+-    "acmsP[60.,50.,75.]","betaP[0.04,0.01,0.06]","gammaP[0.1, 0.005, 1]","peakP[90.0]",
+-    "acmsF[60.,50.,75.]","betaF[0.04,0.01,0.06]","gammaF[0.1, 0.005, 1]","peakF[90.0]",
++    "acmsP[60.,50.,150.]","betaP[0.04,0.01,0.06]","gammaP[0.1, 0.005, 1]","peakP[90.0]",
++    "acmsF[60.,50.,150.]","betaF[0.04,0.001,0.06]","gammaF[0.1, 0.0005, 1]","peakF[90.0]",
+     ]
+      
+ tnpParAltBkgFit = [
+@@ -132,4 +128,3 @@ tnpParAltBkgFit = [
+     "alphaP[0.,-5.,5.]",
+     "alphaF[0.,-5.,5.]",
+     ]
+-        
+diff --git a/etc/inputs/tnpSampleDef.py b/etc/inputs/tnpSampleDef.py
+index 8daf93a..36b1d55 100644
+--- a/etc/inputs/tnpSampleDef.py
++++ b/etc/inputs/tnpSampleDef.py
+@@ -1,102 +1,32 @@
+ from libPython.tnpClassUtils import tnpSample
+ 
+ ### qll stat
+-eosDir1 = 'eos/cms/store/group/phys_egamma/tnp/80X/PhoEleIDs/v1/'
+-eosDir2 = 'eos/cms/store/group/phys_egamma/tnp/80X/PhoEleIDs/v2/'
+-eosDirREC = 'eos/cms/store/group/phys_egamma/tnp/80X/RecoSF/RECOSFs_2016/'
+-eosWinter17 = 'eos/cms/store/group/phys_egamma/tnp/80X/PhoEleIDs/Moriond17_v1/'
++storageData = '/storage/data/cms/store/user/sbrochet/tnp/Electrons/Moriond17_reminiaod_v1/'
++storageMC = '/storage/data/cms/store/user/sbrochet/tnp/Electrons/Moriond17_v1/'
+ Moriond17_80X = {
+     ### MiniAOD TnP for IDs scale factors
+-    'DY_madgraph'          : tnpSample('DY_madgraph',
+-                                       eosWinter17 + 'mc/TnPTree_DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_DYToLL_madgraph_Spring16_reHLT.root',
+-                                       isMC = True, nEvts = -1 ),
++    # 'DY_madgraph'          : tnpSample('DY_madgraph',
++                                       # eosWinter17 + 'mc/TnPTree_DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_DYToLL_madgraph_Spring16_reHLT.root',
++                                       # isMC = True, nEvts = -1 ),
+     'DY_madgraph_Winter17' : tnpSample('DY_madgraph_Winter17', 
+-                                       eosWinter17 + 'mc/TnPTree_DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_DYToLL_madgraph_Moriond17.root',
+-                                       isMC = True, nEvts = 48652793 ),
+-    'DYee_powheg_Winter17' : tnpSample('DYee_powheg_Winter17', 
+-                                       eosWinter17 + 'mc/TnPTree_DYToEE_NNPDF30_13TeV-powheg-pythia8_DYToEE_powheg_Moriond17.root',
+-                                       isMC = True, nEvts = 49986588 ),
++                                       storageMC + 'mc/TnPTree_DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_DYToLL_madgraph_Moriond17.root',
++                                       isMC = True, nEvts = 49144274 ),
++    # 'DYee_powheg_Winter17' : tnpSample('DYee_powheg_Winter17', 
++                                       # storageMC + 'mc/TnPTree_DYToEE_NNPDF30_13TeV-powheg-pythia8_DYToEE_powheg_Moriond17.root',
++                                       # isMC = True, nEvts = 49986588 ),
+     'DY_amcatnlo_Winter17' : tnpSample('DY_amcatnlo_Winter17', 
+-                                       eosWinter17 + 'mc/TnPTree_DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_DYToLL_mcAtNLO_Moriond17.root',
++                                       storageMC + 'mc/TnPTree_DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_DYToLL_mcAtNLO_Moriond17.root',
+                                        isMC = True, nEvts = 28968252 ),
+     'Wj_madgraph_Winter17' : tnpSample('Wj_madgraph_Winter17', 
+-                                       eosWinter17 + 'mc/TnPTree_WJetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_WJets_madgraph_Moriond17.root',
++                                       storageMC + 'mc/TnPTree_WJetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_WJets_madgraph_Moriond17.root',
+                                        isMC = True, nEvts = 29048609 ),
+ 
+-    'data_Run2016B' : tnpSample('data_Run2016B' , eosWinter17 + 'data/TnPTree_SingleElectron_2016rereco_RunB.root' , lumi = 5.767 ),
+-    'data_Run2016C' : tnpSample('data_Run2016C' , eosWinter17 + 'data/TnPTree_SingleElectron_2016rereco_RunC.root' , lumi = 2.646 ),
+-    'data_Run2016D' : tnpSample('data_Run2016D' , eosWinter17 + 'data/TnPTree_SingleElectron_2016rereco_RunD.root' , lumi = 4.353 ),
+-    'data_Run2016E' : tnpSample('data_Run2016E' , eosWinter17 + 'data/TnPTree_SingleElectron_2016rereco_RunE.root' , lumi = 3.985 ),
+-    'data_Run2016F' : tnpSample('data_Run2016F' , eosWinter17 + 'data/TnPTree_SingleElectron_2016rereco_RunF.root' , lumi = 3.160 ),
+-    'data_Run2016G' : tnpSample('data_Run2016G' , eosWinter17 + 'data/TnPTree_SingleElectron_2016rereco_RunG.root' , lumi = 7.539 ),
+-    'data_Run2016H' : tnpSample('data_Run2016H' , eosWinter17 + 'data/TnPTree_SingleElectron_2016prompt_RunH.root' , lumi = 8.762 ),
++    'data_Run2016B' : tnpSample('data_Run2016B' , storageData + 'data/TnPTree_SingleElectron_2016reminiaod_RunB.root' , lumi = 5.788 ),
++    'data_Run2016C' : tnpSample('data_Run2016C' , storageData + 'data/TnPTree_SingleElectron_2016reminiaod_RunC.root' , lumi = 2.573 ),
++    'data_Run2016D' : tnpSample('data_Run2016D' , storageData + 'data/TnPTree_SingleElectron_2016reminiaod_RunD.root' , lumi = 4.248 ),
++    'data_Run2016E' : tnpSample('data_Run2016E' , storageData + 'data/TnPTree_SingleElectron_2016reminiaod_RunE.root' , lumi = 4.009 ),
++    'data_Run2016F' : tnpSample('data_Run2016F' , storageData + 'data/TnPTree_SingleElectron_2016reminiaod_RunF.root' , lumi = 3.102 ),
++    'data_Run2016G' : tnpSample('data_Run2016G' , storageData + 'data/TnPTree_SingleElectron_2016reminiaod_RunG.root' , lumi = 7.540 ),
++    'data_Run2016H' : tnpSample('data_Run2016H' , storageData + 'data/TnPTree_SingleElectron_2016reminiaod_RunH.root' , lumi = 8.606 ),
+ 
+-    
+-
+-    ### AOD TnP for RECO scale factors
+-    'DY_madgraph_Winter17_rec' : tnpSample('DY_madgraph_Winter17_rec'  , 
+-                                           eosDirREC + 'mc/TnPTree_DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_DYToLL_madgraph_Winter2017.root',
+-                                           isMC = True, nEvts = 49748967),
+-    'DY_amcatnlo_Winter17_rec' : tnpSample('DY_amcatnlo_Winter17_rec'  , 
+-                                           eosDirREC + 'mc/TnPTree_DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_DYToLL_mcAtNLO_Winter2017.root',
+-                                           isMC = True, nEvts = 28658054),    
+-    'data_Run2016B_rec' : tnpSample('data_Run2016B_rec', eosDirREC + 'data/TnPTree_SingleElectron_2016rereco_RunB.root', lumi = 5.899),
+-    'data_Run2016C_rec' : tnpSample('data_Run2016C_rec', eosDirREC + 'data/TnPTree_SingleElectron_2016rereco_RunC.root', lumi = 2.646),
+-    'data_Run2016D_rec' : tnpSample('data_Run2016D_rec', eosDirREC + 'data/TnPTree_SingleElectron_2016rereco_RunD.root', lumi = 4.353),
+-    'data_Run2016E_rec' : tnpSample('data_Run2016E_rec', eosDirREC + 'data/TnPTree_SingleElectron_2016rereco_RunE.root', lumi = 4.050),
+-    'data_Run2016F_rec' : tnpSample('data_Run2016F_rec', eosDirREC + 'data/TnPTree_SingleElectron_2016rereco_RunF.root', lumi = 3.160),
+-    'data_Run2016G_rec' : tnpSample('data_Run2016G_rec', eosDirREC + 'data/TnPTree_SingleElectron_2016rereco_RunG.root', lumi = 7.391),
+-    'data_Run2016H_rec' : tnpSample('data_Run2016H_rec', eosDirREC + 'data/TnPTree_SingleElectron_2016prompt_RunH.root', lumi = 8.762),
+-    }
+-
+-Moriond17_80X_prompt = {
+-    'DY_madgraph' : tnpSample('DY_madgraph', eosDir1 + 'mc/TnPTree_DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_DYToLL_madgraph.root', 
+-                              isMC = True, nEvts = 33584160 ),
+-    'data_Run2016B' : tnpSample('data_Run2016B' , eosDir2 + 'data/TnPTree_SingleElectron_2016prompt_RunB.root' , lumi = -1 ),
+-    'data_Run2016C' : tnpSample('data_Run2016C' , eosDir2 + 'data/TnPTree_SingleElectron_2016prompt_RunC.root' , lumi = -1 ),
+-    'data_Run2016D' : tnpSample('data_Run2016D' , eosDir2 + 'data/TnPTree_SingleElectron_2016prompt_RunD.root' , lumi = -1 ),
+-    'data_Run2016F' : tnpSample('data_Run2016F' , eosDir2 + 'data/TnPTree_SingleElectron_2016prompt_RunF.root' , lumi = -1 ),
+-    'data_Run2016G' : tnpSample('data_Run2016G' , eosDir2 + 'data/TnPTree_SingleElectron_2016prompt_RunG.root' , lumi = -1 ),
+-    'data_Run2016H' : tnpSample('data_Run2016H' , eosDir2 + 'data/TnPTree_SingleElectron_2016prompt_RunH.root' , lumi = -1 ),
+     }
+-
+-
+-
+-### for this round eleIDs, phoIDs, trigger trees are included in the same file
+-eosDir = 'eos/cms/store/group/phys_egamma/tnp/80X/76Xids/AllIDs_v0/'
+-Ichep2016_80X = {
+-    'DY_amcatnlo' : tnpSample('DY_amcatnlo', eosDir+'mc/TnPTree_DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_DYToLL_mcAtNLO.root', isMC = True, nEvts = 28696958 ),
+-    'DY_madgraph' : tnpSample('DY_madgraph', eosDir+'mc/TnPTree_DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8.root'           , isMC = True, nEvts = 44716638 ),
+-    'Wjets'       : tnpSample('Wjets'      , eosDir+'mc/TnPTree_WJetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_WJets_madgraph.root' , isMC = True, nEvts = 28062407 ),
+-    'ttbar'       : tnpSample('ttbar'      , eosDir+'mc/TnPTree_TTJets_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_ttbar_madgraph.root'     , isMC = True, nEvts = 10215131 ),
+-    'data_Run2016B' : tnpSample('data_Run2016B' , eosDir+'data/TnPTree_SingleElectron_Run2016B.root' , lumi = 5.884 ),
+-    'data_Run2016C' : tnpSample('data_Run2016C' , eosDir+'data/TnPTree_SingleElectron_Run2016C.root' , lumi = 2.646 ),
+-    'data_Run2016D' : tnpSample('data_Run2016D' , eosDir+'data/TnPTree_SingleElectron_Run2016D.root' , lumi = 4.353 ),
+-}
+-
+-eosDir_v0 = 'eos/cms/store/group/phys_egamma/tnp/80X/'
+-ICHEP2016 = {
+-    'mc_DY_madgraph_ele' : tnpSample('mc_DY_madgraph_ele', eosDir_v0 + 'Photons_76Xids/elev2/mc/TnPTree_DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8.root' ,
+-                                     isMC = True, nEvts = 36311064 ),
+-    'mc_DY_amcatnlo_ele' : tnpSample('mc_DY_amcatnlo_ele', eosDir_v0 + 'Photons_76Xids/elev2/mc/TnPTree_DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8.root',
+-                                     isMC = True, nEvts = 28696958 ),
+-    'mc_DY_madgraph_pho' : tnpSample('mc_DY_madgraph_pho', eosDir_v0 + 'Photons_76Xids/phov2/mc/TnPTree_DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8.root' ,
+-                                     isMC = True, nEvts = 41253879 ),
+-    'mc_DY_amcatnlo_pho' : tnpSample('mc_DY_amcatnlo_pho', eosDir_v0 + 'Photons_76Xids/phov2/mc/TnPTree_DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8.root',
+-                                     isMC = True, nEvts = 28696958 ),
+-    'mc_Wjets_madgraph_pho' : tnpSample('mc_Wjets_madgraph_pho', eosDir_v0 + 'Photons_76Xids/phov2/mc/WJetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8.root'        , 
+-                                        isMC = True, nEvts = 999 ),
+-    'mc_DY_madgraph_rec' : tnpSample('mc_DY_madgraph_rec', eosDir_v0 + 'RecoSF/RECOv3/mc//TnPTree_DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8.root'       ,
+-                                     isMC = True, nEvts = 49877138 ),
+-    'mc_DY_amcatnlo_rec' : tnpSample('mc_DY_amcatnlo_rec', eosDir_v0 + 'RecoSF/RECOv3/mc//TnPTree_DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8.root'      , 
+-                                     isMC = True, nEvts = 28328619 ),
+-    'data_2016_runB_ele' :  tnpSample('data_2016_runB_ele', eosDir_v0 + 'Photons_76Xids/elev2/data/TnPTree_SingleElectron_2016_RunB.root' , lumi = 5.709 ),
+-    'data_2016_runC_ele' :  tnpSample('data_2016_runC_ele', eosDir_v0 + 'Photons_76Xids/elev3/data/TnPTree_SingleElectron_2016_RunC.root' , lumi = 2.646 ),
+-    'data_2016_runD_ele' :  tnpSample('data_2016_runD_ele', eosDir_v0 + 'Photons_76Xids/elev3/data/TnPTree_SingleElectron_2016_RunD.root' , lumi = 4.330 ),
+-    'data_2016_runB_pho' :  tnpSample('data_2016_runB_pho', eosDir_v0 + 'Photons_76Xids/phov2/data/TnPTree_SingleElectron_2016_RunB.root' , lumi = 5.900 ),
+-    'data_2016_runC_pho' :  tnpSample('data_2016_runC_pho', eosDir_v0 + 'Photons_76Xids/phov3/data/TnPTree_SingleElectron_2016_RunC.root' , lumi = 2.646 ),
+-    'data_2016_runD_pho' :  tnpSample('data_2016_runD_pho', eosDir_v0 + 'Photons_76Xids/phov3/data/TnPTree_SingleElectron_2016_RunD.root' , lumi = 4.330 ),
+-    'data_2016_runB_rec' :  tnpSample('data_2016_runB_rec', eosDir_v0 + 'RecoSF/RECOv3/data//TnPTree_SingleElectron_2016_RunB.root'       , lumi = 5.237 ),
+-    'data_2016_runC_rec' :  tnpSample('data_2016_runC_rec', eosDir_v0 + 'RecoSF/RECOv4/data//TnPTree_SingleElectron_2016_RunC.root'       , lumi = 2.646 ),
+-    'data_2016_runD_rec' :  tnpSample('data_2016_runD_rec', eosDir_v0 + 'RecoSF/RECOv5/data//TnPTree_SingleElectron_2016_RunD.root'       , lumi = 4.313 ),
+-}
+diff --git a/libCpp/histFitter.C b/libCpp/histFitter.C
+index 874e459..9f98aaf 100644
+--- a/libCpp/histFitter.C
++++ b/libCpp/histFitter.C
+@@ -155,6 +155,8 @@ void tnpFitter::fits(bool mcTruth,string title) {
+   _work->var("x")->setRange(_xFitMin,_xFitMax);
+   _work->var("x")->setRange("fitMassRange",_xFitMin,_xFitMax);
+   RooFitResult* resPass = pdfPass->fitTo(*_work->data("hPass"),Minos(_useMinos),SumW2Error(kTRUE),Save(),Range("fitMassRange"));
++  resPass->Print();
++
+   //RooFitResult* resPass = pdfPass->fitTo(*_work->data("hPass"),Minos(_useMinos),SumW2Error(kTRUE),Save());
+   if( _fixSigmaFtoSigmaP ) {
+     _work->var("sigmaF")->setVal( _work->var("sigmaP")->getVal() );
+@@ -162,9 +164,11 @@ void tnpFitter::fits(bool mcTruth,string title) {
+   }
+ 
+   _work->var("sigmaF")->setVal(_work->var("sigmaP")->getVal());
+-  _work->var("sigmaF")->setRange(0.8* _work->var("sigmaP")->getVal(), 3.0* _work->var("sigmaP")->getVal());
++  //_work->var("sigmaF")->setRange(0.8* _work->var("sigmaP")->getVal(), 3.0* _work->var("sigmaP")->getVal());
++  //RooFitResult* resFail = pdfFail->fitTo(*_work->data("hFail"),Minos(_useMinos),SumW2Error(kTRUE),Save(),Range("fitMassRange"), RooFit::Minimizer("Minuit2", "Migrad"));
+   RooFitResult* resFail = pdfFail->fitTo(*_work->data("hFail"),Minos(_useMinos),SumW2Error(kTRUE),Save(),Range("fitMassRange"));
+   //RooFitResult* resFail = pdfFail->fitTo(*_work->data("hFail"),Minos(_useMinos),SumW2Error(kTRUE),Save());
++  resFail->Print();
+ 
+ 
+   RooPlot *pPass = _work->var("x")->frame(60,120);
+diff --git a/libPython/EGammaID_scaleFactors.py b/libPython/EGammaID_scaleFactors.py
+index 949c0a2..676ebe3 100644
+--- a/libPython/EGammaID_scaleFactors.py
++++ b/libPython/EGammaID_scaleFactors.py
+@@ -13,7 +13,7 @@ tdrstyle.setTDRStyle()
+ 
+ 
+ effiMin = 0.68
+-effiMax = 1.07
++effiMax = 1.2
+ 
+ sfMin = 0.78
+ sfMax = 1.12
+@@ -68,11 +68,11 @@ def findMinMax( effis ):
+ 
+         
+     if  maxi > 0.95:
+-        maxi = 1.17        
++        maxi = 1.25        
+     elif maxi < 0.87:
+         maxi = 0.87
+     else:
+-        maxi = 1.07
++        maxi = 1.15
+ 
+     if maxi-mini > 0.5:
+         maxi = maxi + 0.2
+@@ -131,10 +131,11 @@ def EffiGraph1D(effDataList, effMCList, sfList ,nameout, xAxis = 'pT', yAxis = '
+ 
+     effminmax =  findMinMax( effDataList )
+     effiMin = effminmax[0]
+-    effiMax = effminmax[1]
++    # effiMax = effminmax[1]
+ 
+     sfminmax =  findMinMax( sfList )
+     sfMin = sfminmax[0]
++    # sfMax = sfminmax[1]
+ #    sfMin = 0.94
+ #    sfMax = 1.02
+ 
+@@ -334,7 +335,8 @@ def doEGM_SFs(filein, lumi, axis = ['pT','eta'] ):
+ #             effGraph.pt_1DGraph_list_customEtaBining(customEtaBining,True)   , False, pdfout )
+ #    EffiGraph1D( effGraph.eta_1DGraph_list(False), effGraph.eta_1DGraph_list(True), True , pdfout )
+     listOfSF1D = EffiGraph1D( effGraph.eta_1DGraph_list( typeGR =  0 ) , # eff Data
+-                              effGraph.eta_1DGraph_list( typeGR = -1 ) , # eff MC
++                              # effGraph.eta_1DGraph_list( typeGR = -1 ) , # eff MC
++                              None,
+                               effGraph.eta_1DGraph_list( typeGR = +1 ) , # SF
+                               pdfout, 
+                               xAxis = axis[1], yAxis = axis[0] )
+@@ -344,7 +346,7 @@ def doEGM_SFs(filein, lumi, axis = ['pT','eta'] ):
+     h2SF      = effGraph.ptEtaScaleFactor_2DHisto(-1)
+     h2Error   = effGraph.ptEtaScaleFactor_2DHisto( 0)  ## only error bars
+ 
+-    rt.gStyle.SetPalette(1)
++    # rt.gStyle.SetPalette(1)
+     rt.gStyle.SetPaintTextFormat('1.3f');
+     rt.gStyle.SetOptTitle(1)
+ 
+diff --git a/libPython/efficiencyUtils.py b/libPython/efficiencyUtils.py
+index 0b58531..31a60be 100644
+--- a/libPython/efficiencyUtils.py
++++ b/libPython/efficiencyUtils.py
+@@ -44,11 +44,11 @@ class efficiency:
+ 
+ 
+     def combineSyst(self,averageEffData,averageEffMC):
+-        systAltBkg      = self.altEff[self.iAltBkgModel] - averageEffData
+-        systAltSig      = self.altEff[self.iAltSigModel] - averageEffData
+-        systAltMC       = self.altEff[self.iAltMCSignal] - averageEffMC
++        systAltBkg      = abs(self.altEff[self.iAltBkgModel] - averageEffData)
++        systAltSig      = abs(self.altEff[self.iAltSigModel] - averageEffData)
++        systAltMC       = abs(self.altEff[self.iAltMCSignal] - averageEffMC)
+ #        systAltTagSelec = self.altEff[self.iAltTagSelec] - averageEffData
+-        systAltTagSelec = self.altEff[self.iAltTagSelec] - averageEffMC
++        systAltTagSelec = abs(self.altEff[self.iAltTagSelec] - averageEffMC)
+ 
+         if self.altEff[self.iAltBkgModel] < 0:
+             systAltBkg = 0
+@@ -62,6 +62,11 @@ class efficiency:
+         if self.altEff[self.iAltTagSelec] < 0:
+             systAltTagSelec = 0
+ 
++        if systAltMC == 0:
++            print("systAltMC == 0")
++            print("Mean eff MC: {}".format(averageEffMC))
++            print("Syst: {}".format(self.altEff[self.iAltMCSignal]))
++
+         self.syst[ 0                 ] = self.errEffData
+         self.syst[ 1                 ] = self.errEffMC
+         self.syst[self.iAltBkgModel+2] = systAltBkg
+@@ -255,6 +260,8 @@ class efficiencyList:
+             hname  = 'h2_uncertaintiesEGamma'             
+ 
+         h2 = rt.TH2F(hname,htitle,xbinsTab.size-1,xbinsTab,ybinsTab.size-1,ybinsTab)
++        h2.SetContour(100)
++        print("Title: {}".format(htitle))
+ 
+         ## init histogram efficiencies and errors to 100%
+         for ix in range(1,h2.GetXaxis().GetNbins()+1):
+@@ -309,6 +316,13 @@ class efficiencyList:
+                             if relError:
+                                 denominator = self.effList[ptBin][etaBin].systCombined
+                             h2.SetBinContent(ix,iy, abs(self.effList[ptBin][etaBin].syst[onlyError-1]) / denominator )
++                            b = abs(self.effList[ptBin][etaBin].syst[onlyError-1]) / denominator 
++                            if b == 0:
++                                print("Syst: {}".format(onlyError - 1))
++                                print("Denom: {}".format(denominator))
++                                print("Num: {}".format(self.effList[ptBin][etaBin].syst[onlyError-1]))
++                                print("Eff: {}".format(self.effList[ptBin][etaBin]))
++                                print("X: {}; Y: {}".format(h2.GetXaxis().GetBinCenter(ix), h2.GetYaxis().GetBinCenter(iy)))
+ 
+         h2.GetXaxis().SetTitle("SuperCluster #eta")
+         h2.GetYaxis().SetTitle("p_{T} [GeV]")
+@@ -414,6 +428,7 @@ class efficiencyList:
+                 listOfGraphs[ptBin].append( {'min': etaBin[0], 'max': etaBin[1],
+                                              'val': aValue  , 'err': anError } )
+ 
++        del listOfGraphs[(150, 500)]
+         return listOfGraphs
+ 
+ 
+diff --git a/tnpEGM_fitter.py b/tnpEGM_fitter.py
+index 5860e01..3e10d1a 100644
+--- a/tnpEGM_fitter.py
++++ b/tnpEGM_fitter.py
+@@ -5,6 +5,7 @@ import os
+ import sys
+ import pickle
+ import shutil
++import math
+ 
+ 
+ parser = argparse.ArgumentParser(description='tnp EGM fitter')
+@@ -192,6 +193,9 @@ if args.sumUp:
+     effis = None
+     effFileName ='%s/egammaEffi.txt' % outputDirectory 
+     fOut = open( effFileName,'w')
++
++    pt_binning = []
++    eta_binning = []
+     
+     for ib in range(len(tnpBins['bins'])):
+         effis = tnpRoot.getAllEffi( info, tnpBins['bins'][ib] )
+@@ -206,6 +210,11 @@ if args.sumUp:
+             astr = '### var2 : %s' % v2Range[1]
+             print astr
+             fOut.write( astr + '\n' )
++            pt_binning += [float(v2Range[0]), float(v2Range[2])]
++            eta_binning += [float(v1Range[0]), float(v1Range[2])]
++        else:
++            pt_binning.append(float(v2Range[2]))
++            eta_binning.append(float(v1Range[2]))
+             
+         astr =  '%+8.3f\t%+8.3f\t%+8.3f\t%+8.3f\t%5.3f\t%5.3f\t%5.3f\t%5.3f\t%5.3f\t%5.3f\t%5.3f\t%5.3f' % (
+             float(v1Range[0]), float(v1Range[2]),
+@@ -221,6 +230,60 @@ if args.sumUp:
+         fOut.write( astr + '\n' )
+     fOut.close()
+ 
++    pt_binning = sorted(list(set(pt_binning)))
++    eta_binning = sorted(list(set(eta_binning)))
++
+     print 'Effis saved in file : ',  effFileName
+     import libPython.EGammaID_scaleFactors as egm_sf
+     egm_sf.doEGM_SFs(effFileName,sampleToFit.lumi)
++
++    json_content = {'dimension': 2, 'variables': ['Eta', 'Pt'], 'binning': {'x': eta_binning, 'y': pt_binning}, 'data': [], 'error_type': 'absolute'}
++    json_content_data = json_content['data']
++
++    for i in range(len(eta_binning) - 1):
++        eta_data = {'bin': [eta_binning[i], eta_binning[i + 1]], 'values': []}
++        json_content_data.append(eta_data)
++
++    for ib in range(len(tnpBins['bins'])):
++        effis = tnpRoot.getAllEffi( info, tnpBins['bins'][ib] )
++
++        ### formatting assuming 2D bining -- to be fixed        
++        v1Range = tnpBins['bins'][ib]['title'].split(';')[1].split('<')
++        v2Range = tnpBins['bins'][ib]['title'].split(';')[2].split('<')
++
++        eta_data = None
++        for data in json_content_data:
++            if data['bin'][0] == float(v1Range[0]) and data['bin'][1] == float(v1Range[2]):
++                eta_data = data
++                break
++
++        if not eta_data:
++            raise Exception("Eta bin not found")
++
++        data_eff = effis['dataNominal'][0]
++        data_stat_error = effis['dataNominal'][1]
++
++        mc_eff = effis['mcNominal'][0]
++        mc_stat_error = effis['mcNominal'][1]
++
++        alt_bkg_error = abs(effis['dataAltBkg' ][0] - data_eff)
++        alt_sig_error = abs(effis['dataAltSig' ][0] - data_eff)
++
++        mc_alt_error = abs(effis['mcAlt'][0] - mc_eff)
++        mc_alt_sel_error = abs(effis['tagSel'][0] - mc_eff)
++
++        data_error = math.sqrt(data_stat_error**2 + alt_bkg_error**2 + alt_sig_error**2)
++        mc_error = math.sqrt(mc_stat_error**2 + mc_alt_error**2 + mc_alt_sel_error**2)
++
++        sf = data_eff / mc_eff
++        sf_error = math.sqrt(sf**2 * ( (data_error / data_eff)**2 + (mc_error / mc_eff)**2 ))
++
++        pt_data = {'bin': [float(v2Range[0]), float(v2Range[2])], 'value': sf, 'error_low': sf_error, 'error_high': sf_error}
++
++        eta_data['values'].append(pt_data)
++
++    filename = os.path.join(outputDirectory, 'scale_factors.json')
++    with open(filename, 'w') as f:
++        import json
++        json.dump(json_content, f, indent=2)
++        print("JSON saved as {}".format(filename))

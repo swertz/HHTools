@@ -10,9 +10,21 @@ mass_ = "mass"
 ProbeTightIDIso = cms.PSet(
         Tight2012 = cms.vstring("pass"),
         combRelIsoPF04dBeta = cms.vdouble(0, 0.15),
-        tag_IsoMu22 = cms.vstring("pass"),
+        # tag_IsoMu22 = cms.vstring("pass"),
         pair_deltaR = cms.vdouble(0.3, 99999),
         dzPV = cms.vdouble(-0.5, 0.5)
+        )
+
+InputFileNames = cms.vstring(
+        'file:/home/fynu/sbrochet/storage/TnP/Muons/Run2016/tag_IsoMu24/TnPTree_80XRereco_Run2016B_GoldenJSON_Run276098to276384_skim.root',
+        'file:/home/fynu/sbrochet/storage/TnP/Muons/Run2016/tag_IsoMu24/TnPTree_80XRereco_Run2016C_GoldenJSON_Run276098to276384_skim.root',
+        'file:/home/fynu/sbrochet/storage/TnP/Muons/Run2016/tag_IsoMu24/TnPTree_80XRereco_Run2016D_GoldenJSON_Run276098to276384_skim.root',
+        'file:/home/fynu/sbrochet/storage/TnP/Muons/Run2016/tag_IsoMu24/TnPTree_80XRereco_Run2016E_GoldenJSON_Run276098to276384_skim.root',
+        'file:/home/fynu/sbrochet/storage/TnP/Muons/Run2016/tag_IsoMu24/TnPTree_80XRereco_Run2016F_GoldenJSON_Run276098to276384_skim.root',
+        # Run G+H
+        'file:/home/fynu/sbrochet/storage/TnP/Muons/Run2016/tag_IsoMu24/TnPTree_80XRereco_Run2016G_GoldenJSON_Run278819to280384_skim.root',
+        'file:/home/fynu/sbrochet/storage/TnP/Muons/Run2016/tag_IsoMu24/TnPTree_80XRereco_Run2016H_v2_GoldenJSON_Run281613to284035_skim.root',
+        'file:/home/fynu/sbrochet/storage/TnP/Muons/Run2016/tag_IsoMu24/TnPTree_80XRereco_Run2016H_GoldenJSON_Run284036to284044_skim.root'
         )
 
 process.TriggerEfficiencies = cms.EDAnalyzer("TagProbeFitTreeAnalyzer",
@@ -37,7 +49,7 @@ process.TriggerEfficiencies = cms.EDAnalyzer("TagProbeFitTreeAnalyzer",
         Categories = cms.PSet(
             # PF      = cms.vstring("PF Muon", "dummy[pass=1,fail=0]"),
             Tight2012 = cms.vstring("Tight Id. Muon", "dummy[pass=1,fail=0]"),
-            tag_IsoMu22 = cms.vstring("Tag pass IsoMu22", "dummy[pass=1,fail=0]"),
+            # tag_IsoMu22 = cms.vstring("Tag pass IsoMu22", "dummy[pass=1,fail=0]"),
 
             DoubleIsoMu17Mu8_Mu17leg = cms.vstring("Pass DoubleMu17Mu8_Mu17 leg", "dummy[pass=1,fail=0]"),
             DoubleIsoMu17Mu8_Mu8leg = cms.vstring("Pass DoubleMu17Mu8_Mu8 Mu8 leg", "dummy[pass=1,fail=0]"),
@@ -140,17 +152,7 @@ process.TriggerEfficiencies = cms.EDAnalyzer("TagProbeFitTreeAnalyzer",
                 )
             ),
 
-    InputFileNames = cms.vstring(
-        'file:/home/fynu/sbrochet/storage/TnP/Muons/Run2016/TnPTree_80XRereco_Run2016B_GoldenJSON_Run276098to276384_skim.root',
-        'file:/home/fynu/sbrochet/storage/TnP/Muons/Run2016/TnPTree_80XRereco_Run2016C_GoldenJSON_Run276098to276384_skim.root',
-        'file:/home/fynu/sbrochet/storage/TnP/Muons/Run2016/TnPTree_80XRereco_Run2016D_GoldenJSON_Run276098to276384_skim.root',
-        'file:/home/fynu/sbrochet/storage/TnP/Muons/Run2016/TnPTree_80XRereco_Run2016E_GoldenJSON_Run276098to276384_skim.root',
-        'file:/home/fynu/sbrochet/storage/TnP/Muons/Run2016/TnPTree_80XRereco_Run2016F_GoldenJSON_Run276098to276384_skim.root',
-        # Run G+H
-        'file:/home/fynu/sbrochet/storage/TnP/Muons/Run2016/TnPTree_80XRereco_Run2016G_GoldenJSON_Run278819to280384_skim.root',
-        'file:/home/fynu/sbrochet/storage/TnP/Muons/Run2016/TnPTree_80XRereco_Run2016H_v2_GoldenJSON_Run281613to284035_skim.root',
-        'file:/home/fynu/sbrochet/storage/TnP/Muons/Run2016/TnPTree_80XRereco_Run2016H_GoldenJSON_Run284036to284044_skim.root'
-        ),
+    InputFileNames = InputFileNames,
     InputTreeName = cms.string("fitter_tree"),
     InputDirectoryName = cms.string("tpTree"),
     OutputFileName = cms.string("TnP_TriggerEff_data_Run2016_BCDEFGH.root"),
@@ -205,19 +207,6 @@ process.TriggerEfficiencies = cms.EDAnalyzer("TagProbeFitTreeAnalyzer",
                 BinToPDFmap = cms.vstring('vpvPlusExpo')
                 ),
 
-            # XPathIsoMu12leg_pt_eta = cms.PSet(
-                # EfficiencyCategoryAndState = cms.vstring("XPathIsoMu12leg", "above"),
-                # BinnedVariables = cms.PSet(
-                    # ProbeTightIDIso,
-
-                    # abseta = cms.vdouble(0, 0.9, 1.2, 2.1, 2.4),
-                    # pt = cms.vdouble(0, 11.5, 11.75, 12, 12.25, 12.5, 13, 15, 20, 25, 30, 40, 50, 60, 80, 120, 200, 500)
-                    # ),
-
-                # UnbinnedVariables = cms.vstring('mass'),
-                # BinToPDFmap = cms.vstring('vpvPlusExpo')
-                # ),
-
             XPathIsoMu8leg_pt_eta = cms.PSet(
                 EfficiencyCategoryAndState = cms.vstring("XPathIsoMu8leg", "above"),
                 BinnedVariables = cms.PSet(
@@ -234,6 +223,45 @@ process.TriggerEfficiencies = cms.EDAnalyzer("TagProbeFitTreeAnalyzer",
 
             ),
     )
+
+process.TriggerEfficienciesVsNPV = process.TriggerEfficiencies.clone(
+        Efficiencies = cms.PSet(),
+        OutputFileName = cms.string("TnP_TriggerEff_data_Run2016_BCDEFGH_vs_npv.root")
+        )
+
+process.TriggerEfficienciesVsNPV.Variables.tag_nVertices = cms.vstring("Number of vertices", "0", "999", "")
+
+process.TriggerEfficienciesVsNPV.Efficiencies.XPathIsoMu23leg_npv = process.TriggerEfficiencies.Efficiencies.XPathIsoMu23leg_pt_eta.clone(
+        BinnedVariables = cms.PSet(
+                ProbeTightIDIso,
+                pt = cms.vdouble(25, 5000),
+                tag_nVertices = cms.vdouble(2.5, 4.5, 6.5, 8.5, 10.5, 12.5, 14.5, 16.5, 18.5, 20.5, 22.5, 24.5, 26.5, 28.5, 30.5, 32.5, 34.5, 36.5, 38.5, 40.5, 42.5, 44.5, 46.5, 48.5, 50.5)
+            )
+        )
+
+process.TriggerEfficienciesVsNPV.Efficiencies.XPathIsoMu8leg_npv = process.TriggerEfficiencies.Efficiencies.XPathIsoMu8leg_pt_eta.clone(
+        BinnedVariables = cms.PSet(
+                ProbeTightIDIso,
+                pt = cms.vdouble(10, 5000),
+                tag_nVertices = cms.vdouble(2.5, 4.5, 6.5, 8.5, 10.5, 12.5, 14.5, 16.5, 18.5, 20.5, 22.5, 24.5, 26.5, 28.5, 30.5, 32.5, 34.5, 36.5, 38.5, 40.5, 42.5, 44.5, 46.5, 48.5, 50.5)
+            )
+        )
+
+process.TriggerEfficienciesVsNPV.Efficiencies.DoubleIsoMu17TkMu8_IsoMu8legORTkMu8leg_npv = process.TriggerEfficiencies.Efficiencies.DoubleIsoMu17TkMu8_IsoMu8legORTkMu8leg_pt_eta.clone(
+        BinnedVariables = cms.PSet(
+                ProbeTightIDIso,
+                pt = cms.vdouble(10, 5000),
+                tag_nVertices = cms.vdouble(2.5, 4.5, 6.5, 8.5, 10.5, 12.5, 14.5, 16.5, 18.5, 20.5, 22.5, 24.5, 26.5, 28.5, 30.5, 32.5, 34.5, 36.5, 38.5, 40.5, 42.5, 44.5, 46.5, 48.5, 50.5)
+            )
+        )
+
+process.TriggerEfficienciesVsNPV.Efficiencies.DoubleIsoMu17TkMu8_IsoMu17leg_npv = process.TriggerEfficiencies.Efficiencies.DoubleIsoMu17Mu8_IsoMu17leg_pt_eta.clone(
+        BinnedVariables = cms.PSet(
+                ProbeTightIDIso,
+                pt = cms.vdouble(19, 5000),
+                tag_nVertices = cms.vdouble(2.5, 4.5, 6.5, 8.5, 10.5, 12.5, 14.5, 16.5, 18.5, 20.5, 22.5, 24.5, 26.5, 28.5, 30.5, 32.5, 34.5, 36.5, 38.5, 40.5, 42.5, 44.5, 46.5, 48.5, 50.5)
+            )
+        )
 
 process.TriggerEfficienciesOnlyPT = cms.EDAnalyzer("TagProbeFitTreeAnalyzer",
         NumCPU = cms.uint32(1),
@@ -257,7 +285,7 @@ process.TriggerEfficienciesOnlyPT = cms.EDAnalyzer("TagProbeFitTreeAnalyzer",
         Categories = cms.PSet(
             # PF      = cms.vstring("PF Muon", "dummy[pass=1,fail=0]"),
             Tight2012 = cms.vstring("Tight Id. Muon", "dummy[pass=1,fail=0]"),
-            tag_IsoMu22 = cms.vstring("Tag pass IsoMu22", "dummy[pass=1,fail=0]"),
+            # tag_IsoMu22 = cms.vstring("Tag pass IsoMu22", "dummy[pass=1,fail=0]"),
 
             DoubleIsoMu17Mu8_Mu17leg = cms.vstring("Pass DoubleMu17Mu8_Mu17 leg", "dummy[pass=1,fail=0]"),
             DoubleIsoMu17Mu8_Mu8leg = cms.vstring("Pass DoubleMu17Mu8_Mu8 Mu8 leg", "dummy[pass=1,fail=0]"),
@@ -360,17 +388,7 @@ process.TriggerEfficienciesOnlyPT = cms.EDAnalyzer("TagProbeFitTreeAnalyzer",
                 )
             ),
 
-    InputFileNames = cms.vstring(
-        'file:/home/fynu/sbrochet/storage/TnP/Muons/Run2016/TnPTree_80XRereco_Run2016B_GoldenJSON_Run276098to276384_skim.root',
-        'file:/home/fynu/sbrochet/storage/TnP/Muons/Run2016/TnPTree_80XRereco_Run2016C_GoldenJSON_Run276098to276384_skim.root',
-        'file:/home/fynu/sbrochet/storage/TnP/Muons/Run2016/TnPTree_80XRereco_Run2016D_GoldenJSON_Run276098to276384_skim.root',
-        'file:/home/fynu/sbrochet/storage/TnP/Muons/Run2016/TnPTree_80XRereco_Run2016E_GoldenJSON_Run276098to276384_skim.root',
-        'file:/home/fynu/sbrochet/storage/TnP/Muons/Run2016/TnPTree_80XRereco_Run2016F_GoldenJSON_Run276098to276384_skim.root',
-        # Run G+H
-        'file:/home/fynu/sbrochet/storage/TnP/Muons/Run2016/TnPTree_80XRereco_Run2016G_GoldenJSON_Run278819to280384_skim.root',
-        'file:/home/fynu/sbrochet/storage/TnP/Muons/Run2016/TnPTree_80XRereco_Run2016H_v2_GoldenJSON_Run281613to284035_skim.root',
-        'file:/home/fynu/sbrochet/storage/TnP/Muons/Run2016/TnPTree_80XRereco_Run2016H_GoldenJSON_Run284036to284044_skim.root'
-        ),
+    InputFileNames = InputFileNames,
     InputTreeName = cms.string("fitter_tree"),
     InputDirectoryName = cms.string("tpTree"),
     OutputFileName = cms.string("TnP_TriggerEff_data_Run2016_BCDEFGH_only_vs_pt.root"),
@@ -455,5 +473,6 @@ process.TriggerEfficienciesOnlyPT = cms.EDAnalyzer("TagProbeFitTreeAnalyzer",
             ),
     )
 
-# process.path = cms.Path(process.TriggerEfficiencies)
-process.path = cms.Path(process.TriggerEfficienciesOnlyPT)
+process.path = cms.Path(process.TriggerEfficiencies)
+# process.path = cms.Path(process.TriggerEfficienciesOnlyPT)
+# process.path = cms.Path(process.TriggerEfficienciesVsNPV)
