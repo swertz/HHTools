@@ -1,65 +1,68 @@
-diff --git a/etc/config/settings_ele.py b/etc/config/settings_ele.py
-index 922e68b..4c4d3bc 100644
---- a/etc/config/settings_ele.py
-+++ b/etc/config/settings_ele.py
-@@ -19,9 +19,11 @@ flags = {
-     'passingMVAwp90'    : cutpass90,
-     'passingMVA80Xwp80' : '(passingMVA80Xwp80 == 1)',
-     'passingMVA80Xwp90' : '(passingMVA80Xwp90 == 1)',
+diff --git a/etc/config/settings_ele_hlt.py b/etc/config/settings_ele_hlt.py
+new file mode 100644
+index 0000000..5ce3fc0
+--- /dev/null
++++ b/etc/config/settings_ele_hlt.py
+@@ -0,0 +1,164 @@
++#############################################################
++########## General settings
++#############################################################
++
++# flag to be Tested
++flags = {
 +    'passingIsoEle23Leg': '(pass_Ele23Ele12_IsoEle23 == 1)',
 +    'passingIsoEle12Leg': '(pass_Ele23Ele12_IsoEle12 == 1)',
-     }
- 
--baseOutDir = 'results/Moriond17/tnpEleID/runGH/'
-+baseOutDir = 'results/Moriond17/tnpTriggerEff/runBCDEFGH/'
- 
- #############################################################
- ########## samples definition  - preparing the samples
-@@ -34,16 +36,19 @@ tnpTreeDir = 'GsfElectronToEleID'
- samplesDef = {
-     'data'   : tnpSamples.Moriond17_80X['data_Run2016H'].clone(),
-     'mcNom'  : tnpSamples.Moriond17_80X['DY_madgraph_Winter17'].clone(),
++    }
++
++baseOutDir = 'results/Moriond17/tnpTriggerEff/runBCDEFGH_reMiniAOD_newetabinning_HLTSafe_dxy_dz/'
++
++#############################################################
++########## samples definition  - preparing the samples
++#############################################################
++### samples are defined in etc/inputs/tnpSampleDef.py
++### not: you can setup another sampleDef File in inputs
++import etc.inputs.tnpSampleDef as tnpSamples
++tnpTreeDir = 'GsfElectronToEleID'
++
++samplesDef = {
++    'data'   : tnpSamples.Moriond17_80X['data_Run2016H'].clone(),
++    'mcNom'  : tnpSamples.Moriond17_80X['DY_madgraph_Winter17'].clone(),
 +    # 'mcNom'  : None,
-     'mcAlt'  : tnpSamples.Moriond17_80X['DY_amcatnlo_Winter17'].clone(),
-+    # 'mcAlt': None,
-     'tagSel' : tnpSamples.Moriond17_80X['DY_madgraph_Winter17'].clone(),
-+    # 'tagSel' : None,
- }
- ## can add data sample easily
- samplesDef['data'].add_sample( tnpSamples.Moriond17_80X['data_Run2016G'] )
--#samplesDef['data'].add_sample( tnpSamples.Moriond17_80X['data_Run2016F'] )
--#samplesDef['data'].add_sample( tnpSamples.Moriond17_80X['data_Run2016E'] )
--#samplesDef['data'].add_sample( tnpSamples.Moriond17_80X['data_Run2016D'] )
--#samplesDef['data'].add_sample( tnpSamples.Moriond17_80X['data_Run2016C'] )
--#samplesDef['data'].add_sample( tnpSamples.Moriond17_80X['data_Run2016B'] )
++    # 'mcAlt'  : tnpSamples.Moriond17_80X['DY_amcatnlo_Winter17'].clone(),
++    'mcAlt': None,
++    # 'tagSel' : tnpSamples.Moriond17_80X['DY_madgraph_Winter17'].clone(),
++    'tagSel' : None,
++}
++## can add data sample easily
++samplesDef['data'].add_sample( tnpSamples.Moriond17_80X['data_Run2016G'] )
 +samplesDef['data'].add_sample( tnpSamples.Moriond17_80X['data_Run2016F'] )
 +samplesDef['data'].add_sample( tnpSamples.Moriond17_80X['data_Run2016E'] )
 +samplesDef['data'].add_sample( tnpSamples.Moriond17_80X['data_Run2016D'] )
 +samplesDef['data'].add_sample( tnpSamples.Moriond17_80X['data_Run2016C'] )
 +samplesDef['data'].add_sample( tnpSamples.Moriond17_80X['data_Run2016B'] )
- 
- ## some sample-based cuts... general cuts defined here after
- ## require mcTruth on MC DY samples and additional cuts
-@@ -62,48 +67,53 @@ if not samplesDef['tagSel'] is None:
-     samplesDef['tagSel'].rename('mcAltSel_DY_madgraph')
-     samplesDef['tagSel'].set_cut('tag_Ele_pt > 35  && tag_Ele_nonTrigMVA80X > 0.95')
- 
--## set MC weight, simple way (use tree weight) 
--#weightName = 'totWeight'
--#if not samplesDef['mcNom' ] is None: samplesDef['mcNom' ].set_weight(weightName)
--#if not samplesDef['mcAlt' ] is None: samplesDef['mcAlt' ].set_weight(weightName)
--#if not samplesDef['tagSel'] is None: samplesDef['tagSel'].set_weight(weightName)
--
--## set MC weight, can use several pileup rw for different data taking periods
--weightName = 'weights_2016_runGH.totWeight'
++
++## some sample-based cuts... general cuts defined here after
++## require mcTruth on MC DY samples and additional cuts
++## all the samples MUST have different names (i.e. sample.name must be different for all)
++## if you need to use 2 times the same sample, then rename the second one
++#samplesDef['data'  ].set_cut('run >= 273726')
++samplesDef['data' ].set_tnpTree(tnpTreeDir)
++if not samplesDef['mcNom' ] is None: samplesDef['mcNom' ].set_tnpTree(tnpTreeDir)
++if not samplesDef['mcAlt' ] is None: samplesDef['mcAlt' ].set_tnpTree(tnpTreeDir)
++if not samplesDef['tagSel'] is None: samplesDef['tagSel'].set_tnpTree(tnpTreeDir)
++
++if not samplesDef['mcNom' ] is None: samplesDef['mcNom' ].set_mcTruth()
++if not samplesDef['mcAlt' ] is None: samplesDef['mcAlt' ].set_mcTruth()
++if not samplesDef['tagSel'] is None: samplesDef['tagSel'].set_mcTruth()
++if not samplesDef['tagSel'] is None:
++    samplesDef['tagSel'].rename('mcAltSel_DY_madgraph')
++    samplesDef['tagSel'].set_cut('tag_Ele_pt > 35  && tag_Ele_nonTrigMVA80X > 0.95')
++
 +# set MC weight, simple way (use tree weight) 
 +weightName = 'totWeight'
- if not samplesDef['mcNom' ] is None: samplesDef['mcNom' ].set_weight(weightName)
- if not samplesDef['mcAlt' ] is None: samplesDef['mcAlt' ].set_weight(weightName)
- if not samplesDef['tagSel'] is None: samplesDef['tagSel'].set_weight(weightName)
--if not samplesDef['mcNom' ] is None: samplesDef['mcNom' ].set_puTree('eos/cms/store/group/phys_egamma/tnp/80X/pu/Winter17/DY_madgraph_Winter17_ele.pu.puTree.root')
--if not samplesDef['mcAlt' ] is None: samplesDef['mcAlt' ].set_puTree('eos/cms/store/group/phys_egamma/tnp/80X/pu/Winter17/DY_amcatnlo_Winter17_ele.pu.puTree.root')
--if not samplesDef['tagSel'] is None: samplesDef['tagSel'].set_puTree('eos/cms/store/group/phys_egamma/tnp/80X/pu/Winter17/DY_madgraph_Winter17_ele.pu.puTree.root')
++if not samplesDef['mcNom' ] is None: samplesDef['mcNom' ].set_weight(weightName)
++if not samplesDef['mcAlt' ] is None: samplesDef['mcAlt' ].set_weight(weightName)
++if not samplesDef['tagSel'] is None: samplesDef['tagSel'].set_weight(weightName)
 +
 +## set MC weight, can use several pileup rw for different data taking periods
 +# weightName = 'weights_2016_runGH.totWeight'
@@ -69,42 +72,29 @@ index 922e68b..4c4d3bc 100644
 +# if not samplesDef['mcNom' ] is None: samplesDef['mcNom' ].set_puTree('eos/cms/store/group/phys_egamma/tnp/80X/pu/Winter17/DY_madgraph_Winter17_ele.pu.puTree.root')
 +# if not samplesDef['mcAlt' ] is None: samplesDef['mcAlt' ].set_puTree('eos/cms/store/group/phys_egamma/tnp/80X/pu/Winter17/DY_amcatnlo_Winter17_ele.pu.puTree.root')
 +# if not samplesDef['tagSel'] is None: samplesDef['tagSel'].set_puTree('eos/cms/store/group/phys_egamma/tnp/80X/pu/Winter17/DY_madgraph_Winter17_ele.pu.puTree.root')
- 
- 
- #############################################################
- ########## bining definition  [can be nD bining]
- #############################################################
- biningDef = [
--   { 'var' : 'probe_sc_eta' , 'type': 'float', 'bins': [-2.5,-2.0,-1.566,-1.4442, -0.8, 0.0, 0.8, 1.4442, 1.566, 2.0, 2.5] },
--   { 'var' : 'probe_Ele_pt' , 'type': 'float', 'bins': [10,20,35,50,100,200,500] },
-+   { 'var' : 'abs(probe_sc_eta)' , 'type': 'float', 'bins': [0.0, 0.9, 1.2, 2.1, 2.5] },
++
++
++#############################################################
++########## bining definition  [can be nD bining]
++#############################################################
++biningDef = [
++   { 'var' : 'probe_sc_eta' , 'type': 'float', 'bins': [-2.5, -2.0, -1.566, -1.4442, -0.8, 0.0, 0.8, 1.4442, 1.566, 2.0, 2.5] },
 +
 +   # Ele23
-+   { 'var' : 'probe_Ele_pt' , 'type': 'float', 'bins': [0, 22, 22.5, 22.75, 23, 23.25, 23.5, 24, 25, 30, 40, 50, 60, 80, 120, 500] },
++   { 'var' : 'probe_Ele_pt' , 'type': 'float', 'bins': [0, 22, 22.5, 22.75, 23, 23.25, 23.5, 24, 25, 30, 35, 50, 90, 150, 500] },
 +
 +   # Ele12
-+   # { 'var' : 'probe_Ele_pt' , 'type': 'float', 'bins': [0, 11, 11.5, 11.75, 12, 12.25, 12.5, 13, 15, 20, 30, 40, 50, 60, 80, 120, 500] },
- ]
- 
- #############################################################
- ########## Cuts definition for all samples
- #############################################################
- ### cut
--cutBase   = 'tag_Ele_pt > 30 && abs(tag_sc_eta) < 2.17 && probe_Ele_q*tag_Ele_q < 0'
-+cutBase   = 'tag_Ele_pt > 30 && abs(tag_sc_eta) < 2.17 && probe_Ele_q*tag_Ele_q < 0 && passingMedium80X == 1'
- 
- # can add addtionnal cuts for some bins (first check bin number using tnpEGM --checkBins)
- additionalCuts = { 
--    0 : 'tag_Ele_trigMVA > 0.92 && sqrt( 2*event_met_pfmet*tag_Ele_pt*(1-cos(event_met_pfphi-tag_Ele_phi))) < 45',
--    1 : 'tag_Ele_trigMVA > 0.92 && sqrt( 2*event_met_pfmet*tag_Ele_pt*(1-cos(event_met_pfphi-tag_Ele_phi))) < 45',
--    2 : 'tag_Ele_trigMVA > 0.92 && sqrt( 2*event_met_pfmet*tag_Ele_pt*(1-cos(event_met_pfphi-tag_Ele_phi))) < 45',
--    3 : 'tag_Ele_trigMVA > 0.92 && sqrt( 2*event_met_pfmet*tag_Ele_pt*(1-cos(event_met_pfphi-tag_Ele_phi))) < 45',
--    4 : 'tag_Ele_trigMVA > 0.92 && sqrt( 2*event_met_pfmet*tag_Ele_pt*(1-cos(event_met_pfphi-tag_Ele_phi))) < 45',
--    5 : 'tag_Ele_trigMVA > 0.92 && sqrt( 2*event_met_pfmet*tag_Ele_pt*(1-cos(event_met_pfphi-tag_Ele_phi))) < 45',
--    6 : 'tag_Ele_trigMVA > 0.92 && sqrt( 2*event_met_pfmet*tag_Ele_pt*(1-cos(event_met_pfphi-tag_Ele_phi))) < 45',
--    7 : 'tag_Ele_trigMVA > 0.92 && sqrt( 2*event_met_pfmet*tag_Ele_pt*(1-cos(event_met_pfphi-tag_Ele_phi))) < 45',
--    8 : 'tag_Ele_trigMVA > 0.92 && sqrt( 2*event_met_pfmet*tag_Ele_pt*(1-cos(event_met_pfphi-tag_Ele_phi))) < 45',
--    9 : 'tag_Ele_trigMVA > 0.92 && sqrt( 2*event_met_pfmet*tag_Ele_pt*(1-cos(event_met_pfphi-tag_Ele_phi))) < 45'
++   # { 'var' : 'probe_Ele_pt' , 'type': 'float', 'bins': [0, 11, 11.5, 11.75, 12, 12.25, 12.5, 13, 15, 20, 35, 50, 90, 150, 500] },
++]
++
++#############################################################
++########## Cuts definition for all samples
++#############################################################
++### cut
++cutBase = 'tag_Ele_pt > 30 && abs(tag_sc_eta) < 2.17 && probe_Ele_q*tag_Ele_q < 0 && passingMedium80X == 1 && passingHLTsafe == 1 && ((abs(probe_sc_eta) < 1.479) ? (abs(probe_Ele_dxy) < 0.05 && abs(probe_Ele_dz) < 0.1) : (abs(probe_Ele_dxy) < 0.1 && abs(probe_Ele_dz) < 0.2))'
++
++# can add addtionnal cuts for some bins (first check bin number using tnpEGM --checkBins)
++additionalCuts = { 
 +    # 0 : 'tag_Ele_trigMVA > 0.92 && sqrt( 2*event_met_pfmet*tag_Ele_pt*(1-cos(event_met_pfphi-tag_Ele_phi))) < 45',
 +    # 1 : 'tag_Ele_trigMVA > 0.92 && sqrt( 2*event_met_pfmet*tag_Ele_pt*(1-cos(event_met_pfphi-tag_Ele_phi))) < 45',
 +    # 2 : 'tag_Ele_trigMVA > 0.92 && sqrt( 2*event_met_pfmet*tag_Ele_pt*(1-cos(event_met_pfphi-tag_Ele_phi))) < 45',
@@ -115,55 +105,96 @@ index 922e68b..4c4d3bc 100644
 +    # 7 : 'tag_Ele_trigMVA > 0.92 && sqrt( 2*event_met_pfmet*tag_Ele_pt*(1-cos(event_met_pfphi-tag_Ele_phi))) < 45',
 +    # 8 : 'tag_Ele_trigMVA > 0.92 && sqrt( 2*event_met_pfmet*tag_Ele_pt*(1-cos(event_met_pfphi-tag_Ele_phi))) < 45',
 +    # 9 : 'tag_Ele_trigMVA > 0.92 && sqrt( 2*event_met_pfmet*tag_Ele_pt*(1-cos(event_met_pfphi-tag_Ele_phi))) < 45'
- }
- 
- #### or remove any additional cut (default)
-@@ -113,22 +123,32 @@ additionalCuts = {
- ########## fitting params to tune fit by hand if necessary
- #############################################################
- tnpParNomFit = [
--    "meanP[-0.0,-5.0,5.0]","sigmaP[0.9,0.5,5.0]",
--    "meanF[-0.0,-5.0,5.0]","sigmaF[0.9,0.5,5.0]",
--    "acmsP[60.,50.,80.]","betaP[0.05,0.01,0.08]","gammaP[0.1, -2, 2]","peakP[90.0]",
--    "acmsF[60.,50.,80.]","betaF[0.05,0.01,0.08]","gammaF[0.1, -2, 2]","peakF[90.0]",
++}
++
++#### or remove any additional cut (default)
++#additionalCuts = None
++
++#############################################################
++########## fitting params to tune fit by hand if necessary
++#############################################################
++# Default values
++tnpParNomFit = [
 +    # "meanP[-0.0,-5.0,5.0]","sigmaP[0.9,0.5,5.0]",
 +    # "meanF[-0.0,-5.0,5.0]","sigmaF[0.9,0.5,5.0]",
-+    "meanP[91.0,60,120.0]","sigmaP[5, 0.01, 10.0]", "widthP[5, 0.01, 10]",
-+    "meanF[91.0,60,120.0]","sigmaF[5, 0.01, 10.0]", "widthF[5, 0.01, 10]",
++    "meanP[91.0,80,100.0]","sigmaP[5, 0.1, 10.0]", "widthP[5, 0.05, 10]",
++    "meanF[91.0,80,100.0]","sigmaF[5, 0.5, 10.0]", "widthF[5, 0.05, 10]",
 +    # "acmsP[90.,60.,120.]","betaP[0.05,0.0,2.08]","gammaP[0.1, 0, 4]","peakP[91]",
 +    # "acmsF[90.,60.,120.]","betaF[0.05,0.0,2.08]","gammaF[0.1, 0, 4]","peakF[91]",
-+    "acmsP[60.,50.,120.]","betaP[0.05,0.01,0.08]","gammaP[0.1, -2, 2]","peakP[90.0]",
-+    "acmsF[60.,50.,120.]","betaF[0.05,0.01,0.08]","gammaF[0.1, -2, 2]","peakF[90.0]",
++    "acmsP[60.,50.,300.]","betaP[0.05,0.01,0.15]","gammaP[0.1, -2, 2]","peakP[90.0]",
++    "acmsF[60.,50.,300.]","betaF[0.05,0.01,0.15]","gammaF[0.1, -2, 2]","peakF[90.0]",
 +    "alphaP[0.,-5.,5.]",
 +    "alphaF[0.,-5.,5.]",
-     ]
- 
- tnpParAltSigFit = [
--    "meanP[-0.0,-5.0,5.0]","sigmaP[1,0.7,6.0]","alphaP[2.0,1.2,3.5]" ,'nP[3,-5,5]',"sigmaP_2[1.5,0.5,6.0]","sosP[1,0.5,5.0]",
--    "meanF[-0.0,-5.0,5.0]","sigmaF[2,0.7,15.0]","alphaF[2.0,1.2,3.5]",'nF[3,-5,5]',"sigmaF_2[2.0,0.5,6.0]","sosF[1,0.5,5.0]",
++    ]
++
++tnpParNomFit = [
++    # "meanP[-0.0,-5.0,5.0]","sigmaP[0.9,0.5,5.0]",
++    # "meanF[-0.0,-5.0,5.0]","sigmaF[0.9,0.5,5.0]",
++    "meanP[91.0,80,100.0]","sigmaP[5, 0.0, 10.0]", "widthP[5, 0.0, 10]",
++    "meanF[91.0,80,100.0]","sigmaF[5, 0.0, 10.0]", "widthF[5, 0.0, 10]",
++    # "acmsP[90.,60.,120.]","betaP[0.05,0.0,2.08]","gammaP[0.1, 0, 4]","peakP[91]",
++    # "acmsF[90.,60.,120.]","betaF[0.05,0.0,2.08]","gammaF[0.1, 0, 4]","peakF[91]",
++    "acmsP[60.,20.,60.]","betaP[0.05,0.01,0.15]","gammaP[0.1, -2, 2]","peakP[90.0]",
++    "acmsF[60.,20.,60.]","betaF[0.05,0.01,0.15]","gammaF[0.1, -2, 2]","peakF[90.0]",
++    "alphaP[0.,-5.,5.]",
++    "alphaF[0.,-5.,5.]",
++    ]
++
++# Default values
++tnpParAltSigFit = [
 +    # "meanP[-0.0,-5.0,5.0]","sigmaP[1,0.7,6.0]","alphaP[2.0,1.2,3.5]" ,'nP[3,-5,5]',"sigmaP_2[1.5,0.5,6.0]","sosP[1,0.5,5.0]",
 +    # "meanF[-0.0,-5.0,5.0]","sigmaF[2,0.7,15.0]","alphaF[2.0,1.2,3.5]",'nF[3,-5,5]',"sigmaF_2[2.0,0.5,6.0]","sosF[1,0.5,5.0]",
 +    "meanP[91.0,60,120]","sigmaP[1,0.7,6.0]","alphaP[2.0,1.2,3.5]" ,'nP[3,-5,5]',"sigmaP_2[1.5,0.5,6.0]","sosP[1,0.5,5.0]",
-+    "meanF[91.0,60,120]","sigmaF[2,0.7,15.0]","alphaF[2.0,1.2,3.5]",'nF[3,-5,5]',"sigmaF_2[2.0,0.5,6.0]","sosF[1,0.5,5.0]",
-     "acmsP[60.,50.,75.]","betaP[0.04,0.01,0.06]","gammaP[0.1, 0.005, 1]","peakP[90.0]",
-     "acmsF[60.,50.,75.]","betaF[0.04,0.01,0.06]","gammaF[0.1, 0.005, 1]","peakF[90.0]",
-     ]
-      
- tnpParAltBkgFit = [
--    "meanP[-0.0,-5.0,5.0]","sigmaP[0.9,0.5,5.0]",
--    "meanF[-0.0,-5.0,5.0]","sigmaF[0.9,0.5,5.0]",
++    "meanF[91.0,60,120]","sigmaF[2,0.7,15.0]","alphaF[2.0,1.2,3.5]",'nF[3,-5,5]',"sigmaF_2[2.0,0.5,15.0]","sosF[1,0.5,5.0]",
++    "acmsP[60.,50.,300.]","betaP[0.05,0.01,0.15]","gammaP[0.1, -2, 2]","peakP[90.0]",
++    "acmsF[60.,50.,300.]","betaF[0.05,0.01,0.15]","gammaF[0.1, -2, 2]","peakF[90.0]",
++    ]
++
++tnpParAltSigFit = [
++    # "meanP[-0.0,-5.0,5.0]","sigmaP[1,0.7,6.0]","alphaP[2.0,1.2,3.5]" ,'nP[3,-5,5]',"sigmaP_2[1.5,0.5,6.0]","sosP[1,0.5,5.0]",
++    # "meanF[-0.0,-5.0,5.0]","sigmaF[2,0.7,15.0]","alphaF[2.0,1.2,3.5]",'nF[3,-5,5]',"sigmaF_2[2.0,0.5,6.0]","sosF[1,0.5,5.0]",
++    "meanP[91.0,60,120]","sigmaP[1,0.7,6.0]","alphaP[2.0,1.2,3.5]" ,'nP[3,-5,5]',"sigmaP_2[1.5,0.5,6.0]","sosP[1,0.5,5.0]",
++    "meanF[91.0,60,120]","sigmaF[2,0.7,15.0]","alphaF[2.0,1.2,3.5]",'nF[3,-5,5]',"sigmaF_2[2.0,0.5,15.0]","sosF[1,0.5,5.0]",
++    "acmsP[60.,50.,80.]","betaP[0.05,0.01,0.1]","gammaP[0.1, -2, 2]","peakP[90.0]",
++    "acmsF[60.,50.,80.]","betaF[0.05,0.01,0.1]","gammaF[0.1, -2, 2]","peakF[90.0]",
++    ]
++     
++tnpParAltBkgFit = [
 +    # "meanP[-0.0,-5.0,5.0]","sigmaP[0.9,0.5,5.0]",
 +    # "meanF[-0.0,-5.0,5.0]","sigmaF[0.9,0.5,5.0]",
-+    "meanP[91.0,60,120.0]","sigmaP[5, 0.01, 10.0]", "widthP[5, 0.01, 10]",
-+    "meanF[91.0,60,120.0]","sigmaF[5, 0.01, 10.0]", "widthF[5, 0.01, 10]",
-     "alphaP[0.,-5.,5.]",
-     "alphaF[0.,-5.,5.]",
-     ]
++    "meanP[91.0,60,120.0]","sigmaP[5, 0.1, 10.0]", "widthP[5, 0.05, 10]",
++    "meanF[91.0,60,120.0]","sigmaF[5, 0.1, 10.0]", "widthF[5, 0.05, 10]",
++    "alphaP[0.,-5.,5.]",
++    "alphaF[0.,-5.,5.]",
++    ]
++        
+diff --git a/etc/inputs/index.php.listPlots b/etc/inputs/index.php.listPlots
+index cb62943..7025b09 100644
+--- a/etc/inputs/index.php.listPlots
++++ b/etc/inputs/index.php.listPlots
+@@ -1,5 +1,9 @@
+ <?php
+ 
++  function sortByName($a, $b) {
++    return strcmp($a['name'], $b['name']);
++  }
++
+   function getFileList($dir)
+   {
+     // array to hold return value
+@@ -31,6 +35,7 @@
+     }
+     $d->close();
+ 
++    usort($retval, 'sortByName');
+     return $retval;
+   }
+ 
 diff --git a/etc/inputs/tnpSampleDef.py b/etc/inputs/tnpSampleDef.py
-index 8daf93a..db26c78 100644
+index 8daf93a..36b1d55 100644
 --- a/etc/inputs/tnpSampleDef.py
 +++ b/etc/inputs/tnpSampleDef.py
-@@ -1,21 +1,18 @@
+@@ -1,102 +1,32 @@
  from libPython.tnpClassUtils import tnpSample
  
  ### qll stat
@@ -171,7 +202,8 @@ index 8daf93a..db26c78 100644
 -eosDir2 = 'eos/cms/store/group/phys_egamma/tnp/80X/PhoEleIDs/v2/'
 -eosDirREC = 'eos/cms/store/group/phys_egamma/tnp/80X/RecoSF/RECOSFs_2016/'
 -eosWinter17 = 'eos/cms/store/group/phys_egamma/tnp/80X/PhoEleIDs/Moriond17_v1/'
-+eosWinter17 = '/storage/data/cms/store/user/sbrochet/tnp/Electrons/Moriond17_v1/'
++storageData = '/storage/data/cms/store/user/sbrochet/tnp/Electrons/Moriond17_reminiaod_v1/'
++storageMC = '/storage/data/cms/store/user/sbrochet/tnp/Electrons/Moriond17_v1/'
  Moriond17_80X = {
      ### MiniAOD TnP for IDs scale factors
 -    'DY_madgraph'          : tnpSample('DY_madgraph',
@@ -181,34 +213,39 @@ index 8daf93a..db26c78 100644
 +                                       # eosWinter17 + 'mc/TnPTree_DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_DYToLL_madgraph_Spring16_reHLT.root',
 +                                       # isMC = True, nEvts = -1 ),
      'DY_madgraph_Winter17' : tnpSample('DY_madgraph_Winter17', 
-                                        eosWinter17 + 'mc/TnPTree_DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_DYToLL_madgraph_Moriond17.root',
+-                                       eosWinter17 + 'mc/TnPTree_DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_DYToLL_madgraph_Moriond17.root',
 -                                       isMC = True, nEvts = 48652793 ),
 -    'DYee_powheg_Winter17' : tnpSample('DYee_powheg_Winter17', 
 -                                       eosWinter17 + 'mc/TnPTree_DYToEE_NNPDF30_13TeV-powheg-pythia8_DYToEE_powheg_Moriond17.root',
 -                                       isMC = True, nEvts = 49986588 ),
++                                       storageMC + 'mc/TnPTree_DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_DYToLL_madgraph_Moriond17.root',
 +                                       isMC = True, nEvts = 49144274 ),
 +    # 'DYee_powheg_Winter17' : tnpSample('DYee_powheg_Winter17', 
-+                                       # eosWinter17 + 'mc/TnPTree_DYToEE_NNPDF30_13TeV-powheg-pythia8_DYToEE_powheg_Moriond17.root',
++                                       # storageMC + 'mc/TnPTree_DYToEE_NNPDF30_13TeV-powheg-pythia8_DYToEE_powheg_Moriond17.root',
 +                                       # isMC = True, nEvts = 49986588 ),
      'DY_amcatnlo_Winter17' : tnpSample('DY_amcatnlo_Winter17', 
-                                        eosWinter17 + 'mc/TnPTree_DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_DYToLL_mcAtNLO_Moriond17.root',
+-                                       eosWinter17 + 'mc/TnPTree_DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_DYToLL_mcAtNLO_Moriond17.root',
++                                       storageMC + 'mc/TnPTree_DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_DYToLL_mcAtNLO_Moriond17.root',
                                         isMC = True, nEvts = 28968252 ),
-@@ -23,80 +20,12 @@ Moriond17_80X = {
-                                        eosWinter17 + 'mc/TnPTree_WJetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_WJets_madgraph_Moriond17.root',
+     'Wj_madgraph_Winter17' : tnpSample('Wj_madgraph_Winter17', 
+-                                       eosWinter17 + 'mc/TnPTree_WJetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_WJets_madgraph_Moriond17.root',
++                                       storageMC + 'mc/TnPTree_WJetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_WJets_madgraph_Moriond17.root',
                                         isMC = True, nEvts = 29048609 ),
  
 -    'data_Run2016B' : tnpSample('data_Run2016B' , eosWinter17 + 'data/TnPTree_SingleElectron_2016rereco_RunB.root' , lumi = 5.767 ),
-+    'data_Run2016B' : tnpSample('data_Run2016B' , eosWinter17 + 'data/TnPTree_SingleElectron_2016rereco_RunB.root' , lumi = 5.933692 ),
-     'data_Run2016C' : tnpSample('data_Run2016C' , eosWinter17 + 'data/TnPTree_SingleElectron_2016rereco_RunC.root' , lumi = 2.646 ),
-     'data_Run2016D' : tnpSample('data_Run2016D' , eosWinter17 + 'data/TnPTree_SingleElectron_2016rereco_RunD.root' , lumi = 4.353 ),
+-    'data_Run2016C' : tnpSample('data_Run2016C' , eosWinter17 + 'data/TnPTree_SingleElectron_2016rereco_RunC.root' , lumi = 2.646 ),
+-    'data_Run2016D' : tnpSample('data_Run2016D' , eosWinter17 + 'data/TnPTree_SingleElectron_2016rereco_RunD.root' , lumi = 4.353 ),
 -    'data_Run2016E' : tnpSample('data_Run2016E' , eosWinter17 + 'data/TnPTree_SingleElectron_2016rereco_RunE.root' , lumi = 3.985 ),
 -    'data_Run2016F' : tnpSample('data_Run2016F' , eosWinter17 + 'data/TnPTree_SingleElectron_2016rereco_RunF.root' , lumi = 3.160 ),
 -    'data_Run2016G' : tnpSample('data_Run2016G' , eosWinter17 + 'data/TnPTree_SingleElectron_2016rereco_RunG.root' , lumi = 7.539 ),
 -    'data_Run2016H' : tnpSample('data_Run2016H' , eosWinter17 + 'data/TnPTree_SingleElectron_2016prompt_RunH.root' , lumi = 8.762 ),
-+    'data_Run2016E' : tnpSample('data_Run2016E' , eosWinter17 + 'data/TnPTree_SingleElectron_2016rereco_RunE.root' , lumi = 4.117 ),
-+    'data_Run2016F' : tnpSample('data_Run2016F' , eosWinter17 + 'data/TnPTree_SingleElectron_2016rereco_RunF.root' , lumi = 3.186 ),
-+    'data_Run2016G' : tnpSample('data_Run2016G' , eosWinter17 + 'data/TnPTree_SingleElectron_2016rereco_RunG.root' , lumi = 7.721 ),
-+    'data_Run2016H' : tnpSample('data_Run2016H' , eosWinter17 + 'data/TnPTree_SingleElectron_2016prompt_RunH.root' , lumi = 8.857 ),
++    'data_Run2016B' : tnpSample('data_Run2016B' , storageData + 'data/TnPTree_SingleElectron_2016reminiaod_RunB.root' , lumi = 5.788 ),
++    'data_Run2016C' : tnpSample('data_Run2016C' , storageData + 'data/TnPTree_SingleElectron_2016reminiaod_RunC.root' , lumi = 2.573 ),
++    'data_Run2016D' : tnpSample('data_Run2016D' , storageData + 'data/TnPTree_SingleElectron_2016reminiaod_RunD.root' , lumi = 4.248 ),
++    'data_Run2016E' : tnpSample('data_Run2016E' , storageData + 'data/TnPTree_SingleElectron_2016reminiaod_RunE.root' , lumi = 4.009 ),
++    'data_Run2016F' : tnpSample('data_Run2016F' , storageData + 'data/TnPTree_SingleElectron_2016reminiaod_RunF.root' , lumi = 3.102 ),
++    'data_Run2016G' : tnpSample('data_Run2016G' , storageData + 'data/TnPTree_SingleElectron_2016reminiaod_RunG.root' , lumi = 7.540 ),
++    'data_Run2016H' : tnpSample('data_Run2016H' , storageData + 'data/TnPTree_SingleElectron_2016reminiaod_RunH.root' , lumi = 8.606 ),
  
 -    
 -
@@ -280,32 +317,33 @@ index 8daf93a..db26c78 100644
 -    'data_2016_runD_rec' :  tnpSample('data_2016_runD_rec', eosDir_v0 + 'RecoSF/RECOv5/data//TnPTree_SingleElectron_2016_RunD.root'       , lumi = 4.313 ),
 -}
 diff --git a/libCpp/RooCMSShape.cc b/libCpp/RooCMSShape.cc
-index 7e00da7..8a446de 100644
+index 7e00da7..6d31699 100644
 --- a/libCpp/RooCMSShape.cc
 +++ b/libCpp/RooCMSShape.cc
-@@ -56,10 +56,16 @@ ClassImp(RooCMSShape)
+@@ -55,6 +55,21 @@ ClassImp(RooCMSShape)
+   // ENTER EXPRESSION IN TERMS OF VARIABLE ARGUMENTS HERE 
  
    //Double_t erf = TMath::Erfc((alpha - x) * beta);
++  //Double_t erf = RooMath::erfc((alpha - x) * beta);
++  //Double_t u = ((x - peak)*gamma);
++
++  ////std::cout << x << "  " << alpha << "   " << peak << std::endl;
++
++  ////if(u < -70) u = 1e20;
++  ////else if( u>70 ) u = 0;
++  ////else u = exp(-u);   //exponential decay
++  //u = exp(-u);   //exponential decay
++
++  ////std::cout << x << "  " << u << std::endl;
++
++  //return erf*u;
++
++
    Double_t erf = RooMath::erfc((alpha - x) * beta);
--  Double_t u = (x - peak)*gamma;
-+  Double_t u = ((x - peak)*gamma);
-+
-+  //std::cout << x << "  " << alpha << "   " << peak << std::endl;
-+
-+  //if(u < -70) u = 1e20;
-+  //else if( u>70 ) u = 0;
-+  //else u = exp(-u);   //exponential decay
-+  u = exp(-u);   //exponential decay
-+
-+  //std::cout << x << "  " << u << std::endl;
+   Double_t u = (x - peak)*gamma;
  
--  if(u < -70) u = 1e20;
--  else if( u>70 ) u = 0;
--  else u = exp(-u);   //exponential decay
-   return erf*u;
-  } 
 diff --git a/libCpp/histFitter.C b/libCpp/histFitter.C
-index 874e459..b6a5e2b 100644
+index 874e459..9b0275f 100644
 --- a/libCpp/histFitter.C
 +++ b/libCpp/histFitter.C
 @@ -9,6 +9,7 @@
@@ -354,7 +392,7 @@ index 874e459..b6a5e2b 100644
    _work->factory("SUM::pdfPass(nSigP*sigPass,nBkgP*bkgPass)");
    _work->factory("SUM::pdfFail(nSigF*sigFail,nBkgF*bkgFail)");
    _work->Print();			         
-@@ -135,20 +136,20 @@ void tnpFitter::fits(bool mcTruth,string title) {
+@@ -135,35 +136,50 @@ void tnpFitter::fits(bool mcTruth,string title) {
    RooAbsPdf *pdfPass = _work->pdf("pdfPass");
    RooAbsPdf *pdfFail = _work->pdf("pdfFail");
  
@@ -389,27 +427,89 @@ index 874e459..b6a5e2b 100644
  
    /// FC: seems to be better to change the actual range than using a fitRange in the fit itself (???)
    /// FC: I don't know why but the integral is done over the full range in the fit not on the reduced range
-@@ -156,13 +157,13 @@ void tnpFitter::fits(bool mcTruth,string title) {
+   _work->var("x")->setRange(_xFitMin,_xFitMax);
    _work->var("x")->setRange("fitMassRange",_xFitMin,_xFitMax);
-   RooFitResult* resPass = pdfPass->fitTo(*_work->data("hPass"),Minos(_useMinos),SumW2Error(kTRUE),Save(),Range("fitMassRange"));
-   //RooFitResult* resPass = pdfPass->fitTo(*_work->data("hPass"),Minos(_useMinos),SumW2Error(kTRUE),Save());
+-  RooFitResult* resPass = pdfPass->fitTo(*_work->data("hPass"),Minos(_useMinos),SumW2Error(kTRUE),Save(),Range("fitMassRange"));
+-  //RooFitResult* resPass = pdfPass->fitTo(*_work->data("hPass"),Minos(_useMinos),SumW2Error(kTRUE),Save());
 -  if( _fixSigmaFtoSigmaP ) {
 -    _work->var("sigmaF")->setVal( _work->var("sigmaP")->getVal() );
 -    _work->var("sigmaF")->setConstant();
 -  }
+ 
+-  _work->var("sigmaF")->setVal(_work->var("sigmaP")->getVal());
+-  _work->var("sigmaF")->setRange(0.8* _work->var("sigmaP")->getVal(), 3.0* _work->var("sigmaP")->getVal());
+-  RooFitResult* resFail = pdfFail->fitTo(*_work->data("hFail"),Minos(_useMinos),SumW2Error(kTRUE),Save(),Range("fitMassRange"));
++  std::cout << "###########" << std::endl;
++  std::cout << "Fitting PASS histogram" << std::endl;
++  std::cout << "###########" << std::endl;
++  //RooFitResult* resPass = pdfPass->fitTo(*_work->data("hPass"),Minos(_useMinos),SumW2Error(kTRUE),Save(),Range("fitMassRange"), RooFit::Verbose(false), RooFit::Minimizer("Minuit2","Migrad"));
++  RooFitResult* resPass = pdfPass->fitTo(*_work->data("hPass"),Minos(_useMinos),SumW2Error(kTRUE),Save(),Range("fitMassRange"), RooFit::Verbose(false));
++  std::cout << "###########" << std::endl;
++  std::cout << "Done" << std::endl;
++  std::cout << "###########" << std::endl;
++  //RooFitResult* resPass = pdfPass->fitTo(*_work->data("hPass"),Minos(_useMinos),SumW2Error(kTRUE),Save());
 +  //if( _fixSigmaFtoSigmaP ) {
 +    //_work->var("sigmaF")->setVal( _work->var("sigmaP")->getVal() );
 +    //_work->var("sigmaF")->setConstant();
 +  //}
- 
--  _work->var("sigmaF")->setVal(_work->var("sigmaP")->getVal());
--  _work->var("sigmaF")->setRange(0.8* _work->var("sigmaP")->getVal(), 3.0* _work->var("sigmaP")->getVal());
++
 +  //_work->var("sigmaF")->setVal(_work->var("sigmaP")->getVal());
 +  //_work->var("sigmaF")->setRange(0.8* _work->var("sigmaP")->getVal(), 3.0* _work->var("sigmaP")->getVal());
-   RooFitResult* resFail = pdfFail->fitTo(*_work->data("hFail"),Minos(_useMinos),SumW2Error(kTRUE),Save(),Range("fitMassRange"));
++  std::cout << "###########" << std::endl;
++  std::cout << "Fitting FAIL histogram" << std::endl;
++  std::cout << "###########" << std::endl;
++  //RooFitResult* resFail = pdfFail->fitTo(*_work->data("hFail"),Minos(_useMinos),SumW2Error(kTRUE),Save(),Range("fitMassRange"), RooFit::Verbose(false), RooFit::Minimizer("Minuit2","Migrad"));
++  RooFitResult* resFail = pdfFail->fitTo(*_work->data("hFail"),Minos(_useMinos),SumW2Error(kTRUE),Save(),Range("fitMassRange"), RooFit::Verbose(false));
++  std::cout << "###########" << std::endl;
++  std::cout << "Done" << std::endl;
++  std::cout << "###########" << std::endl;
    //RooFitResult* resFail = pdfFail->fitTo(*_work->data("hFail"),Minos(_useMinos),SumW2Error(kTRUE),Save());
  
-@@ -205,7 +206,8 @@ void tnpFitter::fits(bool mcTruth,string title) {
+ 
+@@ -171,17 +187,34 @@ void tnpFitter::fits(bool mcTruth,string title) {
+   RooPlot *pFail = _work->var("x")->frame(60,120);
+   pPass->SetTitle("passing probe");
+   pFail->SetTitle("failing probe");
++
++  std::cout << "###########" << std::endl;
++  std::cout << "Drawing PASS" << std::endl;
++  std::cout << "###########" << std::endl;
+   
++  std::cout << "Data" << std::endl;
+   _work->data("hPass") ->plotOn( pPass );
++  std::cout << "pdfPass 1" << std::endl;
+   _work->pdf("pdfPass")->plotOn( pPass, LineColor(kRed) );
++  std::cout << "pdfPass 2" << std::endl;
+   _work->pdf("pdfPass")->plotOn( pPass, Components("bkgPass"),LineColor(kBlue),LineStyle(kDashed));
++  std::cout << "hPass" << std::endl;
+   _work->data("hPass") ->plotOn( pPass );
++
++  std::cout << "###########" << std::endl;
++  std::cout << "Drawing FAIL" << std::endl;
++  std::cout << "###########" << std::endl;
+   
+   _work->data("hFail") ->plotOn( pFail );
+   _work->pdf("pdfFail")->plotOn( pFail, LineColor(kRed) );
+   _work->pdf("pdfFail")->plotOn( pFail, Components("bkgFail"),LineColor(kBlue),LineStyle(kDashed));
+   _work->data("hFail") ->plotOn( pFail );
+ 
++
++  std::cout << "###########" << std::endl;
++  std::cout << "Drawing canvas" << std::endl;
++  std::cout << "###########" << std::endl;
++
+   TCanvas c("c","c",1100,450);
+   c.Divide(3,1);
+   TPad *padText = (TPad*)c.GetPad(1);
+@@ -194,6 +227,7 @@ void tnpFitter::fits(bool mcTruth,string title) {
+   resPass->Write(TString::Format("%s_resP",_histname_base.c_str()),TObject::kOverwrite);
+   resFail->Write(TString::Format("%s_resF",_histname_base.c_str()),TObject::kOverwrite);
+ 
++  std::cout << "All done, exiting" << std::endl;
+   
+ }
+ 
+@@ -205,7 +239,8 @@ void tnpFitter::fits(bool mcTruth,string title) {
  void tnpFitter::textParForCanvas(RooFitResult *resP, RooFitResult *resF,TPad *p) {
  
    double eff = -1;
@@ -419,7 +519,7 @@ index 874e459..b6a5e2b 100644
  
    RooRealVar *nSigP = _work->var("nSigP");
    RooRealVar *nSigF = _work->var("nSigF");
-@@ -215,8 +217,11 @@ void tnpFitter::textParForCanvas(RooFitResult *resP, RooFitResult *resF,TPad *p)
+@@ -215,8 +250,11 @@ void tnpFitter::textParForCanvas(RooFitResult *resP, RooFitResult *resF,TPad *p)
    double nF   = nSigF->getVal();
    double e_nF = nSigF->getError();
    double nTot = nP+nF;
@@ -432,7 +532,7 @@ index 874e459..b6a5e2b 100644
  
    TPaveText *text1 = new TPaveText(0,0.8,1,1);
    text1->SetFillColor(0);
-@@ -224,7 +229,7 @@ void tnpFitter::textParForCanvas(RooFitResult *resP, RooFitResult *resF,TPad *p)
+@@ -224,7 +262,7 @@ void tnpFitter::textParForCanvas(RooFitResult *resP, RooFitResult *resF,TPad *p)
    text1->SetTextAlign(12);
  
    text1->AddText(TString::Format("* fit status pass: %d, fail : %d",resP->status(),resF->status()));
@@ -477,10 +577,19 @@ index 2e977f8..ef2e62f 100644
          listOfBins.append({'cut' : binCut, 'title': binTitle, 'name' : binName, 'vars' : binVars })
          ibin = ibin + 1
 diff --git a/libPython/fitUtils.py b/libPython/fitUtils.py
-index e3c02e8..f7a44ac 100644
+index e3c02e8..3b09f2d 100644
 --- a/libPython/fitUtils.py
 +++ b/libPython/fitUtils.py
-@@ -84,10 +84,14 @@ def createWorkspaceForAltSig( sample, tnpBin, tnpWorkspaceParam ):
+@@ -38,6 +38,8 @@ def createWorkspaceForAltSig( sample, tnpBin, tnpWorkspaceParam ):
+     if sample.isMC:
+         return tnpWorkspaceParam
+ 
++    return tnpWorkspaceParam
++
+     
+     fileref = sample.mcRef.altSigFit
+     filemc  = rt.TFile(fileref,'read')
+@@ -84,10 +86,14 @@ def createWorkspaceForAltSig( sample, tnpBin, tnpWorkspaceParam ):
  def histFitterNominal( sample, tnpBin, tnpWorkspaceParam ):
          
      tnpWorkspaceFunc = [
@@ -497,7 +606,16 @@ index e3c02e8..f7a44ac 100644
          ]
  
      tnpWorkspace = []
-@@ -141,8 +145,10 @@ def histFitterAltSig( sample, tnpBin, tnpWorkspaceParam ):
+@@ -102,7 +108,7 @@ def histFitterNominal( sample, tnpBin, tnpWorkspaceParam ):
+     infile.Close()
+ 
+     ## setup
+-    fitter.useMinos()
++    # fitter.useMinos()
+     rootfile = rt.TFile(sample.nominalFit,'update')
+     fitter.setOutputFile( rootfile )
+     
+@@ -141,8 +147,10 @@ def histFitterAltSig( sample, tnpBin, tnpWorkspaceParam ):
  
      tnpWorkspaceFunc = [
          "tailLeft[1]",
@@ -510,7 +628,7 @@ index e3c02e8..f7a44ac 100644
          "RooCMSShape::bkgPass(x, acmsP, betaP, gammaP, peakP)",
          "RooCMSShape::bkgFail(x, acmsF, betaF, gammaF, peakF)",
          ]
-@@ -194,8 +200,8 @@ def histFitterAltSig( sample, tnpBin, tnpWorkspaceParam ):
+@@ -194,8 +202,8 @@ def histFitterAltSig( sample, tnpBin, tnpWorkspaceParam ):
  def histFitterAltBkg( sample, tnpBin, tnpWorkspaceParam ):
  
      tnpWorkspaceFunc = [
@@ -521,8 +639,39 @@ index e3c02e8..f7a44ac 100644
          "Exponential::bkgPass(x, alphaP)",
          "Exponential::bkgFail(x, alphaF)",
          ]
+diff --git a/libPython/rootUtils.py b/libPython/rootUtils.py
+index 3442e9d..61fdf33 100644
+--- a/libPython/rootUtils.py
++++ b/libPython/rootUtils.py
+@@ -169,8 +169,24 @@ def getAllEffi( info, bindef ):
+         hP = rootfile.Get('%s_Pass'%bindef['name'])
+         hF = rootfile.Get('%s_Fail'%bindef['name'])
+ 
+-        if eP > math.sqrt(hP.Integral()) : eP = math.sqrt(hP.Integral())
+-        if eF > math.sqrt(hF.Integral()) : eF = math.sqrt(hF.Integral())
++        _nP = hP.Integral()
++        _nF = hF.Integral()
++
++        if eP > math.sqrt(_nP) : eP = math.sqrt(_nP)
++        if eF > math.sqrt(_nF) : eF = math.sqrt(_nF)
++
++        if (_nF + _nP) < 50:
++            print("Warning: not enough statistics in bin {} to trust the fit, switching to cut & count".format(bindef['name']))
++            # Not enough statistics for the fit, discard fit results
++            nP = _nP
++            nF = _nF
++            bin1 = 1
++            bin2 = hP.GetXaxis().GetNbins()
++            eP = rt.Double(-1.0)
++            eF = rt.Double(-1.0)
++            nP = hP.IntegralAndError(bin1, bin2, eP)
++            nF = hF.IntegralAndError(bin1, bin2, eF)
++
+         rootfile.Close()
+ 
+         effis['dataNominal'] = computeEffi(nP,nF,eP,eF)
 diff --git a/tnpEGM_fitter.py b/tnpEGM_fitter.py
-index 5860e01..aa3cc5b 100644
+index 5860e01..862a3f3 100644
 --- a/tnpEGM_fitter.py
 +++ b/tnpEGM_fitter.py
 @@ -1,6 +1,7 @@
@@ -533,7 +682,21 @@ index 5860e01..aa3cc5b 100644
  import os
  import sys
  import pickle
-@@ -192,6 +193,9 @@ if args.sumUp:
+@@ -134,6 +135,13 @@ if  args.doFit:
+     sampleToFit.dump()
+     for ib in range(len(tnpBins['bins'])):
+         if (args.binNumber >= 0 and ib == args.binNumber) or args.binNumber < 0:
++            print("")
++            print("")
++            print("##################################################################")
++            print("Fitting bin %r" % tnpBins['bins'][ib]['name'])
++            print("##################################################################")
++            print("")
++            print("")
+             if args.altSig:                 
+                 tnpRoot.histFitterAltSig(  sampleToFit, tnpBins['bins'][ib], tnpConf.tnpParAltSigFit )
+             elif args.altBkg:
+@@ -192,6 +200,9 @@ if args.sumUp:
      effis = None
      effFileName ='%s/egammaEffi.txt' % outputDirectory 
      fOut = open( effFileName,'w')
@@ -543,7 +706,7 @@ index 5860e01..aa3cc5b 100644
      
      for ib in range(len(tnpBins['bins'])):
          effis = tnpRoot.getAllEffi( info, tnpBins['bins'][ib] )
-@@ -206,6 +210,12 @@ if args.sumUp:
+@@ -206,6 +217,12 @@ if args.sumUp:
              astr = '### var2 : %s' % v2Range[1]
              print astr
              fOut.write( astr + '\n' )
@@ -556,7 +719,7 @@ index 5860e01..aa3cc5b 100644
              
          astr =  '%+8.3f\t%+8.3f\t%+8.3f\t%+8.3f\t%5.3f\t%5.3f\t%5.3f\t%5.3f\t%5.3f\t%5.3f\t%5.3f\t%5.3f' % (
              float(v1Range[0]), float(v1Range[2]),
-@@ -221,6 +231,50 @@ if args.sumUp:
+@@ -221,6 +238,56 @@ if args.sumUp:
          fOut.write( astr + '\n' )
      fOut.close()
  
@@ -565,11 +728,12 @@ index 5860e01..aa3cc5b 100644
 +
      print 'Effis saved in file : ',  effFileName
      import libPython.EGammaID_scaleFactors as egm_sf
-     egm_sf.doEGM_SFs(effFileName,sampleToFit.lumi)
+-    egm_sf.doEGM_SFs(effFileName,sampleToFit.lumi)
++    # egm_sf.doEGM_SFs(effFileName,sampleToFit.lumi)
 +            
 +    fOut.close()
 +
-+    json_content = {'dimension': 2, 'variables': ['AbsEta', 'Pt'], 'binning': {'x': eta_binning, 'y': pt_binning}, 'data': [], 'error_type': 'absolute'}
++    json_content = {'dimension': 2, 'variables': ['Eta', 'Pt'], 'binning': {'x': eta_binning, 'y': pt_binning}, 'data': [], 'error_type': 'absolute'}
 +    json_content_data = json_content['data']
 +
 +    for i in range(len(eta_binning) - 1):
@@ -597,6 +761,12 @@ index 5860e01..aa3cc5b 100644
 +        alt_bkg_error = abs(effis['dataAltBkg' ][0] - eff)
 +        alt_sig_error = abs(effis['dataAltSig' ][0] - eff)
 +        error = math.sqrt(stat_error**2 + alt_bkg_error**2 + alt_sig_error**2)
++
++        if eff + error > 1:
++            error = 1 - eff
++
++        if eff - error < 0:
++            eff = error
 +
 +        pt_data = {'bin': [float(v2Range[0]), float(v2Range[2])], 'value': eff, 'error_low': error, 'error_high': error}
 +
