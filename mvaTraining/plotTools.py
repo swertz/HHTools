@@ -12,7 +12,7 @@ import matplotlib.colors as colors
 
 import os
 
-def binDataset(dataset, weights, bins, range=None):
+def binDataset(dataset, weights, bins, range=None, norm=False):
     """
     Bin a dataset
 
@@ -33,14 +33,82 @@ def binDataset(dataset, weights, bins, range=None):
     squared_errors, _ = np.histogram(dataset, weights=np.square(weights), bins=bin_edges)
     errors = np.sqrt(squared_errors)
 
-    norm = False
-
     if norm:
         norm_factor = np.diff(bin_edges) * hist.sum()
         hist /= norm_factor
         errors /= norm_factor
 
     return (hist, errors, bin_edges)
+
+def drawTestingOnRanges(**kwargs):
+    background_data = kwargs.get('testing_background_data')
+    signal_data = kwargs.get('testing_signal_data')
+
+    # Weights, optional
+    background_weights = kwargs.get('testing_background_weights', None)
+    signal_weights = kwargs.get('testing_signal_weights', None)
+
+    # Different cuts
+    background_indices = kwargs.get('testing_background_indices')
+    signal_indices = kwargs.get('testing_signal_indices')
+
+    indices_ranges = kwargs['indices_ranges']
+    
+    x_range = kwargs.get('range')
+    bins = kwargs.get('bins', 50)
+    x_label = kwargs.get('x_label', '')
+    output_file = kwargs.get('output')
+
+    nranges = len(signal_indices)
+
+    fig = plt.figure(1, figsize=(7, 7), dpi=300)
+
+    # Create an axes instance
+    ax = fig.add_subplot(111)
+
+    background_color = '#B64926'
+    signal_color = '#468966'
+
+    background_colors = ["#41bbc5", "#723240", "#b3e467"]
+
+    # Testing data
+    #background_hists = []
+    #signal_hists = []
+    #
+    #bkg_hist, _, bin_edges = binDataset(background_data[background_indices[0]], background_weights[background_indices[0]], bins=bins, range=x_range, norm=True)
+    #sig_hist, _, _ = binDataset(signal_data[signal_indices[0]], signal_weights[signal_indices[0]], bins=bin_edges, norm=True)
+    #background_hists.append(bkg_hist)
+    #signal_hists.append(sig_hist)
+    #
+    #for i in range(1, nranges):
+    #    background_hists.append(binDataset(background_data[background_indices[i]], background_weights[background_indices[i]], bins=bin_edges, norm=True)[0])
+    #    signal_hists.append(binDataset(signal_data[signal_indices[i]], signal_weights[signal_indices[i]], bins=bin_edges, norm=True)[0])
+
+    #bin_centers = (bin_edges[1:] + bin_edges[:-1]) / 2
+    #bin_width = bin_edges[1] - bin_edges[0]
+
+    #for i in range(nranges):
+    #    ax.step(bin_centers, background_hists[i], lw=2, where='mid', label='Background (training) -- range {}'.format(i), color=background_color)
+    #    ax.step(bin_centers, signal_hists[i], lw=2, where='mid', label='Signal (training) -- range {}'.format(i), color=signal_color)
+
+    for i in range(nranges):
+        ax.hist(background_data[background_indices[i]], bins, x_range, normed=True, weights=background_weights[background_indices[i]], histtype='step', color=background_colors[i], label='Background {}'.format(indices_ranges[i]), lw=3)
+        #ax.hist(signal_data[signal_indices[i]], bins, x_range, normed=True, weights=signal_weights[signal_indices[i]], histtype='step', color=signal_color, label='Signal (training) -- range {}')
+    
+    ax.margins(x=0.1)
+    ax.set_ylim(ymin=0)
+
+    handles, labels = ax.get_legend_handles_labels()
+    ax.legend(handles[::-1], labels[::-1], ncol=2, numpoints=1, loc='best', frameon=False)
+
+    ax.set_xlabel(x_label)
+
+    fig.set_tight_layout(True)
+
+    fig.savefig(output_file)
+
+    plt.close()
+    
 
 def drawTrainingTestingComparison(**kwargs):
     training_background_data = kwargs.get('training_background_data')
@@ -123,7 +191,8 @@ def drawNNOutput(background_training_predictions, background_testing_predictions
                  background_training_weights, background_testing_weights,
                  signal_training_weights, signal_testing_weights,
                  output_dir=".", output_name="nn_output.pdf",
-                 bins=50
+                 bins=50,
+                 testing_signal_indices=None, testing_background_indices=None, indices_ranges=None
                  ):
 
     drawTrainingTestingComparison(
@@ -142,6 +211,37 @@ def drawNNOutput(background_training_predictions, background_testing_predictions
             x_label="NN output",
             output=os.path.join(output_dir, output_name)
             )
+    
+    drawTestingOnRanges(
+            testing_background_data=background_testing_predictions,
+            testing_signal_data=signal_testing_predictions,
+
+            testing_background_weights=background_testing_weights,
+            testing_signal_weights=signal_testing_weights,
+
+            testing_background_indices=testing_background_indices,
+            testing_signal_indices=testing_signal_indices,
+            indices_ranges=indices_ranges,
+            
+            bins=bins,
+            range=[0, 1],
+            x_label="NN output",
+            output=os.path.join(output_dir, "ranges_" + output_name)
+            )
+
+def drawNNVersusVar(predictions, var, weights, bins, output_dir=".", output_name="nn_output_vs_var.pdf"):
+    fig = plt.figure(1, figsize=(7, 7), dpi=300)
+    ax = fig.add_subplot(111)
+    
+    hist, xedges, yedges = np.histogram2d(predictions, var, bins=bins, weights=weights)
+    X, Y = np.meshgrid(xedges, yedges)
+    cm = ax.pcolormesh(X, Y, hist.T, norm=colors.LogNorm(vmin=hist.min() + 1e-3, vmax=hist.max()))
+    fig.colorbar(cm)
+    fig.text(0.05, 0.95, "Pearson r: {}".format(np.corrcoef([predictions, var])[1,0]), bbox={"facecolor": "white"})
+
+    fig.savefig(os.path.join(output_dir, output_name))
+
+    plt.close()
 
 def draw2D(x_var, y_var, weights, bins, output_dir=".", output_name="nn_output_vs_var.pdf", x_label=None, y_label=None, title=None, fig_callbacks=[], data_callbacks=[], normed=False, logZ=False, **kwargs):
     fig = plt.figure(1, figsize=(8, 7), dpi=300)
@@ -301,7 +401,6 @@ def draw_keras_history(history, output_dir='.', output_name='loss.pdf'):
 
     plt.close()
 
-
 def drawDNNFlux(masses, predictions, title="", output_dir=".", output_name="flux.pdf"):
     fig = plt.figure(1, figsize=(7, 7), dpi=300)
     fig.clear()
@@ -321,7 +420,26 @@ def drawDNNFlux(masses, predictions, title="", output_dir=".", output_name="flux
     ax.set_xlabel("Mass input (GeV)")
     ax.set_ylabel("DNN output")
     ax.legend()
+    fig.savefig(os.path.join(output_dir, output_name))
 
+    plt.close()
+
+def plotHistories(loss_history, output_dir, output_name):
+    fig, ax = plt.subplots(3, 1, dpi=300)
+
+    values = np.array(loss_history["f"])
+    ax[0].plot(range(len(values)), values, label="full", color="blue")
+    ax[0].legend(loc="upper right")
+    
+    values = np.array(loss_history["d"])
+    ax[1].plot(range(len(values)), values, label="discr", color="green")
+    ax[1].legend(loc="upper right")
+    
+    values = np.array(loss_history["a"])
+    ax[2].plot(range(len(values)), values, label="advers", color="red")
+    ax[2].legend(loc="upper right")
+
+    fig.set_tight_layout(True)
     fig.savefig(os.path.join(output_dir, output_name))
 
     plt.close()

@@ -19,8 +19,9 @@ from root_numpy import tree2array
 from sklearn.model_selection import train_test_split
 from sklearn.utils import shuffle, safe_indexing
 
+from keras.losses import mean_squared_error
 from keras.models import Sequential, Model
-from keras.layers import Dense, Dropout, merge
+from keras.layers import Input, Dense, Dropout, concatenate
 from keras.layers.core import Lambda
 from keras.optimizers import Adam, SGD
 from keras.regularizers import l2
@@ -48,25 +49,25 @@ backgrounds = [
             'input': 'TTTo2L2Nu_13TeV-powheg_*_histos.root',
         },
 
-        {
-            'input': 'DYJetsToLL_M-10to50_*_histos.root',
-        },
+        #{
+        #    'input': 'DYJetsToLL_M-10to50_*_histos.root',
+        #},
 
-        {
-            'input': 'DYToLL_1J_*_histos.root',
-        },
+        #{
+        #    'input': 'DYToLL_1J_*_histos.root',
+        #},
 
-        {
-            'input': 'DYToLL_2J_*_histos.root',
-        },
+        #{
+        #    'input': 'DYToLL_2J_*_histos.root',
+        #},
 
-        {
-            'input': 'DYToLL_0J_*_histos.root',
-        },
+        #{
+        #    'input': 'DYToLL_0J_*_histos.root',
+        #},
 
-        {
-            'input': 'ST_tW_*_5f_*_13TeV-powheg_*_histos.root',
-        },
+        #{
+        #    'input': 'ST_tW_*_5f_*_13TeV-powheg_*_histos.root',
+        #},
 
         ]
 
@@ -142,7 +143,7 @@ def make_parallel(model, gpu_count):
     with tf.device('/cpu:0'):
         merged = []
         for outputs in outputs_all:
-            merged.append(merge(outputs, mode='concat', concat_axis=0, name="TEST"))
+            merged.append(concatenate(outputs, concat_axis=0, name="TEST"))
             
     new_model = Model(input=model.inputs, output=merged)
 
@@ -202,6 +203,117 @@ def create_nonresonant_model(n_inputs, n_neurons=100, n_hidden_layers=4, lr=0.00
     model.compile(loss='binary_crossentropy', optimizer=optimizer, metrics=['accuracy'])
 
     return model
+
+
+def create_adversarial_model(n_inputs, n_comp, lamb):
+
+    def print_t(t, m=None):
+        return tf.Print(t, [t, K.shape(t), K.min(t), K.max(t), K.mean(t)], message=m)
+
+    def make_discr_loss(c):
+        def loss(true, pred):
+            return c * K.binary_crossentropy(true, pred)
+        return loss
+
+    def make_advers_loss(c):
+        def loss_mse(true, pred):
+            return c * K.mean_squared_error(true, pred)
+
+        def loss_mdn(true, params):
+
+            #true = true[:, 0]
+            #true = K.expand_dims(true, 1)
+            true = K.reshape(true, (-1, 1))
+            true = K.repeat_elements(true, n_comp, axis=1)
+            
+            mu = params[:, :n_comp]
+            sigma = params[:, n_comp:2*n_comp] + 10
+            pi = params[:, 2*n_comp:]
+
+            #def exponent(mu, true):
+            #    return -(true - mu) ** 2 / (2. * sigma ** 2)
+
+            #def gaussian(exponent, sigma, pi):
+            #    return pi * ((1. / np.sqrt(2. * np.pi)) / sigma * K.exp(exponent))
+            #pdf = K.zeros((n_batch, 1))
+            #for i in range(n_comp):
+            #    pdf += gaussian(mu[:, i], sigma[:, i], pi[:, i], true)
+
+            exponents = - K.log(pi * ((1. / np.sqrt(2. * np.pi)) / sigma) * (true - mu) ** 2 / (2. * sigma ** 2))
+            exponents = K.clip(exponents, -30, 30)
+            max_exponent = K.max(exponents, axis=1, keepdims=True)
+            max_exponent_repeated = K.repeat_elements(max_exponent, n_comp, axis=1)
+
+            nll = -(max_exponent + K.logsumexp(exponents - max_exponent_repeated, axis=1))
+
+            return c * K.mean(nll)
+
+        def loss_cce(true, pred):
+            return c * K.categorical_crossentropy(true, pred)
+
+        return loss_cce
+
+    def make_trainable(M, trainable=True):
+        for l in M.layers:
+            l.trainable = trainable
+        M.trainable = trainable
+
+    # Define input tensor
+    main_input = Input(shape=(n_inputs,))
+
+    # Intermediate tensors for discriminating network
+    discr_tensor = Dense(100, activation="relu")(main_input)
+    discr_tensor = Dense(100, activation="relu")(discr_tensor)
+    discr_tensor = Dense(100, activation="relu")(discr_tensor)
+    discr_tensor = Dense(100, activation="relu")(discr_tensor)
+    discr_tensor = Dropout(0.3)(discr_tensor)
+    discr_tensor = Dense(1, activation='sigmoid')(discr_tensor)
+    
+    # Training model
+    discr_model = Model(inputs=main_input, outputs=discr_tensor)
+
+    # Adversarial network: takes as input the training output
+    advers_tensor = discr_tensor
+    advers_tensor = Dense(5, activation="relu")(advers_tensor)
+    advers_tensor = Dense(5, activation="relu")(advers_tensor)
+    advers_tensor = Dense(5, activation="relu")(advers_tensor)
+    #advers_tensor = Dense(50, activation="relu")(advers_tensor)
+    
+    # Different outputs for MDN
+    #mu = Dense(n_comp, activation="linear", kernel_initializer='glorot_uniform')(advers_tensor)
+    #sigma = Dense(n_comp, activation="relu", kernel_initializer='glorot_uniform')(advers_tensor)
+    #pi = Dense(n_comp, activation="softmax")(advers_tensor)
+    #advers_tensor = concatenate([mu, sigma, pi])
+    #advers_tensor = mu
+
+    # Categorical adversary
+    advers_tensor = Dense(n_comp, activation="softmax")(advers_tensor)
+    
+    # Adversarial model
+    advers_model = Model(inputs=main_input, outputs=advers_tensor)
+
+    # "Full" model: combines both networks
+    full_model = Model(inputs=main_input, outputs=[discr_tensor, advers_tensor])
+    
+    #optimizer = SGD(lr=0.000001)
+    optimizer_discr = Adam(lr=0.002)
+    optimizer_advers = Adam(lr=0.0001)
+    optimizer_full = Adam(lr=0.5)
+    
+    # First compile discriminating network
+    discr_model.compile(loss='binary_crossentropy', optimizer=optimizer_discr, metrics=['accuracy'])
+    
+    # Freeze discriminating network, compile adversarial (includes discr.!)
+    make_trainable(discr_model, False)
+    advers_model.compile(loss=make_advers_loss(c=1), optimizer=optimizer_advers)
+
+    # Compile full model with both losses: discriminating is trainable, adversarial is not
+    make_trainable(discr_model, True)
+    make_trainable(advers_model, False)
+    full_model.compile(loss=[make_discr_loss(c=1), make_advers_loss(c=-lamb)], optimizer=optimizer_full)
+
+    return discr_model, advers_model, full_model
+
 
 def join_expression(*exprs):
     if len(exprs) == 0:
@@ -292,7 +404,7 @@ def tree_to_numpy(input_file, variables, weight, cut=None, reweight_to_cross_sec
 
     # Convert to plain numpy arrays
     # dataset = dataset.view((dataset.dtype[0], len(variables))).copy()
-    dataset = np.array(dataset.tolist(), dtype=np.float32)
+    #dataset = np.array(dataset.tolist(), dtype=np.float32)
 
     if n:
         print("Reading only {} from input tree".format(n))
@@ -303,7 +415,7 @@ def tree_to_numpy(input_file, variables, weight, cut=None, reweight_to_cross_sec
 
 
 class DatasetManager:
-    def __init__(self, variables, weight_expression, selection):
+    def __init__(self, variables, weight_expression, selection, extra_variables=[]):
         """
         Create a new dataset manager
 
@@ -321,6 +433,7 @@ class DatasetManager:
         self.variables = variables
         self.selection = selection
         self.weight_expression = weight_expression
+        self.extra_variables = extra_variables
 
         self.resonant_mass_probabilities = None
         self.nonresonant_parameters_probabilities = None
@@ -350,7 +463,7 @@ class DatasetManager:
 
         for m in masses:
             f = get_file_from_glob(os.path.join(INPUT_FOLDER, resonant_signals[m]))
-            dataset, weight = tree_to_numpy(f, self.variables, self.weight_expression, self.selection, reweight_to_cross_section=reweight_to_cross_section)
+            dataset, weight = tree_to_numpy(f, self.variables + self.extra_variables, self.weight_expression, self.selection, reweight_to_cross_section=reweight_to_cross_section)
 
             if fraction != 1:
                 dataset, weight = skim_arrays(dataset, weight, fraction=fraction)
@@ -395,7 +508,7 @@ class DatasetManager:
             dataset = []
             weight = []
             for f in files:
-                dataset_, weight_ = tree_to_numpy(f, self.variables, self.weight_expression, self.selection, reweight_to_cross_section=True)
+                dataset_, weight_ = tree_to_numpy(f, self.variables + self.extra_variables, self.weight_expression, self.selection, reweight_to_cross_section=True)
                 weight.append(weight_)
                 dataset.append(dataset_)
 
@@ -450,7 +563,7 @@ class DatasetManager:
             weight = []
             for f in files:
                 print("  {}...".format(os.path.basename(f)))
-                dataset_, weight_ = tree_to_numpy(f, self.variables, self.weight_expression, self.selection, reweight_to_cross_section=True)
+                dataset_, weight_ = tree_to_numpy(f, self.variables + self.extra_variables, self.weight_expression, self.selection, reweight_to_cross_section=True)
                 weight.append(weight_)
                 dataset.append(dataset_)
 
@@ -533,6 +646,30 @@ class DatasetManager:
         self.training_dataset, self.training_weights, self.training_targets = shuffle(self.training_dataset, self.training_weights, self.training_targets, random_state=42)
         self.testing_dataset, self.testing_weights, self.testing_targets = shuffle(self.testing_dataset, self.testing_weights, self.testing_targets, random_state=42)
 
+        def to_array(a):
+            return a.view( (np.float32, len(a.dtype.names)) )
+
+        # We've been working with structured arrays
+        # => use regular arrays, and split between variables and extra variables
+
+        self.training_extra_dataset         = to_array(self.training_dataset[self.extra_variables])
+        self.training_dataset               = to_array(self.training_dataset[self.variables])
+        
+        self.testing_extra_dataset          = to_array(self.testing_dataset[self.extra_variables])
+        self.testing_dataset                = to_array(self.testing_dataset[self.variables])
+
+        self.train_signal_extra_dataset     = to_array(self.train_signal_dataset[self.extra_variables])
+        self.train_signal_dataset           = to_array(self.train_signal_dataset[self.variables])
+        
+        self.test_signal_extra_dataset      = to_array(self.test_signal_dataset[self.extra_variables])
+        self.test_signal_dataset            = to_array(self.test_signal_dataset[self.variables])
+
+        self.train_background_extra_dataset = to_array(self.train_background_dataset[self.extra_variables])
+        self.train_background_dataset       = to_array(self.train_background_dataset[self.variables])
+
+        self.test_background_extra_dataset  = to_array(self.test_background_dataset[self.extra_variables])
+        self.test_background_dataset        = to_array(self.test_background_dataset[self.variables])
+        
     def get_training_datasets(self):
         return self.train_signal_dataset, self.train_background_dataset
 
@@ -660,16 +797,26 @@ def get_files_from_glob(f):
 
     return files
 
+def draw_nn_vs_independent(model, dataset, bins, output_folder):
+    
+    testing_features = dataset.test_background_dataset
+    testing_independent = dataset.test_background_extra_dataset.ravel()
+    testing_weights = dataset.test_background_weights
+
+    _, testing_background_predictions = dataset.get_training_testing_background_predictions(model)
+
+    plotTools.drawNNVersusVar(testing_background_predictions, testing_independent, testing_weights, bins=(np.linspace(0, 1, 25), bins), output_dir=output_folder, output_name="nn_vs_mjj_output_bkg.pdf")
+
 def draw_non_resonant_training_plots(model, dataset, output_folder, split_by_parameters=False):
 
     # plot(model, to_file=os.path.join(output_folder, "model.pdf"))
 
-    # Draw inputs
-    output_input_plots = os.path.join(output_folder, 'inputs')
-    if not os.path.exists(output_input_plots):
-        os.makedirs(output_input_plots)
+    ## Draw inputs
+    #output_input_plots = os.path.join(output_folder, 'inputs')
+    #if not os.path.exists(output_input_plots):
+    #    os.makedirs(output_input_plots)
 
-    dataset.draw_inputs(output_input_plots)
+    #dataset.draw_inputs(output_input_plots)
 
     training_dataset, training_targets = dataset.get_training_combined_dataset_and_targets()
     training_weights = dataset.get_training_combined_weights()
@@ -689,12 +836,20 @@ def draw_non_resonant_training_plots(model, dataset, output_folder, split_by_par
 
     print("Plotting time...")
 
-    # NN output
+    ## NN output
     plotTools.drawNNOutput(training_background_predictions, testing_background_predictions,
                  training_signal_predictions, testing_signal_predictions,
                  training_background_weights, testing_background_weights,
                  training_signal_weights, testing_signal_weights,
-                 output_dir=output_folder, output_name="nn_output.pdf", bins=50)
+                 output_dir=output_folder, output_name="nn_output.pdf", bins=50, 
+                 
+                 testing_signal_indices=[ (dataset.test_signal_extra_dataset > 75) & (dataset.test_signal_extra_dataset <= 140), ~((dataset.test_signal_extra_dataset > 75) & (dataset.test_signal_extra_dataset <= 140))],
+                 testing_background_indices=[ (dataset.test_background_extra_dataset > 75) & (dataset.test_background_extra_dataset <= 140), ~((dataset.test_background_extra_dataset > 75) & (dataset.test_background_extra_dataset <= 140)) ],
+                 indices_ranges=["SR", "BR"]
+                 #testing_signal_indices=[ dataset.test_signal_extra_dataset <= 75, (dataset.test_signal_extra_dataset > 75) & (dataset.test_signal_extra_dataset <= 140), dataset.test_signal_extra_dataset > 140 ],
+                 #testing_background_indices=[ dataset.test_background_extra_dataset <= 75, (dataset.test_background_extra_dataset > 75) & (dataset.test_background_extra_dataset <= 140), dataset.test_background_extra_dataset > 140 ],
+                 #indices_ranges=["mjj < 75", "75 < mjj < 140", "mjj > 140"]
+                 )
 
     # ROC curve
     binned_training_background_predictions, _, bins = plotTools.binDataset(training_background_predictions, training_background_weights, bins=50, range=[0, 1])
