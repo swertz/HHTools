@@ -267,3 +267,28 @@ def draw_keras_history(history, output_dir='.', output_name='loss.pdf'):
     fig.savefig(os.path.join(output_dir, output_name))
 
     plt.close()
+
+
+def drawDNNFlux(masses, predictions, title="", output_dir=".", output_name="flux.pdf"):
+    fig = plt.figure(1, figsize=(7, 7), dpi=300)
+    fig.clear()
+    fig.suptitle(title)
+
+    ax = fig.add_subplot(111)
+   
+    colormap = plt.cm.coolwarm
+    plt.gca().set_color_cycle([colormap(i) for i in np.linspace(0, 0.9, len(predictions))])
+
+    for i,event in enumerate(predictions):
+        dic = {}
+        if i == len(predictions) - 1:
+            dic["label"] = "One event"
+        ax.plot(masses, predictions[i], lw=1, **dic)
+
+    ax.set_xlabel("Mass input (GeV)")
+    ax.set_ylabel("DNN output")
+    ax.legend()
+
+    fig.savefig(os.path.join(output_dir, output_name))
+
+    plt.close()
