@@ -8,6 +8,7 @@ from sklearn import metrics
 
 from matplotlib.collections import PatchCollection
 from matplotlib.patches import Rectangle
+import matplotlib.colors as colors
 
 import os
 
@@ -141,6 +142,38 @@ def drawNNOutput(background_training_predictions, background_testing_predictions
             x_label="NN output",
             output=os.path.join(output_dir, output_name)
             )
+
+def draw2D(x_var, y_var, weights, bins, output_dir=".", output_name="nn_output_vs_var.pdf", x_label=None, y_label=None, title=None, fig_callbacks=[], data_callbacks=[], normed=False, logZ=False, **kwargs):
+    fig = plt.figure(1, figsize=(8, 7), dpi=300)
+    fig.suptitle(title)
+    ax = fig.add_subplot(111)
+    
+    hist, xedges, yedges = np.histogram2d(x_var, y_var, bins=bins, weights=weights, normed=normed)
+
+    for f in data_callbacks:
+        hist, xedges, yedges = f(hist, xedges, yedges)
+    
+    X, Y = np.meshgrid(xedges, yedges)
+
+    norm=None
+    if logZ:
+        hist = np.clip(hist, np.min(hist[hist>0]), np.max(hist))
+        norm=colors.LogNorm(vmin=hist.min(), vmax=hist.max())
+    
+    cm = ax.imshow(hist.T, origin='lower', norm=norm, extent=[min(xedges), max(xedges), min(yedges), max(yedges)], aspect='auto', **kwargs)
+
+    #cm = ax.pcolormesh(X, Y, hist.T, norm=colors.LogNorm(vmin=hist.min() + 1e-10, vmax=hist.max()), shading='gouraud', **kwags)
+    
+    ax.set_xlabel(x_label, fontsize='large')
+    ax.set_ylabel(y_label, fontsize='large')
+    ax.margins(0.05)
+
+    for f in fig_callbacks:
+        f(fig, ax, cm, x_var, y_var)
+
+    fig.savefig(os.path.join(output_dir, output_name))
+    
+    plt.close()
 
 def get_roc(signal, background):
     """
