@@ -154,16 +154,16 @@ def make_parallel(model, gpu_count):
 def create_resonant_model(n_inputs):
     # Define the model
     model = Sequential()
-    model.add(Dense(100, input_dim=n_inputs, activation="relu", init="glorot_uniform"))
+    model.add(Dense(100, input_dim=n_inputs, activation="relu", kernel_initializer="glorot_uniform"))
 
     n_hidden_layers = 4
     for i in range(n_hidden_layers):
-        model.add(Dense(100, activation="relu", init='glorot_uniform'))
+        model.add(Dense(100, activation="relu", kernel_initializer='glorot_uniform'))
         # if i != (n_hidden_layers - 1):
             # model.add(Dropout(0.1))
 
     model.add(Dropout(0.2))
-    model.add(Dense(2, activation='softmax', init='glorot_uniform'))
+    model.add(Dense(2, activation='softmax', kernel_initializer='glorot_uniform'))
 
     # optimizer = Adam(lr=0.000005)
     optimizer = Adam(lr=0.0001)
@@ -177,18 +177,18 @@ def create_nonresonant_model(n_inputs, multi_gpu=False):
 
     # Define the model
     model = Sequential()
-    model.add(Dense(100, input_dim=n_inputs, activation="relu", init="glorot_uniform"))
+    model.add(Dense(100, input_dim=n_inputs, activation="relu", kernel_initializer="glorot_uniform"))
     # model.add(LeakyReLU(alpha=0.2))
 
     n_hidden_layers = 4
     for i in range(n_hidden_layers):
-        model.add(Dense(100, activation="relu", init='glorot_uniform'))
+        model.add(Dense(100, activation="relu", kernel_initializer='glorot_uniform'))
         # model.add(LeakyReLU(alpha=0.2))
         # if i != (n_hidden_layers - 1):
             # model.add(Dropout(0.2))
 
     model.add(Dropout(0.35))
-    model.add(Dense(2, activation='softmax', init='glorot_uniform'))
+    model.add(Dense(2, activation='softmax', kernel_initializer='glorot_uniform'))
 
     if HAVE_GPU and multi_gpu:
         model = make_parallel(model, 2)
@@ -328,7 +328,7 @@ class DatasetManager:
         self.nonresonant_parameters_list = None
         self.nonresonant_parameters_shift_value = None
 
-    def load_resonant_signal(self, masses=resonant_signal_masses, add_mass_column=False, fraction=1):
+    def load_resonant_signal(self, masses=resonant_signal_masses, add_mass_column=False, fraction=1, reweight_to_cross_section=False):
         """
         Load resonant signal
 
@@ -349,7 +349,7 @@ class DatasetManager:
 
         for m in masses:
             f = get_file_from_glob(os.path.join(INPUT_FOLDER, resonant_signals[m]))
-            dataset, weight = tree_to_numpy(f, self.variables, self.weight_expression, self.selection, reweight_to_cross_section=False)
+            dataset, weight = tree_to_numpy(f, self.variables, self.weight_expression, self.selection, reweight_to_cross_section=reweight_to_cross_section)
 
             if fraction != 1:
                 dataset, weight = skim_arrays(dataset, weight, fraction=fraction)
