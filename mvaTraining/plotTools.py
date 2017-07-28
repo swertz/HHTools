@@ -273,8 +273,8 @@ def draw_keras_history(history, output_dir='.', output_name='loss.pdf'):
     validation_losses = history.history['val_loss']
     epochs = np.arange(0, len(training_losses))
 
-    l1 = ax.plot(epochs, training_losses, '-', color='#8E2800', lw=2, label="Training loss")
-    l2 = ax.plot(epochs, validation_losses, '-', color='#468966', lw=2, label="Validation loss")
+    l1 = ax.semilogy(epochs, training_losses, '-', color='#8E2800', lw=2, label="Training loss")
+    l2 = ax.semilogy(epochs, validation_losses, '-', color='#468966', lw=2, label="Validation loss")
 
     ax.set_xlabel("Epochs")
     ax.set_ylabel("Loss")

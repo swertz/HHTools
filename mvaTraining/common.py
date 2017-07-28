@@ -9,6 +9,9 @@ import array
 import numpy as np
 import numpy.lib.recfunctions as recfunc
 
+from scipy.optimize import newton
+from scipy.stats import norm
+
 from ROOT import TChain, TFile, TTree
 
 from root_numpy import tree2array
@@ -77,6 +80,7 @@ for m in resonant_signal_masses:
 # nonresonant_parameters = [(kl, kt) for kl in [-15, -5, -1, 0.0001, 1, 5, 15] for kt in [0.5, 1, 1.75, 2.5]]
 
 # New grid
+#nonresonant_parameters = [(kl, kt) for kl in [-20] for kt in [0.5]]
 nonresonant_parameters = [(kl, kt) for kl in [-20, -5, 0.0001, 1, 2.4, 3.8, 5, 20] for kt in [0.5, 1, 1.75, 2.5]]
 
 nonresonant_weights = {
@@ -163,42 +167,40 @@ def create_resonant_model(n_inputs):
             # model.add(Dropout(0.1))
 
     model.add(Dropout(0.2))
-    model.add(Dense(2, activation='softmax', kernel_initializer='glorot_uniform'))
+    model.add(Dense(1, activation='sigmoid', kernel_initializer='glorot_uniform'))
 
     # optimizer = Adam(lr=0.000005)
     optimizer = Adam(lr=0.0001)
-    model.compile(loss='categorical_crossentropy', optimizer=optimizer, metrics=['accuracy'])
-
-    model.summary()
+    model.compile(loss='binary_crossentropy', optimizer=optimizer, metrics=['accuracy'])
 
     return model
 
-def create_nonresonant_model(n_inputs, multi_gpu=False):
+def create_nonresonant_model(n_inputs, n_neurons=100, n_hidden_layers=4, lr=0.0001, dropout=0.35, do_dropout=True, l2_param=0, batch_norm=False, activation="elu", init="he_uniform", multi_gpu=False):
 
-    # Define the model
     model = Sequential()
-    model.add(Dense(100, input_dim=n_inputs, activation="relu", kernel_initializer="glorot_uniform"))
-    # model.add(LeakyReLU(alpha=0.2))
+    if batch_norm:
+        model.add(BatchNormalization(input_shape=(n_inputs,)))
+        model.add(Dense(n_neurons, activation=activation, kernel_initializer=init, kernel_regularizer=l2(l2_param)))
+    else:
+        model.add(Dense(n_neurons, input_dim=n_inputs, activation=activation, kernel_initializer=init, kernel_regularizer=l2(l2_param)))
+    if batch_norm:
+        model.add(BatchNormalization())
 
-    n_hidden_layers = 4
     for i in range(n_hidden_layers):
-        model.add(Dense(100, activation="relu", kernel_initializer='glorot_uniform'))
-        # model.add(LeakyReLU(alpha=0.2))
-        # if i != (n_hidden_layers - 1):
-            # model.add(Dropout(0.2))
+        model.add(Dense(n_neurons, activation=activation, kernel_initializer=init, kernel_regularizer=l2(l2_param)))
+        if batch_norm:
+            model.add(BatchNormalization())
 
-    model.add(Dropout(0.35))
-    model.add(Dense(2, activation='softmax', kernel_initializer='glorot_uniform'))
+    if do_dropout:
+        model.add(Dropout(dropout))
+    model.add(Dense(1, activation='sigmoid', kernel_initializer='glorot_uniform'))
 
     if HAVE_GPU and multi_gpu:
         model = make_parallel(model, 2)
 
-    # optimizer = SGD(lr=0.03, decay=1e-6, momentum=0.9, nesterov=True)
-    optimizer = Adam(lr=0.0001)
+    optimizer = Adam(lr=lr)
 
-    model.compile(loss='categorical_crossentropy', optimizer=optimizer, metrics=['accuracy'])
-
-    model.summary()
+    model.compile(loss='binary_crossentropy', optimizer=optimizer, metrics=['accuracy'])
 
     return model
 
@@ -394,7 +396,7 @@ class DatasetManager:
             dataset = []
             weight = []
             for f in files:
-                dataset_, weight_ = tree_to_numpy(f, self.variables, self.weight_expression, self.selection, reweight_to_cross_section=False)
+                dataset_, weight_ = tree_to_numpy(f, self.variables, self.weight_expression, self.selection, reweight_to_cross_section=True)
                 weight.append(weight_)
                 dataset.append(dataset_)
 
@@ -405,7 +407,7 @@ class DatasetManager:
                 dataset, weight = skim_arrays(dataset, weight, fraction=fraction)
 
             p[0].append(self.nonresonant_parameters_list[i])
-            p[1].append(len(dataset))
+            p[1].append(np.sum(weight))
 
             if add_parameters_columns:
                 for parameter in self.nonresonant_parameters_list[i]:
@@ -493,7 +495,7 @@ class DatasetManager:
         for i in range(cols.shape[1]):
             self.background_dataset[:, len(self.variables) + i] = cols[:, i]
 
-    def split(self, reweight_background_training_sample=True):
+    def split(self, reweight_signal_training_sample=True, test_size=0.5):
         """
         Split datasets into a training and testing samples
 
@@ -501,17 +503,19 @@ class DatasetManager:
             reweight_background_training_sample: If true, the background training sample is reweighted so that the sum of weights of signal and background are the same
         """
 
-        self.train_signal_dataset, self.test_signal_dataset, self.train_signal_weights, self.test_signal_weights = train_test_split(self.signal_dataset, self.signal_weights, test_size=0.5, random_state=42)
-        self.train_background_dataset, self.test_background_dataset, self.train_background_weights, self.test_background_weights = train_test_split(self.background_dataset, self.background_weights, test_size=0.5, random_state=42)
+        self.train_signal_dataset, self.test_signal_dataset, self.train_signal_weights, self.test_signal_weights = train_test_split(self.signal_dataset, self.signal_weights, test_size=test_size, random_state=42)
+        self.train_background_dataset, self.test_background_dataset, self.train_background_weights, self.test_background_weights = train_test_split(self.background_dataset, self.background_weights, test_size=test_size, random_state=42)
 
-        if reweight_background_training_sample:
+        self.test_background_weights /= test_size
+        self.test_signal_weights /= test_size
+
+        if reweight_signal_training_sample:
             sumw_train_signal = np.sum(self.train_signal_weights)
             sumw_train_background = np.sum(self.train_background_weights)
 
-            ratio = sumw_train_signal / sumw_train_background
-            self.train_background_weights *= ratio
-            self.test_background_weights *= ratio
-            print("Background training sample reweighted so that sum of event weights for signal and background match. Sum of event weight = %.4f" % (np.sum(self.train_signal_weights)))
+            ratio = sumw_train_background / sumw_train_signal
+            self.train_signal_weights *= ratio
+            print("Signal training sample reweighted so that sum of event weights for signal and background match. Sum of event weight = %.4f" % (np.sum(self.train_signal_weights)))
 
         # Create merged training and testing dataset, with targets
         self.training_dataset = np.concatenate([self.train_signal_dataset, self.train_background_dataset])
@@ -523,8 +527,8 @@ class DatasetManager:
         # A hot-vector is a N dimensional vector, where N is the number of classes
         # Here we assume that class 0 is signal, and class 1 is background
         # So we have [1 0] for signal and [0 1] for background
-        self.training_targets = np.array([[1, 0]] * len(self.train_signal_dataset) + [[0, 1]] * len(self.train_background_dataset))
-        self.testing_targets = np.array([[1, 0]] * len(self.test_signal_dataset) + [[0, 1]] * len(self.test_background_dataset))
+        self.training_targets = np.array([1] * len(self.train_signal_dataset) + [0] * len(self.train_background_dataset))#.reshape((-1,1))
+        self.testing_targets = np.array([1] * len(self.test_signal_dataset) + [0] * len(self.test_background_dataset))#.reshape((-1,1))
 
         # Shuffle everything
         self.training_dataset, self.training_weights, self.training_targets = shuffle(self.training_dataset, self.training_weights, self.training_targets, random_state=42)
@@ -573,11 +577,7 @@ class DatasetManager:
         return self.background_weights
 
     def _get_predictions(self, model, values, **kwargs):
-        ignore_n_last_columns = kwargs.get('ignore_last_columns', 0)
-        if ignore_n_last_columns > 0:
-            values = values[:, :-ignore_n_last_columns]
-        predictions = model.predict(values, batch_size=5000, verbose=1)
-        return np.delete(predictions, 1, axis=1).flatten()
+        return model.predict(values, batch_size=20000)[:,0]
 
     def draw_inputs(self, output_dir):
 
@@ -843,3 +843,22 @@ def export_for_lwtnn(model, name):
 
     # And the weights
     model.save_weights(base + "_weights.h5")
+
+
+def get_median_expected_limit(sig_binned, bkg_binned, guess=10):
+    def median_function(s, b):
+        def f(mu):
+            return np.sqrt(- 2 * (np.sum(b * np.log(1 + mu * s/b) - mu * s))) - norm.ppf(0.95)
+        return f
+
+    if np.sum(bkg_binned <= 0) != 0:
+        print("Warning: b has invalid bins!")
+        return None
+    
+    try:
+        limit = newton(median_function(sig_binned[0], bkg_binned[0]), guess)
+    except RuntimeError:
+        print("Warning: could not compute limit!")
+        return None
+
+    return limit

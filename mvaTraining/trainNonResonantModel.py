@@ -10,8 +10,9 @@ import plotTools
 from common import *
 
 import keras
-
 from keras import backend as K
+
+from scipy.stats import ks_2samp
 
 class KerasDebugMonitor(keras.callbacks.Callback):
     def __init__(self):
@@ -67,17 +68,16 @@ inputs = [
 
 cut = "(91 - ll_M) > 15"
 
-# parameters_list = nonresonant_parameters
 parameters_list = nonresonant_parameters
 add_parameters_columns = True
 
-# parameters_list = [(-20, 0.5)]
-# add_parameters_columns = False
+parameters_list = [(1,1)]
+#add_parameters_columns = True
 
-# suffix = "dy_estimation_from_BDT_new_prod_deeper_lr_scheduler_120epochs"
-suffix = "latest_march_prod_100epochs"
+suffix = "hyperopt_result_2017-07-25"
 
 output_suffix = '{:%Y-%m-%d}_{}'.format(datetime.date.today(), suffix)
+#output_suffix = '2017-03-02_latest_march_prod_100epochs'
 output_folder = os.path.join('hh_nonresonant_trained_models', output_suffix)
 
 if not os.path.exists(output_folder):
@@ -99,7 +99,7 @@ testing_signal_dataset, testing_background_dataset = dataset.get_testing_dataset
 
 callbacks = []
 
-output_model_filename = 'hh_nonresonant_trained_model.h5'
+output_model_filename = 'hh_nonresonant_trained_model_updated.h5'
 output_model_filename = os.path.join(output_folder, output_model_filename)
 
 callbacks.append(keras.callbacks.ModelCheckpoint(output_model_filename, monitor='val_loss', verbose=False, save_best_only=True, mode='auto'))
@@ -108,10 +108,13 @@ callbacks.append(keras.callbacks.ModelCheckpoint(output_model_filename, monitor=
 output_logs_folder = os.path.join('hh_nonresonant_trained_models', 'logs', output_suffix)
 # callbacks.append(keras.callbacks.TensorBoard(log_dir=output_logs_folder, histogram_freq=1, write_graph=True, write_images=False))
 
-callbacks.append(keras.callbacks.LearningRateScheduler(lr_scheduler))
+#callbacks.append(keras.callbacks.LearningRateScheduler(lr_scheduler))
 # callbacks.append(keras.callbacks.LearningRateScheduler(lr_scheduler_dedicated))
 
-training = True
+callbacks.append(keras.callbacks.EarlyStopping(monitor='val_loss', patience=10))
+callbacks.append(keras.callbacks.ReduceLROnPlateau(monitor='val_loss', factor=0.2, patience=5))
+
+training = False
 training_time = None
 
 # Load model
@@ -119,11 +122,19 @@ if training:
     n_inputs = len(inputs)
     if add_parameters_columns:
         n_inputs += 2
-    model = create_nonresonant_model(n_inputs)
+    model = create_nonresonant_model(n_inputs,
+            n_neurons=100,
+            n_hidden_layers=5,
+            lr=0.00048375091384374695,
+            do_dropout=False,
+            #dropout=0.25,
+            l2_param=0,
+            batch_norm=True
+            )
 
     start_time = timer()
-    batch_size = 5000
-    nb_epoch = 100
+    batch_size = 512
+    nb_epoch = 200
 
     if HAVE_GPU and len(training_dataset) % 2 != 0:
         # Drop the last event
@@ -132,7 +143,7 @@ if training:
         training_weights = training_weights[:-1]
 
     history = model.fit(training_dataset, training_targets, sample_weight=training_weights, batch_size=batch_size,
-            nb_epoch=nb_epoch, verbose=True, validation_data=(testing_dataset, testing_targets, testing_weights), callbacks=callbacks)
+            epochs=nb_epoch, verbose=True, validation_data=(testing_dataset, testing_targets, testing_weights), callbacks=callbacks)
 
     end_time = timer()
     training_time = datetime.timedelta(seconds=(end_time - start_time))
@@ -158,7 +169,28 @@ if training:
 
 model = keras.models.load_model(output_model_filename)
 
-export_for_lwtnn(model, output_model_filename)
-draw_non_resonant_training_plots(model, dataset, output_folder, split_by_parameters=add_parameters_columns)
+#export_for_lwtnn(model, output_model_filename)
+#try:
+#    draw_non_resonant_training_plots(model, dataset, output_folder, split_by_parameters=add_parameters_columns)
+#except:
+#    pass
+
+# Compute limit on test set
+sig_pred = model.predict(dataset.test_signal_dataset, batch_size=20000)[:,0]
+sig_pred_train = model.predict(dataset.train_signal_dataset, batch_size=20000)[:,0]
+bkg_pred = model.predict(dataset.test_background_dataset, batch_size=20000)[:,0]
+bkg_pred_train = model.predict(dataset.train_background_dataset, batch_size=20000)[:,0]
+
+LUMI = 35900
+
+sig_binned = plotTools.binDataset(sig_pred, LUMI * dataset.test_signal_weights, bins=50, range=[0,1])
+bkg_binned = plotTools.binDataset(bkg_pred, LUMI * dataset.test_background_weights, bins=50, range=[0,1])
+
+limit = get_median_expected_limit(sig_binned, bkg_binned, guess=10)
+
+print("Expected limit from test set: {} fb".format(limit))
+print("KS test for overtraining:")
+print("Signal: {}".format(ks_2samp(sig_pred, sig_pred_train)))
+print("Background: {}".format(ks_2samp(bkg_pred, bkg_pred_train)))
 
 print("All done. Training time: %s" % str(training_time))
