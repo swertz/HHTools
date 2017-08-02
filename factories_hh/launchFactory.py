@@ -8,7 +8,7 @@ import numpy as np
 
 import argparse
 
-from cp3_llbb.CommonTools.condorTools import condorSubmitter
+from cp3_llbb.CommonTools.slurmTools import slurmSubmitter
 
 # Add default ingrid storm package
 sys.path.append('/nfs/soft/python/python-2.7.5-sl6_amd64_gcc44/lib/python2.7/site-packages/storm-0.20-py2.7-linux-x86_64.egg')
@@ -52,7 +52,7 @@ def get_sample(iSample):
     resultset = dbstore.find(Sample, Sample.sample_id == iSample)
     return resultset.one()
 
-# Configure number of files processed by each condor job -- NOT used
+# Configure number of files processed by each slurm job -- NOT used
 # Factor is passed as argument to script
 # `sample` is DB name
 def get_sample_splitting(sample, factor=2):
@@ -67,7 +67,7 @@ def get_sample_splitting(sample, factor=2):
         nfiles = 20
     return nfiles * factor
 
-# Configure number of events processed by each condor job
+# Configure number of events processed by each slurm job
 # Factor is passed as argument to script
 # `sample` is DB name
 def get_sample_events_per_job(sample, factor=1):
@@ -308,7 +308,7 @@ TestPlots_ForSignal = Configuration('generatePlots.py', workflow='test', suffix=
 
 ##### Parse arguments and do actual work ####
 
-parser = argparse.ArgumentParser(description='Facility to submit histFactory jobs on condor.')
+parser = argparse.ArgumentParser(description='Facility to submit histFactory jobs on slurm.')
 parser.add_argument('-o', '--output', dest='output', default=str(datetime.date.today()), help='Name of the output directory.', required=True)
 parser.add_argument('-s', '--submit', help='Choice to actually submit the jobs or not.', action="store_true")
 parser.add_argument('-f', '--factor', dest='factor', type=int, default=1, help='Factor to multiply number of files sent to each job')
@@ -408,12 +408,12 @@ if not args.skip:
 
 ## Write files needed to run on cluster
 
-def create_condor(samples, output, executable):
-    ## Create Condor submitter to handle job creating
-    mySub = condorSubmitter(samples, "%s/build/" % output + executable, "DUMMY", output + "/", rescale=True)
+def create_slurm(samples, output, executable):
+    ## Create slurm submitter to handle job creating
+    mySub = slurmSubmitter(samples, "%s/build/" % output + executable, output + "/", rescale=True)
 
-    ## Create test_condor directory and subdirs
-    mySub.setupCondorDirs()
+    ## Create test_slurm directory and subdirs
+    mySub.setupDirs()
 
     splitTT = True
     splitDY = False
@@ -618,20 +618,20 @@ def create_condor(samples, output, executable):
         #
         #                mySub.sampleCfg.append(newSample)
 
-    ## Write command and data files in the condor directory
-    mySub.createCondorFiles()
+    ## Write command and data files in the slurm directory
+    mySub.createFiles()
 
     # Actually submit the jobs
-    # It is recommended to do a dry-run first without submitting to condor
+    # It is recommended to do a dry-run first without submitting to slurm
     if args.submit:
-       mySub.submitOnCondor()
+       mySub.submit()
 
 for c in configurations:
     if len(c.sample_ids) == 0:
         continue
 
-    condor_samples = []
+    slurm_samples = []
     for id in c.sample_ids:
-        condor_samples.append({'ID': id, 'events_per_job': get_sample_events_per_job(get_sample(id).name, args.factor)})
+        slurm_samples.append({'ID': id, 'events_per_job': get_sample_events_per_job(get_sample(id).name, args.factor)})
 
-    create_condor(condor_samples, args.output + c.suffix, c.executable)
+    create_slurm(slurm_samples, args.output + c.suffix, c.executable)
