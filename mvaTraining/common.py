@@ -33,14 +33,13 @@ import tensorflow as tf
 
 import plotTools
 
-INPUT_FOLDER = '/nfs/scratch/fynu/sbrochet/Moriond17/CMSSW_8_0_26_p2_HH_analysis/src/cp3_llbb/HHTools/mvaTraining/inputs/2017-03-02_latest_prod'
+#INPUT_FOLDER = '/nfs/scratch/fynu/sbrochet/Moriond17/CMSSW_8_0_26_p2_HH_analysis/src/cp3_llbb/HHTools/mvaTraining/inputs/2017-03-02_latest_prod'
+INPUT_FOLDER = '/nfs/scratch/fynu/swertz/CMSSW_8_0_25/src/cp3_llbb/HHTools/slurm/170728_skimForTrainingExtra/slurm/output'
 
 HAVE_GPU = 'ingrid-ui8' in socket.gethostname()
 
 def format_nonresonant_parameters(param):
-    kl = str(param[0])
-    kt = str(param[1])
-    X_Y =  (kl + "_" + kt).replace(".", "p")
+    X_Y =  "{:.2f}_{:.2f}".format(kl, kt).replace(".", "p").replace("-", "m")
 
     return X_Y
 
