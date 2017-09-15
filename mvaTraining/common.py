@@ -19,15 +19,14 @@ from root_numpy import tree2array
 from sklearn.model_selection import train_test_split
 from sklearn.utils import shuffle, safe_indexing
 
-from keras.losses import mean_squared_error
+from keras.losses import mean_squared_error, binary_crossentropy
 from keras.models import Sequential, Model
-from keras.layers import Input, Dense, Dropout, concatenate
+from keras.layers import Input, Dense, Dropout, Concatenate
 from keras.layers.core import Lambda
 from keras.optimizers import Adam, SGD
 from keras.regularizers import l2
 from keras.layers.normalization import BatchNormalization
 from keras.layers.advanced_activations import LeakyReLU
-# from keras.utils.visualize_util import plot
 
 from keras import backend as K
 import tensorflow as tf
@@ -203,6 +202,105 @@ def create_nonresonant_model(n_inputs, n_neurons=100, n_hidden_layers=4, lr=0.00
     model.compile(loss='binary_crossentropy', optimizer=optimizer, metrics=['accuracy'])
 
     return model
+
+
+def create_LSMI_model(n_inputs, n_neurons=100, n_hidden_layers=4, lr=0.01, dropout=0.35, do_dropout=True, l2_param=0, batch_norm=False, activation="elu", init="he_uniform", lamb=1, lsmi_l2=0, sigma_x=1, sigma_y=1):
+    def print_t(t, m=None):
+        return tf.Print(t, [t, K.shape(t), K.min(t), K.max(t), K.mean(t)], message=m + ": ")
+
+    def gauss_kernel(x, xp, sigma):
+        return tf.exp(-tf.square(x - xp) / (2 * sigma**2))
+
+    def phi_function(x, x_batch, y, y_batch):
+        return gauss_kernel(x, x_batch, sigma_x) * gauss_kernel(y, y_batch, sigma_y)
+
+    def LSMI(x, y):
+        batch_size = tf.shape(x)[0]
+        #x_batch = tf.expand_dims(x, axis=-1)
+        #x_rep = tf.tile(tf.transpose(x_batch), tf.shape(x_batch))
+        #y_batch = tf.expand_dims(y, axis=-1)
+        #y_rep = tf.tile(tf.transpose(y_batch), tf.shape(x_batch))
+        #
+        #phi_vec = phi_function(x_rep, x_batch, y_rep, y_batch)
+
+        phi_vec = phi_function(x[None,:], x[:,None], y[None,:], y[:,None])
+
+        h_vec = tf.reduce_mean(phi_vec, axis=1)
+
+        #phi_rep = tf.expand_dims(phi_vec, axis=-1)
+        #tile_shape = tf.scatter_nd(tf.constant([[2]]), tf.reshape(tf.to_float(batch_size), (1,)), tf.constant([3])) + tf.constant([1, 1, 0], dtype=tf.float32)
+        #phi_rep = tf.tile(phi_rep, tf.to_int32(tile_shape))
+        #phi_dot = tf.tensordot(phi_rep, tf.transpose(phi_vec), axes=[[2], [0]])
+        #norm = tf.to_float(batch_size * batch_size)
+        #H_mat = tf.reduce_mean(phi_dot, axis=1) / norm
+        phi_vec = phi_function(x[None,:,None], x[:,None,None], y[None,None,:], y[:,None,None]) 
+        H_mat = tf.tensordot(phi_vec, phi_vec, axes=([1,2], [1,2])) / tf.to_float(batch_size * batch_size)
+
+        I = lsmi_l2 * tf.eye(batch_size)
+        inv = tf.matrix_inverse(H_mat + I)
+        h_vec = tf.expand_dims(h_vec, axis=-1)
+        theta_vec = tf.tensordot(inv, h_vec, axes=1)
+
+        #lsmi = tf.tensordot(tf.transpose(h_vec), tf.expand_dims(theta_vec, axis=-1), axes=1)
+        lsmi = 0.5 * tf.reduce_sum(theta_vec * h_vec) - 0.5
+
+        return lsmi
+    
+    def lsmi_loss(true, pred):
+        true_nn = true[:,0]
+        pred_nn = pred[:,0]
+        extra = pred[:,1]
+
+        #discr_loss = K.mean(binary_crossentropy(true_nn, pred_nn))
+        
+        bkg_target = tf.zeros(shape=tf.shape(true_nn))
+        bkg_mask = tf.equal(true_nn, bkg_target)
+        pred_nn_bkg = tf.boolean_mask(pred_nn, bkg_mask)
+        extra_bkg = tf.boolean_mask(extra, bkg_mask)
+
+        lsmi_loss = LSMI(pred_nn_bkg, extra_bkg)
+        lsmi_loss = K.reshape(lsmi_loss, (1,1))
+        #lsmi_loss = print_t(lsmi_loss, 'lsmi')
+        #discr_loss = print_t(discr_loss, 'discr')
+        
+        return lsmi_loss
+        #return discr_loss + lamb * lsmi_loss
+
+    # Define input tensor
+    main_input = Input(shape=(n_inputs,))
+
+    # Intermediate tensors for discriminating network
+    if batch_norm:
+        discr_tensor = BatchNormalization()(main_input)
+    else:
+        discr_tensor = main_input
+    for i in range(1 + n_hidden_layers):
+        discr_tensor = Dense(n_neurons, activation=activation, kernel_initializer=init, kernel_regularizer=l2(l2_param))(discr_tensor)
+        if batch_norm:
+            discr_tensor = BatchNormalization()(discr_tensor)
+    if do_dropout:
+        discr_tensor = Dropout(dropout)(discr_tensor)
+    discr_tensor = Dense(1, activation='sigmoid', kernel_initializer='glorot_uniform')(discr_tensor)
+    
+    # Training model
+    discr_model = Model(inputs=main_input, outputs=discr_tensor)
+    optimizer_discr = Adam(lr=lr)
+    discr_model.compile(loss='binary_crossentropy', optimizer=optimizer_discr, metrics=['accuracy'])
+
+    # LSMI-loss model
+    extra_var_input = Input(shape=(1,))
+    if batch_norm:
+        extra_var_tensor = BatchNormalization()(extra_var_input)
+    else:
+        extra_var_tensor = extra_var_input
+    lsmi_output = Concatenate()([discr_tensor, extra_var_tensor])
+    
+    lsmi_model = Model(inputs=[main_input, extra_var_input], outputs=lsmi_output)
+    optimizer_lsmi = Adam(lr=lr)
+    lsmi_model.compile(loss=lsmi_loss, optimizer=optimizer_lsmi)
+
+    return discr_model, lsmi_model
+
 
 
 def create_adversarial_model(n_inputs, n_comp, lamb):
@@ -607,7 +705,7 @@ class DatasetManager:
         for i in range(cols.shape[1]):
             self.background_dataset[:, len(self.variables) + i] = cols[:, i]
 
-    def split(self, reweight_signal_training_sample=True, test_size=0.5):
+    def split(self, reweight_signal_training_sample=True, reweight_signal_testing_sample=False, test_size=0.5):
         """
         Split datasets into a training and testing samples
 
@@ -629,6 +727,14 @@ class DatasetManager:
             self.train_signal_weights *= ratio
             print("Signal training sample reweighted so that sum of event weights for signal and background match. Sum of event weight = %.4f" % (np.sum(self.train_signal_weights)))
 
+        if reweight_signal_testing_sample:
+            sumw_test_signal = np.sum(self.test_signal_weights)
+            sumw_test_background = np.sum(self.test_background_weights)
+
+            ratio = sumw_test_background / sumw_test_signal
+            self.test_signal_weights *= ratio
+            print("Signal testing sample reweighted so that sum of event weights for signal and background match. Sum of event weight = %.4f" % (np.sum(self.test_signal_weights)))
+
         # Create merged training and testing dataset, with targets
         self.training_dataset = np.concatenate([self.train_signal_dataset, self.train_background_dataset])
         self.training_weights = np.concatenate([self.train_signal_weights, self.train_background_weights])
@@ -639,8 +745,8 @@ class DatasetManager:
         # A hot-vector is a N dimensional vector, where N is the number of classes
         # Here we assume that class 0 is signal, and class 1 is background
         # So we have [1 0] for signal and [0 1] for background
-        self.training_targets = np.array([1] * len(self.train_signal_dataset) + [0] * len(self.train_background_dataset))#.reshape((-1,1))
-        self.testing_targets = np.array([1] * len(self.test_signal_dataset) + [0] * len(self.test_background_dataset))#.reshape((-1,1))
+        self.training_targets = np.array([1] * len(self.train_signal_dataset) + [0] * len(self.train_background_dataset)).reshape((-1,1))
+        self.testing_targets = np.array([1] * len(self.test_signal_dataset) + [0] * len(self.test_background_dataset)).reshape((-1,1))
 
         # Shuffle everything
         self.training_dataset, self.training_weights, self.training_targets = shuffle(self.training_dataset, self.training_weights, self.training_targets, random_state=42)
@@ -843,12 +949,12 @@ def draw_non_resonant_training_plots(model, dataset, output_folder, split_by_par
                  training_signal_weights, testing_signal_weights,
                  output_dir=output_folder, output_name="nn_output.pdf", bins=50, 
                  
-                 testing_signal_indices=[ (dataset.test_signal_extra_dataset > 75) & (dataset.test_signal_extra_dataset <= 140), ~((dataset.test_signal_extra_dataset > 75) & (dataset.test_signal_extra_dataset <= 140))],
-                 testing_background_indices=[ (dataset.test_background_extra_dataset > 75) & (dataset.test_background_extra_dataset <= 140), ~((dataset.test_background_extra_dataset > 75) & (dataset.test_background_extra_dataset <= 140)) ],
-                 indices_ranges=["SR", "BR"]
-                 #testing_signal_indices=[ dataset.test_signal_extra_dataset <= 75, (dataset.test_signal_extra_dataset > 75) & (dataset.test_signal_extra_dataset <= 140), dataset.test_signal_extra_dataset > 140 ],
-                 #testing_background_indices=[ dataset.test_background_extra_dataset <= 75, (dataset.test_background_extra_dataset > 75) & (dataset.test_background_extra_dataset <= 140), dataset.test_background_extra_dataset > 140 ],
-                 #indices_ranges=["mjj < 75", "75 < mjj < 140", "mjj > 140"]
+                 #testing_signal_indices=[ (dataset.test_signal_extra_dataset > 75) & (dataset.test_signal_extra_dataset <= 140), ~((dataset.test_signal_extra_dataset > 75) & (dataset.test_signal_extra_dataset <= 140))],
+                 #testing_background_indices=[ (dataset.test_background_extra_dataset > 75) & (dataset.test_background_extra_dataset <= 140), ~((dataset.test_background_extra_dataset > 75) & (dataset.test_background_extra_dataset <= 140)) ],
+                 #indices_ranges=["SR", "BR"]
+                 testing_signal_indices=[ dataset.test_signal_extra_dataset <= 75, (dataset.test_signal_extra_dataset > 75) & (dataset.test_signal_extra_dataset <= 140), dataset.test_signal_extra_dataset > 140 ],
+                 testing_background_indices=[ dataset.test_background_extra_dataset <= 75, (dataset.test_background_extra_dataset > 75) & (dataset.test_background_extra_dataset <= 140), dataset.test_background_extra_dataset > 140 ],
+                 indices_ranges=["mjj < 75", "75 < mjj < 140", "mjj > 140"]
                  )
 
     # ROC curve

@@ -13,46 +13,6 @@ import keras
 
 from keras import backend as K
 
-class KerasDebugMonitor(keras.callbacks.Callback):
-    def __init__(self):
-        super(KerasDebugMonitor, self).__init__()
-
-    def _get_learning_rate(self, epoch):
-        lr = K.get_value(self.model.optimizer.lr)
-        iterations = K.get_value(self.model.optimizer.iterations)
-        decay = K.get_value(self.model.optimizer.decay)
-        print(decay)
-        if decay > 0:
-            lr *= (1. / (1. + decay * iterations))
-
-        return lr
-
-    def on_epoch_begin(self, epoch, logs=None):
-        if not hasattr(self.model.optimizer, 'lr'):
-            raise ValueError('Optimizer must have a "lr" attribute.')
-        lr = self._get_learning_rate(epoch)
-        print('Epoch %d: learning-rate: %.5e' % (epoch, lr))
-
-    def on_epoch_end(self, epoch, logs=None):
-        pass
-
-def lr_scheduler(epoch):
-    default_lr = 0.005
-    drop = 0.1
-    epochs_drop = 50.0
-    lr = default_lr * math.pow(drop, min(1, math.floor((1 + epoch) / epochs_drop)))
-
-    return lr
-
-def lr_scheduler_dedicated(epoch):
-    default_lr = 0.001
-    drop = 0.5
-    epochs_drop = 15.0
-    lr = default_lr * math.pow(drop, min(1, math.floor((1 + epoch) / epochs_drop)))
-
-    return lr
-
-
 inputs = [
         "jj_pt", 
         "ll_pt",

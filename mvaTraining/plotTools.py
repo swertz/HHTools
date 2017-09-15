@@ -151,12 +151,12 @@ def drawTrainingTestingComparison(**kwargs):
     signal_color = '#468966'
 
     # Training data
-    training_background_histogram, training_background_errors, bin_edges = binDataset(training_background_data, training_background_weights, bins=bins, range=range)
-    training_signal_histogram, training_signal_errors, _ = binDataset(training_signal_data, training_signal_weights, bins=bin_edges)
+    training_background_histogram, training_background_errors, bin_edges = binDataset(training_background_data, training_background_weights, bins=bins, range=range, norm=True)
+    training_signal_histogram, training_signal_errors, _ = binDataset(training_signal_data, training_signal_weights, bins=bin_edges, norm=True)
 
     # Testing data
-    testing_background_histogram, testing_background_errors, _ = binDataset(testing_background_data,testing_background_weights, bins=bin_edges)
-    testing_signal_histogram, testing_signal_errors, _ = binDataset(testing_signal_data,testing_signal_weights, bins=bin_edges)
+    testing_background_histogram, testing_background_errors, _ = binDataset(testing_background_data,testing_background_weights, bins=bin_edges, norm=True)
+    testing_signal_histogram, testing_signal_errors, _ = binDataset(testing_signal_data,testing_signal_weights, bins=bin_edges, norm=True)
 
     bin_centers = (bin_edges[1:] + bin_edges[:-1]) / 2
     bin_width = bin_edges[1] - bin_edges[0]
@@ -369,12 +369,15 @@ def draw_keras_history(history, output_dir='.', output_name='loss.pdf'):
     # Create an axes instance
     ax = fig.add_subplot(111)
 
-    training_losses = history.history['loss']
-    validation_losses = history.history['val_loss']
-    epochs = np.arange(0, len(training_losses))
-
-    l1 = ax.semilogy(epochs, training_losses, '-', color='#8E2800', lw=2, label="Training loss")
-    l2 = ax.semilogy(epochs, validation_losses, '-', color='#468966', lw=2, label="Validation loss")
+    if 'loss' in history.history.keys():
+        training_losses = history.history['loss']
+        epochs = np.arange(0, len(training_losses))
+        l1 = ax.semilogy(epochs, training_losses, '-', color='#8E2800', lw=2, label="Training loss")
+    
+    if 'val_loss' in history.history.keys():
+        validation_losses = history.history['val_loss']
+        epochs = np.arange(0, len(validation_losses))
+        l2 = ax.semilogy(epochs, validation_losses, '-', color='#468966', lw=2, label="Validation loss")
 
     ax.set_xlabel("Epochs")
     ax.set_ylabel("Loss")
@@ -393,9 +396,10 @@ def draw_keras_history(history, output_dir='.', output_name='loss.pdf'):
     fig.set_tight_layout(True)
 
     # lns = l1 + l2 + l3 + l4
-    lns = l1 + l2
-    labs = [l.get_label() for l in lns]
-    ax.legend(lns, labs, loc='best', numpoints=1, frameon=False)
+    #lns = l1 + l2
+    #labs = [l.get_label() for l in lns]
+    #ax.legend(lns, labs, loc='best', numpoints=1, frameon=False)
+    ax.legend(loc='best', numpoints=1, frameon=False)
 
     fig.savefig(os.path.join(output_dir, output_name))
 
