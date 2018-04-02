@@ -4,8 +4,6 @@ import os
 import yaml
 import glob
 
-#usage: python listHisto.py [yields]
-from ROOT import TFile
 import argparse
 
 parser = argparse.ArgumentParser(description='Facility to produce the yml with plots information.')
@@ -23,12 +21,12 @@ if not os.path.exists(args.directory):
     parser.error("%r does not exists" % args.directory)
 
 rootDir = args.directory
-condorDir = os.path.join(rootDir, "condor/output")
+slurmDir = os.path.join(rootDir, "slurm/output")
 
-# Find a ROOT file in condor output directory
-root_files = glob.glob(os.path.join(condorDir, "*.root"))
+# Find a ROOT file in slurm output directory
+root_files = glob.glob(os.path.join(slurmDir, "*.root"))
 if len(root_files) == 0:
-    raise Exception("No ROOT files found in %r" % condorDir)
+    raise Exception("No ROOT files found in %r" % slurmDir)
 
 fileName = ""
 for file in root_files:
@@ -41,6 +39,7 @@ print("Listing histograms found in %r" % fileName)
 if args.unblinded:
     print("WARNING -- PRODUCING UNBLINDED PLOTS")
 
+from ROOT import TFile
 file = TFile.Open(fileName) 
 keys = file.GetListOfKeys() 
 alreadyIn = []
@@ -60,7 +59,7 @@ with open('hh_plotter_all.yml.tpl') as tpl_handle:
 # Configure root directory
 with open('centralConfig.yml.tpl') as tpl_handle:
     tpl = tpl_handle.read()
-    tpl = tpl.format(root=condorDir)
+    tpl = tpl.format(root=slurmDir)
     with open('centralConfig.yml', 'w') as f:
         f.write(tpl)
 
@@ -340,6 +339,10 @@ for key in keys:
             if args.yields:
                 plots['override'] = True
         
+        elif "lljj_M_" in key_name:
+            plot['x-axis'] = "m_{lljj} (GeV)"
+            plot.update(defaultStyle_events_per_gev)
+
         elif "jj_M_" in key_name and "_vs_" not in key_name:
             plot['x-axis'] = "m_{jj} (GeV)"
             plot.update(defaultStyle_events_per_gev)
