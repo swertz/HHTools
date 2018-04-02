@@ -76,6 +76,9 @@ def default_code_before_loop():
             }
         }
         
+        shouldCheckResonantSignalPoint = false;
+        shouldCheckNonResonantSignalPoint = false;
+        
         auto checkResonantSignalPoint = [shouldCheckResonantSignalPoint, shouldCheckNonResonantSignalPoint, resonantSignalMass](double m) -> bool {
             if (shouldCheckNonResonantSignalPoint)
                 return false;
@@ -135,7 +138,7 @@ def default_headers():
             "flavor_weighted_btag_efficiency_on_bdt.h",
             "KerasModelEvaluator.h",
             "TMVAEvaluator.h",
-            "LWTNNEvaluator.h"
+            "LWTNNEvaluator.h",
             ]
 
 def default_include_directories(scriptDir):
@@ -546,6 +549,7 @@ class BasePlotter:
         self.genht_plot = []
 
         self.forSkimmer_plot = []
+        self.event_number_plot = []
 
         for cat in categories:
 
@@ -569,7 +573,7 @@ class BasePlotter:
                         'plot_cut': self.totalCut,
                         'binning': '(2, 0, 2)'
                 })
-            
+                
             # Neural network output
             def skimSignal2DCut(*args):
                 if len(args) == 1:
@@ -1313,6 +1317,26 @@ class BasePlotter:
                     'plot_cut': self.totalCut,
                     'binning': '(2, 0, 2)',
                     'type': 'bool'
+                },
+            ])
+            self.event_number_plot.extend([
+                {
+                    'name': 'event_run_%s_%s_%s%s'%(self.llFlav, self.suffix, self.extraString, self.systematicString),
+                    'variable': "event_run",
+                    'plot_cut': self.totalCut,
+                    'binning': '(500, -10000, 10000)'
+                },
+                {
+                    'name': 'event_lumi_%s_%s_%s%s'%(self.llFlav, self.suffix, self.extraString, self.systematicString),
+                    'variable': "event_lumi",
+                    'plot_cut': self.totalCut,
+                    'binning': '(500, -10000, 10000)'
+                },
+                {
+                    'name': 'event_event_%s_%s_%s%s'%(self.llFlav, self.suffix, self.extraString, self.systematicString),
+                    'variable': "event_event",
+                    'plot_cut': self.totalCut,
+                    'binning': '(500, -10000, 10000)'
                 },
             ])
             

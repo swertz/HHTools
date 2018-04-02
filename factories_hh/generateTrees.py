@@ -62,6 +62,8 @@ flavour = "All"
 categories = [flavour]
 
 plots_for_branches = []
+if "event" in branch_families:
+    plots_for_branches += ["event_number"]
 if "basic" in branch_families:
     plots_for_branches += ["mjj", "basic", "nn_inputs", "other", "forSkimmer", "cmva", "evt"]
 if "gen" in branch_families:
@@ -94,7 +96,7 @@ if do_lljj:
 else:
     basePlotter = BasePlotter(btag=True)
 
-tree["cut"] = basePlotter.joinCuts(basePlotter.sanityCheck, basePlotter.dict_cat_cut[flavour])
+tree["cut"] = basePlotter.joinCuts(basePlotter.sanityCheck, basePlotter.dict_cat_cut[flavour], basePlotter.dict_stage_cut[stage])
 
 plots = basePlotter.generatePlots(categories, stage, systematic="nominal", weights=[], requested_plots=plots_for_branches)
 
