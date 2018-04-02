@@ -26,6 +26,8 @@
 const std::vector< std::map<std::string, double> > clustering_couplings;
 const std::vector< std::string > clustering_coupling_names;
 
+enum class BMVER { V1, V3 };
+
 // couplings for "v1" benchmarks
 const std::map< int, std::map<std::string, double> > benchmark_couplings_v1 {
     // SM
@@ -285,7 +287,7 @@ class HHEFTReweighter {
         ////////////////////  CLUSTERING MODEL ////////////////////////////
         ///////////////////////////////////////////////////////////////////
 
-        double getBenchmarkME(const LorentzVector& h1, const LorentzVector& h2, const int bm, double alpha_s=0);
+        double getBenchmarkME(const LorentzVector& h1, const LorentzVector& h2, const int bm, double alpha_s=0, BMVER ver=BMVER::V3);
 
         double getACParamsME(const LorentzVector& h1, const LorentzVector& h2, const std::map<std::string, double>& params, double alpha_s=0);
 

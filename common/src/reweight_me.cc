@@ -9,15 +9,18 @@ HHEFTReweighter& getHHEFTReweighter(std::string ME_dir) {
 ////////////////////  CLUSTERING MODEL ////////////////////////////
 ///////////////////////////////////////////////////////////////////
 
-double HHEFTReweighter::getBenchmarkME(const LorentzVector& h1, const LorentzVector& h2, const int bm, double alpha_s) {
+double HHEFTReweighter::getBenchmarkME(const LorentzVector& h1, const LorentzVector& h2, const int bm, double alpha_s, BMVER ver) {
     // enforce the on-shell mass
     auto shell_h1 = put_on_shell(h1, 125);
     auto shell_h2 = put_on_shell(h2, 125);
 
     std::pair< std::vector<double>, std::vector<double> > initials = getInitialsFromHiggses(shell_h1, shell_h2);
     std::vector< std::pair<int, std::vector<double>> > finals = { { 25, LORENTZ_TO_ARRAY(shell_h1) }, { 25, LORENTZ_TO_ARRAY(shell_h2) } };
-
-    return (*m_evaluator_AC)(benchmark_couplings_v3.at(bm), 21, 21, initials, finals, alpha_s);
+    
+    if (ver == BMVER::V1)
+        return (*m_evaluator_AC)(benchmark_couplings_v1.at(bm), 21, 21, initials, finals, alpha_s);
+    else
+        return (*m_evaluator_AC)(benchmark_couplings_v3.at(bm), 21, 21, initials, finals, alpha_s);
 }
 
 double HHEFTReweighter::getACParamsME(const LorentzVector& h1, const LorentzVector& h2, const std::map<std::string, double>& params, double alpha_s) {
