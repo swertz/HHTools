@@ -229,13 +229,16 @@ def drawNNOutput(background_training_predictions, background_testing_predictions
             output=os.path.join(output_dir, "ranges_" + output_name)
             )
 
-def drawNNVersusVar(predictions, var, weights, bins, output_dir=".", output_name="nn_output_vs_var.pdf"):
-    fig = plt.figure(1, figsize=(7, 7), dpi=300)
+def drawNNVersusVar(predictions, var, weights, bins, output_dir=".", output_name="nn_output_vs_var.pdf", logZ=False):
+    fig = plt.figure(1, figsize=(6, 6), dpi=300)
     ax = fig.add_subplot(111)
     
     hist, xedges, yedges = np.histogram2d(predictions, var, bins=bins, weights=weights)
     X, Y = np.meshgrid(xedges, yedges)
-    cm = ax.pcolormesh(X, Y, hist.T, norm=colors.LogNorm(vmin=hist.min() + 1e-3, vmax=hist.max()))
+    if logZ:
+        cm = ax.pcolormesh(X, Y, hist.T, norm=colors.LogNorm(vmin=hist.min() + 1e-3, vmax=hist.max()))
+    else:
+        cm = ax.pcolormesh(X, Y, hist.T)
     fig.colorbar(cm)
     fig.text(0.05, 0.95, "Pearson r: {}".format(np.corrcoef([predictions, var])[1,0]), bbox={"facecolor": "white"})
 
@@ -317,13 +320,14 @@ def draw_roc(signal, background, output_dir=".", output_name="roc.pdf"):
     x, y = get_roc(signal, background)
     auc = metrics.auc(x, y, reorder=True)
 
-    fig = plt.figure(1, figsize=(7, 7), dpi=300)
+    fig = plt.figure(1, figsize=(6, 6), dpi=300)
     fig.clear()
 
     # Create an axes instance
     ax = fig.add_subplot(111)
 
     ax.plot(x, y, '-', color='#B64926', lw=2, label="AUC: %.4f" % auc)
+    ax.plot([0, 1], [0, 1], ':', color='black', lw=2, label="Random cut")
     ax.margins(0.05)
 
     ax.set_xlabel("Background efficiency")
@@ -363,7 +367,7 @@ def draw_keras_history(history, output_dir='.', output_name='loss.pdf'):
       history:  Keras training history
     """
 
-    fig = plt.figure(1, figsize=(7, 7), dpi=300)
+    fig = plt.figure(1, figsize=(6, 6), dpi=300)
     fig.clear()
 
     # Create an axes instance
@@ -372,12 +376,12 @@ def draw_keras_history(history, output_dir='.', output_name='loss.pdf'):
     if 'loss' in history.history.keys():
         training_losses = history.history['loss']
         epochs = np.arange(0, len(training_losses))
-        l1 = ax.semilogy(epochs, training_losses, '-', color='#8E2800', lw=2, label="Training loss")
+        l1 = ax.plot(epochs, training_losses, '-', color='#8E2800', lw=2, label="Training loss")
     
     if 'val_loss' in history.history.keys():
         validation_losses = history.history['val_loss']
         epochs = np.arange(0, len(validation_losses))
-        l2 = ax.semilogy(epochs, validation_losses, '-', color='#468966', lw=2, label="Validation loss")
+        l2 = ax.plot(epochs, validation_losses, '-', color='#468966', lw=2, label="Validation loss")
 
     ax.set_xlabel("Epochs")
     ax.set_ylabel("Loss")
@@ -431,19 +435,62 @@ def drawDNNFlux(masses, predictions, title="", output_dir=".", output_name="flux
 def plotHistories(loss_history, output_dir, output_name):
     fig, ax = plt.subplots(3, 1, dpi=300)
 
-    values = np.array(loss_history["f"])
-    ax[0].plot(range(len(values)), values, label="full", color="blue")
-    ax[0].legend(loc="upper right")
-    
     values = np.array(loss_history["d"])
-    ax[1].plot(range(len(values)), values, label="discr", color="green")
-    ax[1].legend(loc="upper right")
+    ax[0].plot(range(len(values)), values, color="blue")
+    #ax[0].legend(loc="upper right")
+    ax[0].set_ylabel("Discr. loss")
     
     values = np.array(loss_history["a"])
-    ax[2].plot(range(len(values)), values, label="advers", color="red")
-    ax[2].legend(loc="upper right")
+    ax[1].plot(range(len(values)), values, color="green")
+    #ax[1].legend(loc="lower right")
+    ax[1].set_ylabel("Advers. loss")
 
+    values = np.array(loss_history["f"])
+    ax[2].plot(range(len(values)), values, color="red")
+    #ax[2].legend(loc="lower right")
+    ax[2].set_ylabel("Total loss")
+    ax[2].set_xlabel("Iterations")
+    
     fig.set_tight_layout(True)
     fig.savefig(os.path.join(output_dir, output_name))
 
+    plt.close()
+
+def drawPredictedRatio(discr, advers, data, nuisance, targets, weights, folder, output, only_bkg=False, n_bins=200, scaling=10):
+    targets = targets[:,0].astype(bool)
+    sum_wgt_sig = np.sum(weights[targets])
+    sum_wgt_bkg = np.sum(weights[~targets])
+    # Make sure signals and backgrounds are normalised
+    weights[~targets] /= sum_wgt_bkg
+    weights[targets] /= sum_wgt_sig
+    
+    if only_bkg:
+        data = data[~targets]
+        nuisance = nuisance[~targets]
+        weights = weights[~targets]
+
+    fig = plt.figure(1, figsize=(6, 6), dpi=300)
+    fig.clear()
+
+    ax = fig.add_subplot(111)
+
+    reg_0 = nuisance#[:,0].astype(bool)
+    #reg_1 = nuisance[:,1].astype(bool)
+
+    scores = discr.predict(data, batch_size=20000)
+
+    hist_0, bins, _ = ax.hist(scores[reg_0], n_bins, (0,1), weights=scaling*weights[reg_0], histtype='step', label='Region 1')
+    total, _, _ = ax.hist(scores, bins, weights=scaling*weights, histtype='step', label='Total')
+
+    #total = hist_0 + hist_1
+    ratio = np.true_divide(hist_0, total)
+
+    bin_center = 0.5*(bins[0:-1] + bins[1:])
+    pred_ratio = advers.predict(bin_center)[:,0]
+    ax.plot(bin_center, pred_ratio, label='Advers output')
+
+    ax.plot(bin_center, ratio, 'o', label='Hist ratio')
+
+    ax.legend()
+    fig.savefig(os.path.join(folder, output))
     plt.close()

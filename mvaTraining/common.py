@@ -14,7 +14,7 @@ from scipy.stats import norm
 
 from ROOT import TChain, TFile, TTree
 
-from root_numpy import tree2array
+from root_numpy import tree2array, rec2array
 
 from sklearn.model_selection import train_test_split
 from sklearn.utils import shuffle, safe_indexing
@@ -39,7 +39,7 @@ INPUT_FOLDER = '/nfs/scratch/fynu/swertz/CMSSW_8_0_25/src/cp3_llbb/HHTools/slurm
 HAVE_GPU = 'ingrid-ui8' in socket.gethostname()
 
 def format_nonresonant_parameters(param):
-    X_Y =  "{:.2f}_{:.2f}".format(kl, kt).replace(".", "p").replace("-", "m")
+    X_Y =  "{:.2f}_{:.2f}".format(*param).replace(".", "p").replace("-", "m")
 
     return X_Y
 
@@ -100,6 +100,37 @@ nonresonant_signals = {}
 for grid_point in nonresonant_parameters:
     X_Y = format_nonresonant_parameters(grid_point)
     nonresonant_signals[grid_point] = 'GluGluToHHTo2B2VTo2L2Nu_point_{}_13TeV-madgraph_*_histos.root'.format(X_Y)
+
+
+def print_t(t, m=None):
+    """
+    Print the tensor, shape, min, max, mean, and optional message.
+    Use as: tensor = print_t(tensor)
+    """
+    return tf.Print(t, [t, K.shape(t), K.min(t), K.max(t), K.mean(t)], message=m + ": ")
+
+class LinearLRScheduler:
+    def __init__(self, model, lr, factor, nb_epochs):
+        """Will apply linear decay of the learning rate, of a factor 'factor' after 'nb_epochs' epochs."""
+        self.model = model
+        self.lr = lr
+        self.factor = factor
+        self.nb_epochs = nb_epochs
+        K.set_value(model.optimizer.lr, lr)
+
+    def sched(self, epo):
+        lr = self.lr * (1 - (1 - 1./self.factor) / self.nb_epochs * epo)
+        K.set_value(self.model.optimizer.lr, lr)
+
+def PowerLayer(n):
+    """From in input tensor x of shape (None, 1), return a concatenated tensor with [x, x**2, ..., x**n]"""
+    def f(x):
+        outputs = [x]
+        for i in range(2, n + 1):
+            outputs.append(K.pow(x, i + 1))
+        return K.concatenate(outputs)
+    return Lambda(f)
+
 
 def make_parallel(model, gpu_count):
     """
@@ -205,9 +236,6 @@ def create_nonresonant_model(n_inputs, n_neurons=100, n_hidden_layers=4, lr=0.00
 
 
 def create_LSMI_model(n_inputs, n_neurons=100, n_hidden_layers=4, lr=0.01, dropout=0.35, do_dropout=True, l2_param=0, batch_norm=False, activation="elu", init="he_uniform", lamb=1, lsmi_l2=0, sigma_x=1, sigma_y=1):
-    def print_t(t, m=None):
-        return tf.Print(t, [t, K.shape(t), K.min(t), K.max(t), K.mean(t)], message=m + ": ")
-
     def gauss_kernel(x, xp, sigma):
         return tf.exp(-tf.square(x - xp) / (2 * sigma**2))
 
@@ -305,19 +333,13 @@ def create_LSMI_model(n_inputs, n_neurons=100, n_hidden_layers=4, lr=0.01, dropo
 
 def create_adversarial_model(n_inputs, n_comp, lamb):
 
-    def print_t(t, m=None):
-        return tf.Print(t, [t, K.shape(t), K.min(t), K.max(t), K.mean(t)], message=m)
-
     def make_discr_loss(c):
         def loss(true, pred):
             return c * K.binary_crossentropy(true, pred)
         return loss
 
-    def make_advers_loss(c):
-        def loss_mse(true, pred):
-            return c * K.mean_squared_error(true, pred)
-
-        def loss_mdn(true, params):
+    def make_mdn_loss(c):
+        def loss(true, params):
 
             #true = true[:, 0]
             #true = K.expand_dims(true, 1)
@@ -345,72 +367,101 @@ def create_adversarial_model(n_inputs, n_comp, lamb):
             nll = -(max_exponent + K.logsumexp(exponents - max_exponent_repeated, axis=1))
 
             return c * K.mean(nll)
+        return loss
 
-        def loss_cce(true, pred):
-            return c * K.categorical_crossentropy(true, pred)
-
-        return loss_cce
+    def make_combined_loss(target):
+        def loss(true, pred):
+            # Make adversarial loss zero on the signal -- for which target=1
+            # We need to keep the batch structure since every entry will be weighted by the event weight
+            return (1 - target) * K.binary_crossentropy(true, pred)
+        return loss
 
     def make_trainable(M, trainable=True):
         for l in M.layers:
             l.trainable = trainable
         M.trainable = trainable
 
+    discr_n_nodes = 100
+    discr_n_layers = 4
+    discr_activation = "relu"
+    discr_dropout = 0.3
+    discr_batchnorm = True
+    discr_l2 = 1e-7
+    init = "glorot_uniform"
+
     # Define input tensor
-    main_input = Input(shape=(n_inputs,))
+    main_input = Input(name="discr_input", shape=(n_inputs,))
 
     # Intermediate tensors for discriminating network
-    discr_tensor = Dense(100, activation="relu")(main_input)
-    discr_tensor = Dense(100, activation="relu")(discr_tensor)
-    discr_tensor = Dense(100, activation="relu")(discr_tensor)
-    discr_tensor = Dense(100, activation="relu")(discr_tensor)
-    discr_tensor = Dropout(0.3)(discr_tensor)
-    discr_tensor = Dense(1, activation='sigmoid')(discr_tensor)
+
+    if discr_batchnorm:
+        discr_tensor = BatchNormalization()(main_input)
+    else:
+        discr_tensor = main_input
+    for i in range(1 + discr_n_layers):
+        discr_tensor = Dense(discr_n_nodes, activation=discr_activation, kernel_initializer=init, kernel_regularizer=l2(discr_l2))(discr_tensor)
+        if discr_batchnorm:
+            discr_tensor = BatchNormalization()(discr_tensor)
+    if discr_dropout is not None:
+        discr_tensor = Dropout(discr_dropout)(discr_tensor)
+    discr_tensor = Dense(1, activation='sigmoid', kernel_initializer='glorot_uniform', name='discr_output')(discr_tensor)
     
     # Training model
-    discr_model = Model(inputs=main_input, outputs=discr_tensor)
+    discr_model = Model(inputs=main_input, outputs=discr_tensor, name="discr_model")
 
     # Adversarial network: takes as input the training output
-    advers_tensor = discr_tensor
-    advers_tensor = Dense(5, activation="relu")(advers_tensor)
-    advers_tensor = Dense(5, activation="relu")(advers_tensor)
-    advers_tensor = Dense(5, activation="relu")(advers_tensor)
-    #advers_tensor = Dense(50, activation="relu")(advers_tensor)
+    activation = "selu"
+    kernel_init = "he_normal"
+    n_power = 3
+    n_nodes = 100
+    n_layers = 5
+    dropout = 0.5
+    
+    advers_input = Input(shape=(1,), name="advers_input")
+    advers_tensor = BatchNormalization()(advers_input)
+    if n_power > 0:
+        advers_tensor = BatchNormalization()(PowerLayer(n_power)(advers_tensor))
+    for i in range(n_layers):
+        advers_tensor = BatchNormalization()(Dense(n_nodes, activation=activation, kernel_initializer=kernel_init)(advers_tensor))
+    if dropout > 0:
+        advers_tensor = Dropout(dropout)(advers_tensor)
     
     # Different outputs for MDN
     #mu = Dense(n_comp, activation="linear", kernel_initializer='glorot_uniform')(advers_tensor)
     #sigma = Dense(n_comp, activation="relu", kernel_initializer='glorot_uniform')(advers_tensor)
     #pi = Dense(n_comp, activation="softmax")(advers_tensor)
     #advers_tensor = concatenate([mu, sigma, pi])
-    #advers_tensor = mu
+    #advers_tensor = Dense(n_comp, activation="softmax")(advers_tensor)
 
     # Categorical adversary
-    advers_tensor = Dense(n_comp, activation="softmax")(advers_tensor)
+    advers_tensor = Dense(n_comp, activation="sigmoid", name="advers_output")(advers_tensor)
+    advers_model = Model(inputs=advers_input, outputs=advers_tensor, name="advers_model")
     
-    # Adversarial model
-    advers_model = Model(inputs=main_input, outputs=advers_tensor)
+    # Adversarial model -- with discriminator nodes
+    advers_full_model = Model(inputs=main_input, outputs=advers_model(discr_tensor), name="advers_model_with_discr")
 
-    # "Full" model: combines both networks
-    full_model = Model(inputs=main_input, outputs=[discr_tensor, advers_tensor])
-    
-    #optimizer = SGD(lr=0.000001)
-    optimizer_discr = Adam(lr=0.002)
-    optimizer_advers = Adam(lr=0.0001)
-    optimizer_full = Adam(lr=0.5)
+    # "Full" model: combines both networks -- only discriminator trainable
+    target_input = Input(shape=(1,))
+    discr_full_model = Model(inputs=[main_input, target_input], outputs=[discr_tensor, advers_model(discr_tensor)], name="discr_model with advers")
     
     # First compile discriminating network
-    discr_model.compile(loss='binary_crossentropy', optimizer=optimizer_discr, metrics=['accuracy'])
+    discr_model.compile(loss='binary_crossentropy', optimizer=Adam(lr=2e-5), metrics=['accuracy'])
     
     # Freeze discriminating network, compile adversarial (includes discr.!)
-    make_trainable(discr_model, False)
-    advers_model.compile(loss=make_advers_loss(c=1), optimizer=optimizer_advers)
+    #make_trainable(advers_full_model, True)
+    #make_trainable(discr_model, False)
+    #advers_full_model.compile(loss='binary_crossentropy', optimizer=Adam(lr=1e-6))
+    #advers_full_model.compile(loss=make_advers_loss(c=1), optimizer=Adam(lr=5e-5))
+    advers_model.compile(loss='binary_crossentropy', optimizer=Adam(lr=1e-4))
 
     # Compile full model with both losses: discriminating is trainable, adversarial is not
+    # Careful about the ordere of these calls!
+    make_trainable(discr_full_model, False)
     make_trainable(discr_model, True)
-    make_trainable(advers_model, False)
-    full_model.compile(loss=[make_discr_loss(c=1), make_advers_loss(c=-lamb)], optimizer=optimizer_full)
+    discr_full_model.trainable = True
+    discr_full_model.compile(loss=['binary_crossentropy', make_combined_loss(target=target_input)], loss_weights=[1, -lamb], optimizer=Adam(lr=2e-5))
 
-    return discr_model, advers_model, full_model
+    return discr_model, advers_model, discr_full_model, advers_full_model
 
 
 def join_expression(*exprs):
@@ -503,6 +554,7 @@ def tree_to_numpy(input_file, variables, weight, cut=None, reweight_to_cross_sec
     # Convert to plain numpy arrays
     # dataset = dataset.view((dataset.dtype[0], len(variables))).copy()
     #dataset = np.array(dataset.tolist(), dtype=np.float32)
+    dataset = rec2array(dataset)
 
     if n:
         print("Reading only {} from input tree".format(n))
@@ -570,6 +622,8 @@ class DatasetManager:
             p[1].append(len(dataset))
 
             if add_mass_column:
+                # FIXME -- if parameterised, convert to plain numpy array,
+                # otherwise keep it as a structured array
                 mass_col = np.empty(len(dataset)) # dtype=[('resonant_mass', '<f4')])
                 mass_col.fill(m)
                 dataset = np.c_[dataset, mass_col]
@@ -587,7 +641,7 @@ class DatasetManager:
 
         print("Done. Number of signal events: %d ; Sum of weights: %.4f" % (len(self.signal_dataset), np.sum(self.signal_weights)))
 
-    def load_nonresonant_signal(self, parameters_list=nonresonant_parameters, add_parameters_columns=False, fraction=1, parameters_shift=None):
+    def load_nonresonant_signal(self, parameters_list=nonresonant_parameters, add_parameters_columns=False, fraction=1, parameters_shift=None, reweight_to_cross_section=False):
 
         self.nonresonant_parameters_list = self._user_to_positive_parameters_list(parameters_list, parameters_shift)
 
@@ -606,7 +660,7 @@ class DatasetManager:
             dataset = []
             weight = []
             for f in files:
-                dataset_, weight_ = tree_to_numpy(f, self.variables + self.extra_variables, self.weight_expression, self.selection, reweight_to_cross_section=True)
+                dataset_, weight_ = tree_to_numpy(f, self.variables + self.extra_variables, self.weight_expression, self.selection, reweight_to_cross_section=reweight_to_cross_section)
                 weight.append(weight_)
                 dataset.append(dataset_)
 
@@ -636,7 +690,7 @@ class DatasetManager:
         self.signal_weights = np.concatenate(weights)
         self.nonresonant_parameters_probabilities = p
 
-        print("Done. Number of signal events: %d ; Sum of weights: %.4f" % (len(self.signal_dataset), np.sum(self.signal_weights)))
+        print("Done. Number of signal events: %d ; Sum of weights: %.10f" % (len(self.signal_dataset), np.sum(self.signal_weights)))
 
     def load_backgrounds(self, add_mass_column=False, add_parameters_columns=False):
 
@@ -710,14 +764,12 @@ class DatasetManager:
         Split datasets into a training and testing samples
 
         Parameter:
-            reweight_background_training_sample: If true, the background training sample is reweighted so that the sum of weights of signal and background are the same
+            reweight_signal_training_sample: If true, the signal training sample is reweighted so that the sum of weights of signal and background are the same
+            reweight_signal_testing_sample: If true, the signal testing sample is reweighted so that the sum of weights of signal and background are the same
         """
 
         self.train_signal_dataset, self.test_signal_dataset, self.train_signal_weights, self.test_signal_weights = train_test_split(self.signal_dataset, self.signal_weights, test_size=test_size, random_state=42)
         self.train_background_dataset, self.test_background_dataset, self.train_background_weights, self.test_background_weights = train_test_split(self.background_dataset, self.background_weights, test_size=test_size, random_state=42)
-
-        self.test_background_weights /= test_size
-        self.test_signal_weights /= test_size
 
         if reweight_signal_training_sample:
             sumw_train_signal = np.sum(self.train_signal_weights)
@@ -736,17 +788,22 @@ class DatasetManager:
             print("Signal testing sample reweighted so that sum of event weights for signal and background match. Sum of event weight = %.4f" % (np.sum(self.test_signal_weights)))
 
         # Create merged training and testing dataset, with targets
-        self.training_dataset = np.concatenate([self.train_signal_dataset, self.train_background_dataset])
-        self.training_weights = np.concatenate([self.train_signal_weights, self.train_background_weights])
-        self.testing_dataset = np.concatenate([self.test_signal_dataset, self.test_background_dataset])
-        self.testing_weights = np.concatenate([self.test_signal_weights, self.test_background_weights])
+        self.training_dataset = np.vstack((self.train_signal_dataset, self.train_background_dataset))
+        self.training_weights = np.hstack((self.train_signal_weights, self.train_background_weights))
+        self.testing_dataset = np.vstack((self.test_signal_dataset, self.test_background_dataset))
+        self.testing_weights = np.hstack((self.test_signal_weights, self.test_background_weights))
 
-        # Create one-hot vector, the target of the training
-        # A hot-vector is a N dimensional vector, where N is the number of classes
-        # Here we assume that class 0 is signal, and class 1 is background
-        # So we have [1 0] for signal and [0 1] for background
-        self.training_targets = np.array([1] * len(self.train_signal_dataset) + [0] * len(self.train_background_dataset)).reshape((-1,1))
-        self.testing_targets = np.array([1] * len(self.test_signal_dataset) + [0] * len(self.test_background_dataset)).reshape((-1,1))
+        # Create target variable (1 for signal, 0 for background)
+        #self.training_targets = np.concatenate(np.array([1] * len(self.train_signal_dataset) + [0] * len(self.train_background_dataset)).reshape((-1,1))
+        #self.testing_targets = np.array([1] * len(self.test_signal_dataset) + [0] * len(self.test_background_dataset)).reshape((-1,1))
+        self.training_targets = np.vstack((
+                np.ones((self.train_signal_dataset.shape[0], 1)), 
+                np.zeros((self.train_background_dataset.shape[0], 1))
+            ))
+        self.testing_targets = np.vstack((
+                np.ones((self.test_signal_dataset.shape[0], 1)), 
+                np.zeros((self.test_background_dataset.shape[0], 1))
+            ))
 
         # Shuffle everything
         self.training_dataset, self.training_weights, self.training_targets = shuffle(self.training_dataset, self.training_weights, self.training_targets, random_state=42)
@@ -758,23 +815,37 @@ class DatasetManager:
         # We've been working with structured arrays
         # => use regular arrays, and split between variables and extra variables
 
-        self.training_extra_dataset         = to_array(self.training_dataset[self.extra_variables])
-        self.training_dataset               = to_array(self.training_dataset[self.variables])
+        self.training_extra_dataset         = self.training_dataset[:,len(self.variables):]
+        self.training_dataset               = self.training_dataset[:,:len(self.variables)]
         
-        self.testing_extra_dataset          = to_array(self.testing_dataset[self.extra_variables])
-        self.testing_dataset                = to_array(self.testing_dataset[self.variables])
+        self.testing_extra_dataset          = self.testing_dataset[:,len(self.variables):]
+        self.testing_dataset                = self.testing_dataset[:,:len(self.variables)]
 
-        self.train_signal_extra_dataset     = to_array(self.train_signal_dataset[self.extra_variables])
-        self.train_signal_dataset           = to_array(self.train_signal_dataset[self.variables])
+        self.train_signal_extra_dataset     = self.train_signal_dataset[:,len(self.variables):]
+        self.train_signal_dataset           = self.train_signal_dataset[:,:len(self.variables)]
         
-        self.test_signal_extra_dataset      = to_array(self.test_signal_dataset[self.extra_variables])
-        self.test_signal_dataset            = to_array(self.test_signal_dataset[self.variables])
+        self.test_signal_extra_dataset      = self.test_signal_dataset[:,len(self.variables):]
+        self.test_signal_dataset            = self.test_signal_dataset[:,:len(self.variables)]
 
-        self.train_background_extra_dataset = to_array(self.train_background_dataset[self.extra_variables])
-        self.train_background_dataset       = to_array(self.train_background_dataset[self.variables])
+        self.train_background_extra_dataset = self.train_background_dataset[:,len(self.variables):]
+        self.train_background_dataset       = self.train_background_dataset[:,:len(self.variables)]
 
-        self.test_background_extra_dataset  = to_array(self.test_background_dataset[self.extra_variables])
-        self.test_background_dataset        = to_array(self.test_background_dataset[self.variables])
+        self.test_background_extra_dataset  = self.test_background_dataset[:,len(self.variables):]
+        self.test_background_dataset        = self.test_background_dataset[:,:len(self.variables)]
+
+    def normalise_training_weights(self):
+        """Normalise training weights s.t. sum(sig&bkg weights) = number of sig&bkg events"""
+        ratio = len(self.training_weights) / np.sum(self.training_weights)
+        self.training_weights *= ratio
+        self.train_signal_weights *= ratio
+        self.train_background_weights *= ratio
+
+    def normalise_testing_weights(self):
+        """Normalise testing weights s.t. sum(sig&bkg weights) = number of sig&bkg events"""
+        ratio = len(self.testing_weights) / np.sum(self.testing_weights)
+        self.testing_weights *= ratio
+        self.test_signal_weights *= ratio
+        self.test_background_weights *= ratio
         
     def get_training_datasets(self):
         return self.train_signal_dataset, self.train_background_dataset
@@ -915,14 +986,14 @@ def draw_nn_vs_independent(model, dataset, bins, output_folder):
 
 def draw_non_resonant_training_plots(model, dataset, output_folder, split_by_parameters=False):
 
-    # plot(model, to_file=os.path.join(output_folder, "model.pdf"))
+    #plot(model, to_file=os.path.join(output_folder, "model.pdf"))
 
-    ## Draw inputs
-    #output_input_plots = os.path.join(output_folder, 'inputs')
-    #if not os.path.exists(output_input_plots):
-    #    os.makedirs(output_input_plots)
+    # Draw inputs
+    output_input_plots = os.path.join(output_folder, 'inputs')
+    if not os.path.exists(output_input_plots):
+        os.makedirs(output_input_plots)
 
-    #dataset.draw_inputs(output_input_plots)
+    dataset.draw_inputs(output_input_plots)
 
     training_dataset, training_targets = dataset.get_training_combined_dataset_and_targets()
     training_weights = dataset.get_training_combined_weights()
@@ -944,21 +1015,23 @@ def draw_non_resonant_training_plots(model, dataset, output_folder, split_by_par
 
     ## NN output
     plotTools.drawNNOutput(training_background_predictions, testing_background_predictions,
-                 training_signal_predictions, testing_signal_predictions,
-                 training_background_weights, testing_background_weights,
-                 training_signal_weights, testing_signal_weights,
-                 output_dir=output_folder, output_name="nn_output.pdf", bins=50, 
-                 
-                 #testing_signal_indices=[ (dataset.test_signal_extra_dataset > 75) & (dataset.test_signal_extra_dataset <= 140), ~((dataset.test_signal_extra_dataset > 75) & (dataset.test_signal_extra_dataset <= 140))],
-                 #testing_background_indices=[ (dataset.test_background_extra_dataset > 75) & (dataset.test_background_extra_dataset <= 140), ~((dataset.test_background_extra_dataset > 75) & (dataset.test_background_extra_dataset <= 140)) ],
-                 #indices_ranges=["SR", "BR"]
-                 testing_signal_indices=[ dataset.test_signal_extra_dataset <= 75, (dataset.test_signal_extra_dataset > 75) & (dataset.test_signal_extra_dataset <= 140), dataset.test_signal_extra_dataset > 140 ],
-                 testing_background_indices=[ dataset.test_background_extra_dataset <= 75, (dataset.test_background_extra_dataset > 75) & (dataset.test_background_extra_dataset <= 140), dataset.test_background_extra_dataset > 140 ],
-                 indices_ranges=["mjj < 75", "75 < mjj < 140", "mjj > 140"]
-                 )
+            training_signal_predictions, testing_signal_predictions,
+            training_background_weights, testing_background_weights,
+            training_signal_weights, testing_signal_weights,
+            output_dir=output_folder, output_name="nn_output.pdf", bins=50, 
+
+            #testing_signal_indices=[ (dataset.test_signal_extra_dataset[:,0] > 75) & (dataset.test_signal_extra_dataset[:,0] <= 140), ~((dataset.test_signal_extra_dataset[:,0] > 75) & (dataset.test_signal_extra_dataset[:,0] <= 140))],
+            #testing_background_indices=[ (dataset.test_background_extra_dataset[:,0] > 75) & (dataset.test_background_extra_dataset[:,0] <= 140), ~((dataset.test_background_extra_dataset[:,0] > 75) & (dataset.test_background_extra_dataset[:,0] <= 140)) ],
+            testing_signal_indices=[ dataset.test_signal_extra_dataset[:,0].astype(bool), ~(dataset.test_signal_extra_dataset[:,0].astype(bool)) ],
+            testing_background_indices=[ dataset.test_background_extra_dataset[:,0].astype(bool), ~(dataset.test_background_extra_dataset[:,0].astype(bool)) ],
+            indices_ranges=["SR", "BR"]
+            #testing_signal_indices=[ dataset.test_signal_extra_dataset <= 75, (dataset.test_signal_extra_dataset > 75) & (dataset.test_signal_extra_dataset <= 140), dataset.test_signal_extra_dataset > 140 ],
+            #testing_background_indices=[ dataset.test_background_extra_dataset <= 75, (dataset.test_background_extra_dataset > 75) & (dataset.test_background_extra_dataset <= 140), dataset.test_background_extra_dataset > 140 ],
+            #indices_ranges=["mjj < 75", "75 < mjj < 140", "mjj > 140"]
+            )
 
     # ROC curve
-    binned_training_background_predictions, _, bins = plotTools.binDataset(training_background_predictions, training_background_weights, bins=50, range=[0, 1])
+    binned_training_background_predictions, _, bins = plotTools.binDataset(training_background_predictions, training_background_weights, bins=1000, range=[0, 1])
     binned_training_signal_predictions, _, _ = plotTools.binDataset(training_signal_predictions, training_signal_weights, bins=bins)
     plotTools.draw_roc(binned_training_signal_predictions, binned_training_background_predictions, output_dir=output_folder, output_name="roc_curve.pdf")
 
