@@ -9,15 +9,7 @@ import numpy as np
 import argparse
 
 from cp3_llbb.CommonTools.slurmTools import slurmSubmitter
-
-# Add default ingrid storm package
-sys.path.append('/nfs/soft/python/python-2.7.5-sl6_amd64_gcc44/lib/python2.7/site-packages/storm-0.20-py2.7-linux-x86_64.egg')
-sys.path.append('/nfs/soft/python/python-2.7.5-sl6_amd64_gcc44/lib/python2.7/site-packages/MySQL_python-1.2.3-py2.7-linux-x86_64.egg')
-
-CMSSW_BASE = os.environ['CMSSW_BASE']
-SCRAM_ARCH = os.environ['SCRAM_ARCH']
-sys.path.append(os.path.join(CMSSW_BASE, 'bin', SCRAM_ARCH))
-from SAMADhi import Dataset, Sample, DbStore
+from cp3_llbb.SAMADhi.SAMADhi import Dataset, Sample, DbStore
 
 import inspect
 scriptDir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
