@@ -230,17 +230,17 @@ class GridReweighting:
     def library_dirs(self):
         return [
                 os.path.join(self.scriptDir, "..", "common", "MatrixElements", "pp_hh_5coup", "build"),
-                "/nfs/scratch/fynu/swertz/Madgraph/cmssw_madgraph_lp/pp_hh_all_MV_standalone/SubProcesses/P0_gg_hh/",
-                "/nfs/scratch/fynu/swertz/Madgraph/cmssw_madgraph_lp/pp_hh_all_MV_standalone/SubProcesses/P1_gg_hh/",
-                "/nfs/scratch/fynu/swertz/Madgraph/cmssw_madgraph_lp/pp_hh_all_MV_standalone/SubProcesses/P2_gg_hh/",
-                os.path.join(self.scriptDir, "..", "common", "MatrixElements", "pp_hh_tree_MV", "build"),
+                #"/nfs/scratch/fynu/swertz/Madgraph/cmssw_madgraph_lp/pp_hh_all_MV_standalone/SubProcesses/P0_gg_hh/",
+                #"/nfs/scratch/fynu/swertz/Madgraph/cmssw_madgraph_lp/pp_hh_all_MV_standalone/SubProcesses/P1_gg_hh/",
+                #"/nfs/scratch/fynu/swertz/Madgraph/cmssw_madgraph_lp/pp_hh_all_MV_standalone/SubProcesses/P2_gg_hh/",
+                #os.path.join(self.scriptDir, "..", "common", "MatrixElements", "pp_hh_tree_MV", "build"),
             ]
 
     def libraries(self):
         return [
                 "libme_pp_hh_5coup.a",
-                "libhhWrapper0.a", "libhhWrapper1.a", "libhhWrapper2.a", "gfortran", "m", "quadmath",
-                "libme_pp_hh_tree_MV_standalone.a",
+                # "libhhWrapper0.a", "libhhWrapper1.a", "libhhWrapper2.a", "gfortran", "m", "quadmath",
+                # "libme_pp_hh_tree_MV_standalone.a",
             ]
 
     def sources(self):

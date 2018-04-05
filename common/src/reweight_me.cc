@@ -66,7 +66,7 @@ double HHEFTReweighter::computeXS5(const std::map<std::string, double>& params) 
 ////////////////  MALTONI ET AL. MODEL ////////////////////////////
 ///////////////////////////////////////////////////////////////////
 
-double HHEFTReweighter::getMVParamsME(const LorentzVector& h1, const LorentzVector& h2, const std::map<std::string, double>& params, double alpha_s) {
+/*double HHEFTReweighter::getMVParamsME(const LorentzVector& h1, const LorentzVector& h2, const std::map<std::string, double>& params, double alpha_s) {
     // MadLoop complains if Higgses are not precisely on shell
     auto shell_h1 = put_on_shell(h1, 125);
     auto shell_h2 = put_on_shell(h2, 125);
@@ -152,7 +152,7 @@ void HHEFTReweighter::getCustomMVTermsME(const LorentzVector& h1, const LorentzV
 
         weights_ophig_ops.at(i) = f_11 - f_01;
     }
-}
+}*/
 
 ///////////////////////////////////////////////////////////////////
 ////////////////////////  HELPER STUFF ////////////////////////////
